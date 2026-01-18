@@ -48,7 +48,8 @@ services:
       dockerfile: Dockerfile
       target: frontend-dev
     container_name: beerfinder_frontend
-    command: npm start
+    entrypoint: ["/sbin/tini", "--"]
+    command: ["sh", "/app/frontend/entrypoint-dev.sh"]
     volumes:
       - ./frontend:/app/frontend
       - /app/frontend/node_modules

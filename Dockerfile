@@ -26,6 +26,9 @@ RUN chmod +x /app/backend/entrypoint-dev.sh
 # Stage 2: Frontend (React) - Development
 FROM node:18-alpine as frontend-dev
 
+# Install tini for proper signal handling
+RUN apk add --no-cache tini
+
 WORKDIR /app/frontend
 
 # Copy package files and install dependencies
@@ -35,6 +38,9 @@ RUN if [ -f package-lock.json ]; then npm ci; else npm install; fi
 
 # Copy frontend code
 COPY frontend/ .
+
+# Make entrypoint script executable
+RUN chmod +x /app/frontend/entrypoint-dev.sh
 
 # Set default API URL for build (can be overridden by environment variable)
 ARG REACT_APP_API_URL=http://localhost:8000/api/v1
