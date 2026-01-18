@@ -1,0 +1,630 @@
+{
+    "name": "JWT Authentication Implementation",
+    "description": [
+        "Implement JWT (JSON Web Tokens) authentication system for the BeerFinder project.",
+        "The system will allow users to register, log in, and access protected endpoints.",
+        "djangorestframework-simplejwt will be used in the backend and token handling in the React frontend.",
+        "This implementation follows React best practices from Vercel's React Best Practices guide (vercel-labs agent-skills), including localStorage versioning, lazy state initialization, functional setState updates, and error handling.",
+        "IMPORTANT: We are in day 0 development, so existing migrations will be edited directly instead of creating new 'add' migrations."
+    ],
+    "technologies": {
+        "backend": "Django REST Framework + djangorestframework-simplejwt",
+        "frontend": "React + TypeScript + Axios",
+        "authentication": "JWT (Access Token + Refresh Token)",
+        "storage": "localStorage (frontend)"
+    },
+    "tasks": [
+        {
+            "name": "Backend - Base Installation and Configuration",
+            "tasks": [
+                "Install djangorestframework-simplejwt in requirements.txt",
+                "Add 'rest_framework_simplejwt' to INSTALLED_APPS in settings.py",
+                "Configure REST_FRAMEWORK in settings.py to use JWT authentication",
+                "Configure SIMPLE_JWT in settings.py with expiration times and refresh token rotation",
+                "Update CORS settings if necessary to allow credentials"
+            ],
+            "files_to_edit": [
+                "backend/requirements.txt",
+                "backend/beerfinder/settings.py"
+            ],
+            "details": {
+                "requirements.txt": "Add line: djangorestframework-simplejwt==5.3.1 (or version compatible with Django 5.0.1)",
+                "settings.py": {
+                    "INSTALLED_APPS": "Add 'rest_framework_simplejwt' after 'rest_framework'",
+                    "REST_FRAMEWORK": {
+                        "DEFAULT_AUTHENTICATION_CLASSES": "Change from [] to ['rest_framework_simplejwt.authentication.JWTAuthentication']",
+                        "DEFAULT_PERMISSION_CLASSES": "Change from 'AllowAny' to 'rest_framework.permissions.IsAuthenticated' for protected endpoints (or use specific permissions per viewset)"
+                    },
+                    "SIMPLE_JWT": {
+                        "ACCESS_TOKEN_LIFETIME": "timedelta(minutes=60) - access token valid for 1 hour",
+                        "REFRESH_TOKEN_LIFETIME": "timedelta(days=7) - refresh token valid for 7 days",
+                        "ROTATE_REFRESH_TOKENS": "True - generates new refresh token on each refresh",
+                        "BLACKLIST_AFTER_ROTATION": "True - invalidates the previous refresh token",
+                        "ALGORITHM": "'HS256'",
+                        "SIGNING_KEY": "Django SECRET_KEY",
+                        "AUTH_HEADER_TYPES": "('Bearer',)"
+                    }
+                }
+            }
+        },
+        {
+            "name": "Backend - Create Authentication Serializers",
+            "tasks": [
+                "Create file backend/api/serializers.py (if it doesn't exist, it already exists but verify)",
+                "Add UserRegistrationSerializer in serializers.py",
+                "Add UserSerializer to get authenticated user information",
+                "Validate that existing serializers (POISerializer, etc.) are not affected"
+            ],
+            "files_to_edit": [
+                "backend/api/serializers.py"
+            ],
+            "details": {
+                "UserRegistrationSerializer": {
+                    "fields": "username, email, password, password_confirm",
+                    "validations": "Validate that password and password_confirm match, validate email format",
+                    "write_only": "password must be write_only",
+                    "create_method": "Use Django's create_user to hash the password correctly"
+                },
+                "UserSerializer": {
+                    "fields": "id, username, email, first_name, last_name",
+                    "purpose": "To return authenticated user information without exposing password"
+                }
+            }
+        },
+        {
+            "name": "Backend - Create Authentication Views",
+            "tasks": [
+                "Create file backend/api/auth_views.py (new file)",
+                "Create RegisterView (APIView) for user registration",
+                "Create UserProfileView (APIView or ViewSet) to get/update authenticated user profile",
+                "Verify that existing views (POIViewSet, etc.) work with optional or required authentication as needed"
+            ],
+            "files_to_create": [
+                "backend/api/auth_views.py"
+            ],
+            "files_to_edit": [
+                "backend/api/views.py"
+            ],
+            "details": {
+                "RegisterView": {
+                    "method": "POST",
+                    "endpoint": "/api/v1/auth/register/",
+                    "functionality": "Create new user, return JWT tokens (access + refresh)",
+                    "response": "{'access': token, 'refresh': token, 'user': UserSerializer(user)}"
+                },
+                "UserProfileView": {
+                    "methods": ["GET", "PATCH"],
+                    "endpoint": "/api/v1/auth/profile/",
+                    "authentication": "Required (IsAuthenticated)",
+                    "GET": "Return authenticated user information",
+                    "PATCH": "Allow updating email, first_name, last_name (not password here)"
+                }
+            }
+        },
+        {
+            "name": "Backend - Configure Authentication URLs",
+            "tasks": [
+                "Edit backend/api/urls.py to add authentication routes",
+                "Add routes for login, refresh, register and profile",
+                "Use TokenObtainPairView and TokenRefreshView from simplejwt for login and refresh",
+                "Verify that existing routes (/pois/, /items/, etc.) continue to work"
+            ],
+            "files_to_edit": [
+                "backend/api/urls.py"
+            ],
+            "details": {
+                "urls_to_add": [
+                    "path('auth/login/', TokenObtainPairView.as_view(), name='token_obtain_pair')",
+                    "path('auth/refresh/', TokenRefreshView.as_view(), name='token_refresh')",
+                    "path('auth/register/', RegisterView.as_view(), name='register')",
+                    "path('auth/profile/', UserProfileView.as_view(), name='user_profile')"
+                ],
+                "imports_needed": [
+                    "from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView",
+                    "from .auth_views import RegisterView, UserProfileView"
+                ]
+            }
+        },
+        {
+            "name": "Backend - Update Permissions in Existing Views",
+            "tasks": [
+                "Review backend/api/views.py",
+                "Decide which endpoints require authentication and which are public",
+                "Update POIViewSet: probably list and retrieve public, create/update/delete require auth",
+                "Update ItemViewSet according to business needs",
+                "Update ItemRequestViewSet: create probably requires auth, list may be public or not"
+            ],
+            "files_to_edit": [
+                "backend/api/views.py"
+            ],
+            "details": {
+                "POIViewSet": {
+                    "permission_classes": "Use @action decorator or get_permissions() to differentiate",
+                    "list": "AllowAny (public)",
+                    "retrieve": "AllowAny (public)",
+                    "create": "IsAuthenticated (requires login)",
+                    "update": "IsAuthenticated or IsOwner (only creator)",
+                    "delete": "IsAuthenticated or IsOwner"
+                },
+                "ItemViewSet": {
+                    "list": "AllowAny (public)",
+                    "retrieve": "AllowAny (public)",
+                    "create/update/delete": "IsAuthenticated or IsAdminUser (only admins can modify items)"
+                },
+                "ItemRequestViewSet": {
+                    "list": "IsAuthenticated (users see their own requests) or IsAdminUser (admins see all)",
+                    "create": "IsAuthenticated (any authenticated user can create request)",
+                    "update": "IsAdminUser (only admins can approve/reject)"
+                }
+            }
+        },
+        {
+            "name": "Backend - Verify Migrations",
+            "tasks": [
+                "Review backend/api/migrations/0001_initial.py",
+                "Verify that Django User models are already included (dependencies include AUTH_USER_MODEL)",
+                "DO NOT create new migrations for authentication (we use native Django User)",
+                "If User needs to be extended in the future, edit 0001_initial.py directly (day 0 development)",
+                "Verify that created_by and requested_by in existing models already reference AUTH_USER_MODEL correctly"
+            ],
+            "files_to_review": [
+                "backend/api/migrations/0001_initial.py",
+                "backend/api/models.py"
+            ],
+            "details": {
+                "migration_check": "The 0001_initial.py migration already includes dependencies: [migrations.swappable_dependency(settings.AUTH_USER_MODEL)], so no changes are needed",
+                "models_check": "Verify that POI.created_by and ItemRequest.requested_by already use models.ForeignKey(User, ...) correctly",
+                "no_new_migrations": "DO NOT run makemigrations for auth, only use native Django User"
+            }
+        },
+        {
+            "name": "Frontend - Create Authentication Service",
+            "tasks": [
+                "Create file frontend/src/services/authService.ts",
+                "Implement login(username, password) function that calls /auth/login/",
+                "Implement register(userData) function that calls /auth/register/",
+                "Implement refreshToken() function that uses stored refresh token",
+                "Implement logout() function that clears tokens from localStorage",
+                "Implement getCurrentUser() function that gets authenticated user profile",
+                "Save tokens in localStorage with versioning (access_token:v1 and refresh_token:v1)",
+                "Wrap all localStorage operations in try-catch blocks (handles incognito/quota errors)",
+                "Store only tokens, not full user objects (data minimization)"
+            ],
+            "files_to_create": [
+                "frontend/src/services/authService.ts"
+            ],
+            "details": {
+                "authService.ts": {
+                    "baseURL": "Use the same getApiBaseUrl() logic as in poiService.ts",
+                    "versioning": "Define const VERSION = 'v1' at module level for localStorage keys",
+                    "best_practices": {
+                        "versioning": "Use versioned keys: `access_token:${VERSION}` and `refresh_token:${VERSION}` to prevent schema conflicts",
+                        "error_handling": "Wrap all localStorage.setItem/getItem/removeItem in try-catch blocks (throws in incognito/private browsing, quota exceeded, or disabled)",
+                        "data_minimization": "Only store tokens (access and refresh), NOT full user objects or sensitive data",
+                        "storage_keys": "access_token:v1, refresh_token:v1 (versioned for future migrations)"
+                    },
+                    "login": {
+                        "endpoint": "POST /api/v1/auth/login/",
+                        "body": "{username, password}",
+                        "response": "{access, refresh}",
+                        "storage": "try { localStorage.setItem(`access_token:${VERSION}`, access); localStorage.setItem(`refresh_token:${VERSION}`, refresh); } catch {}"
+                    },
+                    "register": {
+                        "endpoint": "POST /api/v1/auth/register/",
+                        "body": "{username, email, password, password_confirm}",
+                        "response": "{access, refresh, user}",
+                        "storage": "Save only tokens (access and refresh), same as login with versioning and try-catch"
+                    },
+                    "refreshToken": {
+                        "endpoint": "POST /api/v1/auth/refresh/",
+                        "body": "{refresh: refresh_token}",
+                        "response": "{access}",
+                        "storage": "try { localStorage.setItem(`access_token:${VERSION}`, access); } catch {}"
+                    },
+                    "logout": {
+                        "action": "try { localStorage.removeItem(`access_token:${VERSION}`); localStorage.removeItem(`refresh_token:${VERSION}`); } catch {}"
+                    },
+                    "getCurrentUser": {
+                        "endpoint": "GET /api/v1/auth/profile/",
+                        "headers": "Authorization: Bearer {access_token}",
+                        "response": "User object",
+                        "note": "Do NOT store user object in localStorage, only tokens"
+                    }
+                }
+            }
+        },
+        {
+            "name": "Frontend - Create Authentication Context",
+            "tasks": [
+                "Create file frontend/src/contexts/AuthContext.tsx",
+                "Create AuthProvider component that wraps the app",
+                "Implement state for user, isAuthenticated, isLoading",
+                "Use lazy state initialization for reading from localStorage (useState with function)",
+                "Use functional setState updates to prevent stale closures",
+                "Implement functions: login, register, logout, refreshToken",
+                "Implement effect to verify token when app loads",
+                "Implement axios interceptor to automatically add token to requests"
+            ],
+            "files_to_create": [
+                "frontend/src/contexts/AuthContext.tsx"
+            ],
+            "files_to_edit": [
+                "frontend/src/App.tsx"
+            ],
+            "details": {
+                "AuthContext.tsx": {
+                    "state": {
+                        "user": "User | null",
+                        "isAuthenticated": "boolean",
+                        "isLoading": "boolean"
+                    },
+                    "best_practices": {
+                        "lazy_initialization": "Use useState(() => { try { const token = localStorage.getItem(`access_token:${VERSION}`); return token ? { isAuthenticated: true } : { isAuthenticated: false }; } catch { return { isAuthenticated: false }; } }) to avoid reading localStorage on every render",
+                        "functional_setState": "Use functional updates: setUser(curr => ({ ...curr, ...updates })) instead of setUser({ ...user, ...updates }) to prevent stale closures and avoid dependencies",
+                        "stable_callbacks": "Use functional setState in useCallback to create stable callback references without dependencies"
+                    },
+                    "functions": {
+                        "login": "Call authService.login(), save tokens, update state using functional setState: setUser(() => user), setIsAuthenticated(() => true)",
+                        "register": "Call authService.register(), save tokens, update state using functional setState",
+                        "logout": "Call authService.logout(), clear state using functional setState: setUser(() => null), setIsAuthenticated(() => false)",
+                        "refreshToken": "Call authService.refreshToken() when access token expires, use functional setState for updates"
+                    },
+                    "useEffect": [
+                        "On mount: check if access_token:v1 exists in localStorage (already done via lazy initialization)",
+                        "If token exists: call getCurrentUser() to verify validity and update user state",
+                        "If token expired: try refreshToken() automatically",
+                        "Use functional setState in all state updates within effects"
+                    ],
+                    "axios_interceptor": {
+                        "request": "Add Authorization header with Bearer token to all requests (read from versioned localStorage key)",
+                        "response_error": "If 401 (Unauthorized): try refreshToken() and resend request, if fails: logout()"
+                    }
+                },
+                "App.tsx": {
+                    "wrap": "Wrap <Routes> with <AuthProvider>"
+                }
+            }
+        },
+        {
+            "name": "Frontend - Update Axios Configuration",
+            "tasks": [
+                "Edit frontend/src/services/poiService.ts",
+                "Add request interceptor to include JWT token in headers",
+                "Add response interceptor to handle 401 errors (expired token)",
+                "Create file frontend/src/utils/axiosConfig.ts for centralized axios configuration (optional, best practice)"
+            ],
+            "files_to_edit": [
+                "frontend/src/services/poiService.ts"
+            ],
+            "files_to_create": [
+                "frontend/src/utils/axiosConfig.ts (optional but recommended)"
+            ],
+            "details": {
+                "axios_interceptor": {
+                    "request": "axios.interceptors.request.use((config) => { try { const token = localStorage.getItem(`access_token:${VERSION}`); if (token) { config.headers.Authorization = `Bearer ${token}`; } } catch {} return config; })",
+                    "response_error": "axios.interceptors.response.use(response => response, async (error) => { if (error.response?.status === 401) { // Try refresh token and resend request } })"
+                },
+                "centralized_config": "If axiosConfig.ts is created, export configured axios instance and use it in poiService and authService"
+            }
+        },
+        {
+            "name": "Frontend - Create Login and Registration Components",
+            "tasks": [
+                "Create file frontend/src/components/LoginForm.tsx",
+                "Create file frontend/src/components/RegisterForm.tsx",
+                "Create file frontend/src/components/LoginForm.css",
+                "Create file frontend/src/components/RegisterForm.css",
+                "Implement forms with basic validation",
+                "Connect forms with AuthContext (use useAuth hook)"
+            ],
+            "files_to_create": [
+                "frontend/src/components/LoginForm.tsx",
+                "frontend/src/components/LoginForm.css",
+                "frontend/src/components/RegisterForm.tsx",
+                "frontend/src/components/RegisterForm.css"
+            ],
+            "details": {
+                "LoginForm.tsx": {
+                    "fields": "username (text), password (password)",
+                    "validation": "Required fields, show backend errors",
+                    "onSubmit": "Call authContext.login(username, password)",
+                    "onSuccess": "Redirect to / (home) or previous page",
+                    "error_handling": "Show backend error messages (e.g., 'Invalid credentials')"
+                },
+                "RegisterForm.tsx": {
+                    "fields": "username (text), email (email), password (password), password_confirm (password)",
+                    "validation": "Validate that password and password_confirm match, email format, required fields",
+                    "onSubmit": "Call authContext.register(userData)",
+                    "onSuccess": "Redirect to / (home) or welcome page",
+                    "error_handling": "Show backend validation errors (e.g., 'Username already exists')"
+                }
+            }
+        },
+        {
+            "name": "Frontend - Create Authentication Page",
+            "tasks": [
+                "Create file frontend/src/pages/AuthPage.tsx",
+                "Create file frontend/src/pages/AuthPage.css",
+                "Implement tabs or toggle to switch between Login and Register",
+                "Include LoginForm and RegisterForm in the page",
+                "Add route /auth or /login in App.tsx"
+            ],
+            "files_to_create": [
+                "frontend/src/pages/AuthPage.tsx",
+                "frontend/src/pages/AuthPage.css"
+            ],
+            "files_to_edit": [
+                "frontend/src/App.tsx"
+            ],
+            "details": {
+                "AuthPage.tsx": {
+                    "layout": "Centered, modern and clean design",
+                    "tabs": "Toggle between 'Login' and 'Register' or show both forms",
+                    "styling": "Use modern CSS, responsive, consistent with the rest of the app"
+                },
+                "App.tsx": {
+                    "route": "Add <Route path='/auth' element={<AuthPage />} /> or <Route path='/login' element={<AuthPage />} />"
+                }
+            }
+        },
+        {
+            "name": "Frontend - Create User Profile Component",
+            "tasks": [
+                "Create file frontend/src/components/UserProfile.tsx (optional, to show user info)",
+                "Create file frontend/src/components/UserMenu.tsx (dropdown with options: Profile, Logout)",
+                "Add UserMenu in the application header/navbar",
+                "Display authenticated user's username"
+            ],
+            "files_to_create": [
+                "frontend/src/components/UserMenu.tsx",
+                "frontend/src/components/UserMenu.css"
+            ],
+            "files_to_edit": [
+                "frontend/src/pages/MapPage.tsx (or wherever the header is)"
+            ],
+            "details": {
+                "UserMenu.tsx": {
+                    "display": "Show username or user avatar",
+                    "dropdown": "Menu with options: View Profile, Logout",
+                    "logout": "Call authContext.logout() and redirect to /auth"
+                }
+            }
+        },
+        {
+            "name": "Frontend - Implement Protected Routes",
+            "tasks": [
+                "Create file frontend/src/components/ProtectedRoute.tsx",
+                "Implement component that checks isAuthenticated from AuthContext",
+                "If not authenticated: redirect to /auth",
+                "If authenticated: render children (protected component)",
+                "Apply ProtectedRoute to routes that require authentication (e.g., create POI)"
+            ],
+            "files_to_create": [
+                "frontend/src/components/ProtectedRoute.tsx"
+            ],
+            "files_to_edit": [
+                "frontend/src/App.tsx"
+            ],
+            "details": {
+                "ProtectedRoute.tsx": {
+                    "logic": "if (!isAuthenticated) { return <Navigate to='/auth' /> } else { return children }",
+                    "loading": "Show loading spinner while isLoading is true"
+                },
+                "usage": "Wrap routes that require auth: <Route path='/create' element={<ProtectedRoute><CreatePOIPage /></ProtectedRoute>} />"
+            }
+        },
+        {
+            "name": "Frontend - Update CreatePOIModal to Use Authentication",
+            "tasks": [
+                "Review frontend/src/components/CreatePOIModal.tsx",
+                "Verify that API calls work with JWT tokens (should work automatically with interceptor)",
+                "Optional: Show message if user is not authenticated when trying to create POI",
+                "Optional: Redirect to /auth if not authenticated"
+            ],
+            "files_to_edit": [
+                "frontend/src/components/CreatePOIModal.tsx"
+            ],
+            "details": {
+                "check_auth": "Use useAuth() to verify isAuthenticated before showing modal or allowing create",
+                "error_handling": "If API returns 401, interceptor should handle refresh token automatically"
+            }
+        },
+        {
+            "name": "Frontend - Update package.json if Necessary",
+            "tasks": [
+                "Verify that all necessary dependencies are in package.json",
+                "axios is already installed (✓)",
+                "react-router-dom is already installed (✓)",
+                "No additional dependencies needed for JWT (manual token handling)"
+            ],
+            "files_to_review": [
+                "frontend/package.json"
+            ],
+            "details": {
+                "dependencies_check": "axios and react-router-dom are already installed, no changes needed"
+            }
+        },
+        {
+            "name": "Testing and Verification",
+            "tasks": [
+                "Test new user registration from frontend",
+                "Test login with valid credentials",
+                "Test login with invalid credentials (should show error)",
+                "Verify that tokens are saved in localStorage",
+                "Test access to protected endpoint with valid token",
+                "Test access to protected endpoint without token (should return 401)",
+                "Test refresh token when access token expires",
+                "Test logout (should clear tokens and redirect)",
+                "Verify that unauthenticated users can view POIs (public list/retrieve)",
+                "Verify that only authenticated users can create POIs"
+            ],
+            "test_scenarios": [
+                "Successful registration → tokens saved → user authenticated",
+                "Successful login → tokens saved → user authenticated",
+                "Create POI without authentication → should fail with 401",
+                "Create POI with authentication → should work",
+                "Access token expired → automatic refresh → successful request",
+                "Refresh token expired → automatic logout → redirect to /auth"
+            ]
+        }
+    ],
+    "musts": [
+        "DO NOT create new migrations for authentication - use native Django User",
+        "If it's necessary to modify User-related models, edit 0001_initial.py directly (day 0 development)",
+        "All public endpoints (list POIs, view POI) must continue to work without authentication",
+        "Tokens must be handled securely (localStorage is acceptable for development, consider httpOnly cookies in production)",
+        "Implement automatic refresh token when access token expires",
+        "Handle authentication errors in a user-friendly way in the frontend",
+        "Maintain consistency in UI/UX design with the rest of the application",
+        "Follow React best practices: localStorage versioning, lazy state initialization, functional setState, try-catch for storage operations"
+    ],
+    "considerations": {
+        "security": {
+            "development": "localStorage is acceptable for development",
+            "production": "Consider httpOnly cookies for greater security (requires changes in CORS and backend)",
+            "token_expiration": "Access token: 1 hour, Refresh token: 7 days (configurable in settings.py)"
+        },
+        "user_experience": {
+            "auto_refresh": "Implement automatic token refresh to not interrupt user experience",
+            "error_messages": "Show clear error messages in Spanish if necessary",
+            "loading_states": "Show loading states during authentication"
+        },
+        "future_improvements": [
+            "Implement 'Remember me' to extend session time",
+            "Add password recovery (password reset)",
+            "Add email verification",
+            "Implement more granular roles and permissions (admin, moderator, user)",
+            "Add OAuth2/OpenID Connect for login with Google, GitHub, etc."
+        ]
+    },
+    "react_best_practices_applied": {
+        "localStorage_versioning": {
+            "rule": "Version and Minimize localStorage Data (client-localstorage-schema.md)",
+            "implementation": "Use versioned keys: `access_token:v1` and `refresh_token:v1` to prevent schema conflicts and enable future migrations",
+            "benefits": "Schema evolution, reduced storage size, prevents storing tokens/PII/internal flags"
+        },
+        "localStorage_error_handling": {
+            "rule": "Always wrap localStorage operations in try-catch",
+            "implementation": "All localStorage.setItem/getItem/removeItem calls wrapped in try-catch blocks",
+            "reason": "localStorage throws in incognito/private browsing (Safari, Firefox), when quota exceeded, or when disabled"
+        },
+        "lazy_state_initialization": {
+            "rule": "Use Lazy State Initialization (rerender-lazy-state-init.md)",
+            "implementation": "Use useState(() => { /* read from localStorage */ }) instead of useState(localStorage.getItem(...))",
+            "benefits": "Avoids reading localStorage on every render, only runs once on initial mount"
+        },
+        "functional_setState": {
+            "rule": "Use Functional setState Updates (rerender-functional-setstate.md)",
+            "implementation": "Use setUser(curr => ({ ...curr, ...updates })) instead of setUser({ ...user, ...updates })",
+            "benefits": "Prevents stale closures, creates stable callback references, eliminates unnecessary dependencies, prevents bugs"
+        },
+        "data_minimization": {
+            "rule": "Store minimal fields from server responses",
+            "implementation": "Only store access_token and refresh_token in localStorage, NOT full user objects",
+            "benefits": "Reduced storage size, prevents storing sensitive data, faster localStorage operations"
+        },
+        "references": {
+            "guide": "vercel-labs agent-skills main skills-react-best-practices/",
+            "relevant_rules": [
+                "client-localstorage-schema.md",
+                "js-cache-storage.md",
+                "rerender-lazy-state-init.md",
+                "rerender-functional-setstate.md"
+            ]
+        }
+    },
+    "file_changes_summary": {
+        "backend_files_to_edit": [
+            "backend/requirements.txt",
+            "backend/beerfinder/settings.py",
+            "backend/api/serializers.py",
+            "backend/api/views.py",
+            "backend/api/urls.py"
+        ],
+        "backend_files_to_create": [
+            "backend/api/auth_views.py"
+        ],
+        "backend_files_to_review": [
+            "backend/api/migrations/0001_initial.py (verify, do not edit unless necessary)"
+        ],
+        "frontend_files_to_edit": [
+            "frontend/src/App.tsx",
+            "frontend/src/services/poiService.ts",
+            "frontend/src/components/CreatePOIModal.tsx",
+            "frontend/src/pages/MapPage.tsx (to add UserMenu)"
+        ],
+        "frontend_files_to_create": [
+            "frontend/src/services/authService.ts",
+            "frontend/src/contexts/AuthContext.tsx",
+            "frontend/src/components/LoginForm.tsx",
+            "frontend/src/components/LoginForm.css",
+            "frontend/src/components/RegisterForm.tsx",
+            "frontend/src/components/RegisterForm.css",
+            "frontend/src/components/UserMenu.tsx",
+            "frontend/src/components/UserMenu.css",
+            "frontend/src/components/ProtectedRoute.tsx",
+            "frontend/src/pages/AuthPage.tsx",
+            "frontend/src/pages/AuthPage.css",
+            "frontend/src/utils/axiosConfig.ts (optional)"
+        ]
+    },
+    "implementation_order": [
+        "1. Backend: Install and configure djangorestframework-simplejwt",
+        "2. Backend: Create authentication serializers",
+        "3. Backend: Create authentication views",
+        "4. Backend: Configure authentication URLs",
+        "5. Backend: Update permissions in existing views",
+        "6. Frontend: Create authentication service",
+        "7. Frontend: Create authentication context",
+        "8. Frontend: Update axios configuration",
+        "9. Frontend: Create login/registration components",
+        "10. Frontend: Create authentication page",
+        "11. Frontend: Implement protected routes",
+        "12. Frontend: Add UserMenu and update UI",
+        "13. Testing: Test all authentication flows"
+    ],
+    "output_format": {
+        "status": "COMPLETED",
+        "current_task": 13,
+        "current_subtask": 0,
+        "log": [
+            "Task 0: Backend - Base Installation and Configuration - COMPLETED",
+            "Task 1: Backend - Create Authentication Serializers - COMPLETED",
+            "Task 2: Backend - Create Authentication Views - COMPLETED",
+            "Task 3: Backend - Configure Authentication URLs - COMPLETED",
+            "Task 4: Backend - Update Permissions in Existing Views - COMPLETED",
+            "Task 5: Backend - Verify Migrations - COMPLETED",
+            "Task 6: Frontend - Create Authentication Service - COMPLETED",
+            "Task 7: Frontend - Create Authentication Context - COMPLETED",
+            "Task 8: Frontend - Update Axios Configuration - COMPLETED",
+            "Task 9: Frontend - Create Login and Registration Components - COMPLETED",
+            "Task 10: Frontend - Create Authentication Page - COMPLETED",
+            "Task 11: Frontend - Create User Profile Component - COMPLETED",
+            "Task 12: Frontend - Implement Protected Routes - COMPLETED",
+            "Task 13: Frontend - Update CreatePOIModal to Use Authentication - COMPLETED"
+        ],
+        "command_output": "",
+        "failed_command": "",
+        "next_action": "ALL_TASKS_COMPLETED",
+        "files_created": [
+            "backend/api/auth_views.py",
+            "frontend/src/services/authService.ts",
+            "frontend/src/utils/axiosConfig.ts",
+            "frontend/src/contexts/AuthContext.tsx",
+            "frontend/src/components/LoginForm.tsx",
+            "frontend/src/components/LoginForm.css",
+            "frontend/src/components/RegisterForm.tsx",
+            "frontend/src/components/RegisterForm.css",
+            "frontend/src/components/UserMenu.tsx",
+            "frontend/src/components/UserMenu.css",
+            "frontend/src/components/ProtectedRoute.tsx",
+            "frontend/src/pages/AuthPage.tsx",
+            "frontend/src/pages/AuthPage.css"
+        ],
+        "dirs_created": [
+            "frontend/src/contexts"
+        ],
+        "services_running": [],
+        "errors": []
+    }
+}

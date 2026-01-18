@@ -1,5 +1,6 @@
 from rest_framework import viewsets, status
 from rest_framework.decorators import action
+from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
 from django.contrib.gis.geos import Point
 from .models import POI, Item, ItemRequest
@@ -14,6 +15,16 @@ class POIViewSet(viewsets.ModelViewSet):
     """
     queryset = POI.objects.all()
     serializer_class = POISerializer
+
+    def get_permissions(self):
+        """
+        Instantiates and returns the list of permissions that this view requires.
+        """
+        if self.action in ['list', 'retrieve']:
+            permission_classes = [AllowAny]
+        else:
+            permission_classes = [IsAuthenticated]
+        return [permission() for permission in permission_classes]
 
     def get_serializer_class(self):
         if self.action == 'list':
@@ -92,6 +103,16 @@ class ItemViewSet(viewsets.ModelViewSet):
     queryset = Item.objects.all()
     serializer_class = ItemSerializer
 
+    def get_permissions(self):
+        """
+        Instantiates and returns the list of permissions that this view requires.
+        """
+        if self.action in ['list', 'retrieve']:
+            permission_classes = [AllowAny]
+        else:
+            permission_classes = [IsAdminUser]
+        return [permission() for permission in permission_classes]
+
 
 class ItemRequestViewSet(viewsets.ModelViewSet):
     """
@@ -100,5 +121,24 @@ class ItemRequestViewSet(viewsets.ModelViewSet):
     queryset = ItemRequest.objects.all()
     serializer_class = ItemRequestSerializer
 
+    def get_permissions(self):
+        """
+        Instantiates and returns the list of permissions that this view requires.
+        """
+        if self.action == 'update' or self.action == 'partial_update':
+            permission_classes = [IsAdminUser]
+        else:
+            permission_classes = [IsAuthenticated]
+        return [permission() for permission in permission_classes]
+
+    def get_queryset(self):
+        """
+        Filter queryset: users see their own requests, admins see all.
+        """
+        queryset = super().get_queryset()
+        if not self.request.user.is_staff:
+            queryset = queryset.filter(requested_by=self.request.user)
+        return queryset
+
     def perform_create(self, serializer):
-        serializer.save(requested_by=self.request.user if self.request.user.is_authenticated else None)
+        serializer.save(requested_by=self.request.user)

@@ -1,0 +1,21 @@
+.login-form {
+  width: 100%;
+}
+
+.form-title {
+  margin: 0 0 var(--spacing-xl) 0;
+  font-size: var(--font-size-2xl);
+  font-weight: 600;
+  text-align: center;
+  color: var(--color-text);
+}
+
+.form-error-message {
+  padding: var(--spacing-sm) var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+  background-color: #ffebee;
+  color: var(--color-danger);
+  border-radius: var(--radius-md);
+  border: 1px solid #ef5350;
+  font-size: var(--font-size-sm);
+}

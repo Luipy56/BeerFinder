@@ -1,16 +1,30 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import './MapComponent.css';
 import { POI, CreatePOIDto } from '../types/poi';
 import POIService from '../services/poiService';
 import CreatePOIModal from './CreatePOIModal';
+import ViewPOIModal from './ViewPOIModal';
+import EditPOIModal from './EditPOIModal';
+import DeletePOIModal from './DeletePOIModal';
+import { useAuth } from '../contexts/AuthContext';
+import { useToast } from '../contexts/ToastContext';
+import { formatPrice } from '../utils/format';
 
 const MapComponent: React.FC = () => {
+  const { isAuthenticated } = useAuth();
+  const { showSuccess, showError } = useToast();
+  const navigate = useNavigate();
   const [pois, setPois] = useState<POI[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState<boolean>(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState<boolean>(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
   const [clickedLocation, setClickedLocation] = useState<{ lat: number; lng: number } | null>(null);
+  const [selectedPOI, setSelectedPOI] = useState<POI | null>(null);
 
   useEffect(() => {
     loadPOIs();
@@ -37,8 +51,31 @@ const MapComponent: React.FC = () => {
   };
 
   const handleMapClick = (lat: number, lng: number) => {
+    // Close ViewPOIModal if open when clicking on map
+    if (isViewModalOpen) {
+      setIsViewModalOpen(false);
+      setSelectedPOI(null);
+      return;
+    }
+    
+    if (!isAuthenticated) {
+      if (window.confirm('You need to be logged in to create a POI. Would you like to login?')) {
+        navigate('/auth');
+      }
+      return;
+    }
     setClickedLocation({ lat, lng });
-    setIsModalOpen(true);
+    setIsCreateModalOpen(true);
+  };
+
+  const handleMarkerClick = (poi: POI) => {
+    setSelectedPOI(poi);
+    // Don't open ViewPOIModal here - only open it when "View Details" button is clicked
+  };
+
+  const handleViewDetails = (poi: POI) => {
+    setSelectedPOI(poi);
+    setIsViewModalOpen(true);
   };
 
   const handleCreatePOI = async (name: string, description: string, price?: number) => {
@@ -53,20 +90,62 @@ const MapComponent: React.FC = () => {
         price,
       };
 
-      console.log('Creating POI with data:', newPOI);
       const createdPOI = await POIService.createPOI(newPOI);
       setPois([...pois, createdPOI]);
-      console.log('POI created successfully:', createdPOI);
+      showSuccess('POI created successfully!');
     } catch (error: any) {
       console.error('Error creating POI:', error);
-      console.error('Error details:', {
-        message: error.message,
-        code: error.code,
-        config: error.config,
-        response: error.response,
-      });
-      alert(`Failed to create POI: ${error.message || 'Network error'}. Please check the console for details.`);
+      showError(error.response?.data?.detail || error.message || 'Failed to create POI. Please try again.');
+      throw error;
     }
+  };
+
+  const handleEditPOI = async (name: string, description: string, price?: number) => {
+    if (!selectedPOI) return;
+
+    try {
+      const updatedPOI = await POIService.updatePOI(selectedPOI.id, {
+        name,
+        description,
+        price,
+      });
+      setPois(pois.map((p) => (p.id === selectedPOI.id ? updatedPOI : p)));
+      setIsEditModalOpen(false);
+      setIsViewModalOpen(false);
+      setSelectedPOI(updatedPOI);
+      showSuccess('POI updated successfully!');
+    } catch (error: any) {
+      console.error('Error updating POI:', error);
+      showError(error.response?.data?.detail || error.message || 'Failed to update POI. Please try again.');
+      throw error;
+    }
+  };
+
+  const handleDeletePOI = async () => {
+    if (!selectedPOI) return;
+
+    try {
+      await POIService.deletePOI(selectedPOI.id);
+      setPois(pois.filter((p) => p.id !== selectedPOI.id));
+      setIsDeleteModalOpen(false);
+      setIsViewModalOpen(false);
+      setSelectedPOI(null);
+      showSuccess('POI deleted successfully!');
+    } catch (error: any) {
+      console.error('Error deleting POI:', error);
+      showError(error.response?.data?.detail || error.message || 'Failed to delete POI. Please try again.');
+      throw error;
+    }
+  };
+
+  const handleOpenEdit = () => {
+    setIsViewModalOpen(false);
+    setIsEditModalOpen(true);
+  };
+
+  const handleOpenDelete = () => {
+    setIsViewModalOpen(false);
+    setIsDeleteModalOpen(true);
   };
 
   if (loading) {
@@ -86,28 +165,83 @@ const MapComponent: React.FC = () => {
         />
         <MapClickHandler onMapClick={handleMapClick} />
         {pois.map((poi) => (
-          <Marker key={poi.id} position={[poi.latitude, poi.longitude]}>
+          <Marker
+            key={poi.id}
+            position={[poi.latitude, poi.longitude]}
+          >
             <Popup>
-              <div>
+              <div className="poi-popup">
                 <h3>{poi.name}</h3>
-                <p>{poi.description}</p>
-                {poi.price && <p><strong>Price:</strong> ${poi.price.toFixed(2)}</p>}
+                {poi.description && <p>{poi.description}</p>}
+                {poi.price !== undefined && poi.price !== null && (
+                  <p><strong>Price:</strong> ${formatPrice(poi.price)}</p>
+                )}
+                <button
+                  className="btn btn-sm btn-primary"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleViewDetails(poi);
+                  }}
+                  style={{ marginTop: '0.5rem', width: '100%' }}
+                >
+                  View Details
+                </button>
               </div>
             </Popup>
           </Marker>
         ))}
       </MapContainer>
+      {pois.length === 0 && !loading && (
+        <div className="map-empty-state">
+          <h3>No Points of Interest</h3>
+          <p>Click on the map to create your first POI</p>
+        </div>
+      )}
       {clickedLocation && (
         <CreatePOIModal
-          isOpen={isModalOpen}
+          isOpen={isCreateModalOpen}
           onClose={() => {
-            setIsModalOpen(false);
+            setIsCreateModalOpen(false);
             setClickedLocation(null);
           }}
           onSubmit={handleCreatePOI}
           latitude={clickedLocation.lat}
           longitude={clickedLocation.lng}
         />
+      )}
+      {selectedPOI && (
+        <>
+          <ViewPOIModal
+            isOpen={isViewModalOpen}
+            onClose={() => {
+              setIsViewModalOpen(false);
+              setSelectedPOI(null);
+            }}
+            poi={selectedPOI}
+            onEdit={handleOpenEdit}
+            onDelete={handleOpenDelete}
+            canEdit={isAuthenticated}
+            canDelete={isAuthenticated}
+          />
+          <EditPOIModal
+            isOpen={isEditModalOpen}
+            onClose={() => {
+              setIsEditModalOpen(false);
+              setSelectedPOI(null);
+            }}
+            poi={selectedPOI}
+            onSubmit={handleEditPOI}
+          />
+          <DeletePOIModal
+            isOpen={isDeleteModalOpen}
+            onClose={() => {
+              setIsDeleteModalOpen(false);
+              setSelectedPOI(null);
+            }}
+            poi={selectedPOI}
+            onConfirm={handleDeletePOI}
+          />
+        </>
       )}
     </div>
   );

@@ -1,26 +1,35 @@
 import React, { useState, useEffect, useRef } from 'react';
-import './CreatePOIModal.css';
+import { POI } from '../types/poi';
+import './EditPOIModal.css';
 
-interface CreatePOIModalProps {
+interface EditPOIModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (name: string, description: string, price?: number) => void;
-  latitude: number;
-  longitude: number;
+  poi: POI | null;
+  onSubmit: (name: string, description: string, price?: number) => Promise<void>;
 }
 
-const CreatePOIModal: React.FC<CreatePOIModalProps> = ({
+const EditPOIModal: React.FC<EditPOIModalProps> = ({
   isOpen,
   onClose,
+  poi,
   onSubmit,
-  latitude,
-  longitude,
 }) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState('');
+  const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const nameInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (poi) {
+      setName(poi.name);
+      setDescription(poi.description || '');
+      setPrice(poi.price !== undefined && poi.price !== null ? poi.price.toString() : '');
+      setError(null);
+    }
+  }, [poi]);
 
   useEffect(() => {
     if (isOpen && nameInputRef.current) {
@@ -30,23 +39,24 @@ const CreatePOIModal: React.FC<CreatePOIModalProps> = ({
 
   useEffect(() => {
     if (!isOpen) {
-      setName('');
-      setDescription('');
-      setPrice('');
+      setError(null);
       setIsSubmitting(false);
     }
   }, [isOpen]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (name.trim() && !isSubmitting) {
-      setIsSubmitting(true);
-      try {
-        await onSubmit(name, description, price ? parseFloat(price) : undefined);
-        onClose();
-      } catch (error) {
-        setIsSubmitting(false);
-      }
+    if (!name.trim() || isSubmitting || !poi) return;
+
+    setError(null);
+    setIsSubmitting(true);
+
+    try {
+      await onSubmit(name, description, price ? parseFloat(price) : undefined);
+      onClose();
+    } catch (err: any) {
+      setError(err.message || 'Failed to update POI. Please try again.');
+      setIsSubmitting(false);
     }
   };
 
@@ -56,7 +66,7 @@ const CreatePOIModal: React.FC<CreatePOIModalProps> = ({
     }
   };
 
-  if (!isOpen) return null;
+  if (!isOpen || !poi) return null;
 
   return (
     <div
@@ -64,11 +74,11 @@ const CreatePOIModal: React.FC<CreatePOIModalProps> = ({
       onClick={handleOverlayClick}
       role="dialog"
       aria-modal="true"
-      aria-labelledby="create-poi-title"
+      aria-labelledby="edit-poi-title"
     >
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2 id="create-poi-title" className="modal-title">Create New Point of Interest</h2>
+          <h2 id="edit-poi-title" className="modal-title">Edit Point of Interest</h2>
           <button
             className="modal-close"
             onClick={onClose}
@@ -80,29 +90,35 @@ const CreatePOIModal: React.FC<CreatePOIModalProps> = ({
         </div>
         <form onSubmit={handleSubmit}>
           <div className="modal-body">
+            {error && (
+              <div className="form-error-message" role="alert" aria-live="polite">
+                {error}
+              </div>
+            )}
             <div className="form-group">
-              <label htmlFor="name" className="form-label required">
+              <label htmlFor="edit-name" className="form-label required">
                 Name
               </label>
               <input
                 ref={nameInputRef}
                 type="text"
-                id="name"
-                className="form-input"
+                id="edit-name"
+                className={`form-input ${error ? 'error' : ''}`}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
                 placeholder="Enter POI name"
                 disabled={isSubmitting}
                 aria-required="true"
+                aria-invalid={error ? 'true' : 'false'}
               />
             </div>
             <div className="form-group">
-              <label htmlFor="description" className="form-label">
+              <label htmlFor="edit-description" className="form-label">
                 Description
               </label>
               <textarea
-                id="description"
+                id="edit-description"
                 className="form-textarea"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
@@ -112,12 +128,12 @@ const CreatePOIModal: React.FC<CreatePOIModalProps> = ({
               />
             </div>
             <div className="form-group">
-              <label htmlFor="price" className="form-label">
+              <label htmlFor="edit-price" className="form-label">
                 Price
               </label>
               <input
                 type="number"
-                id="price"
+                id="edit-price"
                 className="form-input"
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
@@ -129,7 +145,7 @@ const CreatePOIModal: React.FC<CreatePOIModalProps> = ({
             </div>
             <div className="form-group">
               <span className="form-help">
-                Location: {latitude.toFixed(6)}, {longitude.toFixed(6)}
+                Location: {poi.latitude.toFixed(6)}, {poi.longitude.toFixed(6)}
               </span>
             </div>
           </div>
@@ -147,7 +163,7 @@ const CreatePOIModal: React.FC<CreatePOIModalProps> = ({
               className={`btn btn-primary ${isSubmitting ? 'btn-loading' : ''}`}
               disabled={isSubmitting || !name.trim()}
             >
-              {isSubmitting ? 'Creating...' : 'Create POI'}
+              {isSubmitting ? 'Saving...' : 'Save Changes'}
             </button>
           </div>
         </form>
@@ -156,4 +172,4 @@ const CreatePOIModal: React.FC<CreatePOIModalProps> = ({
   );
 };
 
-export default CreatePOIModal;
+export default EditPOIModal;

@@ -1,0 +1,102 @@
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: var(--spacing-md);
+}
+
+.auth-container {
+  width: 100%;
+  max-width: 500px;
+  background: var(--color-background);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xl);
+  overflow: hidden;
+}
+
+.auth-header {
+  padding: var(--spacing-md);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.btn-back {
+  background: none;
+  border: none;
+  color: var(--color-primary);
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  cursor: pointer;
+  padding: var(--spacing-xs) 0;
+  transition: all var(--transition-base);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.btn-back:hover {
+  color: var(--color-primary-hover, var(--color-primary));
+  text-decoration: underline;
+}
+
+.btn-back:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+.auth-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.tab-button {
+  flex: 1;
+  padding: var(--spacing-md);
+  background: none;
+  border: none;
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+  font-weight: 500;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  border-bottom: 2px solid transparent;
+  background-color: transparent;
+}
+
+.tab-button:hover {
+  background-color: var(--color-surface);
+  color: var(--color-text);
+}
+
+.tab-button.active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+  background-color: var(--color-surface);
+}
+
+.tab-button:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: -2px;
+}
+
+.auth-content {
+  padding: var(--spacing-xl);
+}
+
+@media (max-width: 767px) {
+  .auth-page {
+    padding: var(--spacing-sm);
+  }
+
+  .auth-container {
+    border-radius: var(--radius-md);
+  }
+
+  .auth-content {
+    padding: var(--spacing-lg);
+  }
+}

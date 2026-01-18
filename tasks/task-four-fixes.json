@@ -1,0 +1,72 @@
+{
+    "name": "BeerFinder",
+    "description": [
+        "The project will be an app or a web application where users can:",
+        "View a real-time map of their area.",
+        "The maps must be of any part of the world.",
+        "Create points of interest (POIs) by clicking directly on the map.",
+        "View their own POIs as well as those created by other users.",
+        "Edit any existing POI, regardless of who created it.",
+        "Access detailed information about each POI.",
+        "Each POI will include data such as name, description, price, and other attributes.",
+        "The application will require an API to fetch POI data.",
+        "A database will be needed to store information about POIs, items, and users.",
+        "POI information may include items pre-created in the database, referenced via foreign keys to avoid redundancy.",
+        "Users with permission will be able to add new items.",
+        "Users without permission may submit item insertion requests.",
+        "The database should be accessible for other future applications."
+    ],
+    "technologies": {
+      "backend": "Django REST Framework + djangorestframework-simplejwt",
+      "frontend": "React + TypeScript + Axios",
+      "authentication": "JWT (Access Token + Refresh Token)",
+      "storage": "localStorage (frontend)"
+    },
+    "Prompt for the user to execute the tasks": "@task.json Execute tasks SEQUENTIALLY. For each step: * Capture ALL output/error * Update output_format JSON only * Move to next step ONLY if status=completed Respond ONLY with output_format JSON. Never free text.",
+    "tasks":[ {
+      "name": "Fix login error", 
+      "description": "Fix the error: The user is not logged in after the correct credentials are entered in the login form. If the credentials are invalid, the error is correctly displayed in the login form.",
+      "console.log the error":"authService.ts:122 GET http://localhost:8000/api/v1/auth/profile/ 401 (Unauthorized) getCurrentUser @ authService.ts:122 (anonymous) @ AuthContext.tsx:93 await in (anonymous) handleSubmit @ LoginForm.tsx:22"
+    
+    },
+    {
+      "name": "The ir no button to come back from the login/register page to the home page", 
+      "description": "Add a button to come back from the login/register page to the home page"
+    },
+    {
+      "name": "Double pop up", 
+      "description": "When the user clicks on a POI, two pop ups are displayed. One to view the POI basic information and other to view the POI details. Only the basic information pop up should be displayed because it have the button to view the POI details."
+    },
+    {
+      "name": "Close pop up when clicking on the map", 
+      "description": "When clicing on the map when there is a basic information pop up displayed, the pop up should be closed and the map should be focused again"
+    },
+    {
+      "name": "Profile down menu bad behavior", 
+      "description": "The profile down menu has a bad behavior. When the user clicks on the profile down menu, the menu is displayed behind the map."
+    }
+ 
+  ],
+    "musts": [
+      "The user should be able to come back from the login/register page to the home page"
+    ],
+    "output_format": {
+        "status": "completed",
+        "current_task": 5,
+        "current_subtask": 0,
+        "log": [
+          "Task 1: Fixed login error by updating authService.ts to use axios instance from axiosConfig.ts instead of creating a new instance without interceptors. This ensures the Authorization header is properly added to requests.",
+          "Task 2: Added 'Back to Home' button to AuthPage component. The button is displayed at the top of the auth container and navigates back to the home page when clicked.",
+          "Task 3: Fixed double popup issue. Removed the automatic opening of ViewPOIModal when marker is clicked. Now only the Leaflet Popup (basic information) is displayed, and ViewPOIModal opens only when 'View Details' button is clicked.",
+          "Task 4: Added functionality to close ViewPOIModal when clicking on the map. The handleMapClick function now checks if ViewPOIModal is open and closes it before processing map clicks.",
+          "Task 5: Fixed profile dropdown z-index issue. Increased z-index from 1000 to 2000 to ensure the dropdown appears above the Leaflet map."
+        ],
+        "command_output": "",
+        "failed_command": "",
+        "next_action": "",
+        "files_created": [""],
+        "dirs_created": [],
+        "services_running": [],
+        "errors": []
+    }
+}

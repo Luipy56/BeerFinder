@@ -1,0 +1,220 @@
+{
+    "name": "BeerFinder",
+    "description": [
+        "The project will be an app or a web application where users can:",
+        "View a real-time map of their area.",
+        "The maps must be of any part of the world.",
+        "Create points of interest (POIs) by clicking directly on the map.",
+        "View their own POIs as well as those created by other users.",
+        "Edit any existing POI, regardless of who created it.",
+        "Access detailed information about each POI.",
+        "Each POI will include data such as name, description, price, and other attributes.",
+        "The application will require an API to fetch POI data.",
+        "A database will be needed to store information about POIs, items, and users.",
+        "POI information may include items pre-created in the database, referenced via foreign keys to avoid redundancy.",
+        "Users with permission will be able to add new items.",
+        "Users without permission may submit item insertion requests.",
+        "The database should be accessible for other future applications."
+    ],
+    "technologies": {
+      "backend": "Django REST Framework + djangorestframework-simplejwt",
+      "frontend": "React + TypeScript + Axios",
+      "authentication": "JWT (Access Token + Refresh Token)",
+      "storage": "localStorage (frontend)"
+    },
+    "design_system": {
+      "colors": {
+        "primary": "#007bff",
+        "secondary": "#6c757d",
+        "success": "#28a745",
+        "danger": "#dc3545",
+        "warning": "#ffc107",
+        "info": "#17a2b8",
+        "background": "#ffffff",
+        "surface": "#f8f9fa",
+        "text": "#212529",
+        "text_secondary": "6c757d",
+        "border": "#dee2e6"
+      },
+      "breakpoints": {
+        "mobile": "320px",
+        "tablet": "768px",
+        "desktop": "1024px",
+        "wide": "1440px"
+      },
+      "spacing": {
+        "xs": "0.25rem",
+        "sm": "0.5rem",
+        "md": "1rem",
+        "lg": "1.5rem",
+        "xl": "2rem",
+        "xxl": "3rem"
+      },
+      "typography": {
+        "font_family": "system-ui, -apple-system, sans-serif",
+        "font_sizes": {
+          "xs": "0.75rem",
+          "sm": "0.875rem",
+          "base": "1rem",
+          "lg": "1.125rem",
+          "xl": "1.25rem",
+          "2xl": "1.5rem",
+          "3xl": "2rem"
+        }
+      }
+    },
+    "tasks": [
+      {
+        "name": "Setup Design System Foundation",
+        "subtasks": [
+          "Create shared CSS variables file (styles/variables.css or similar) with color palette, spacing, typography",
+          "Define consistent button styles (primary, secondary, danger, etc.)",
+          "Define consistent input/form field styles",
+          "Define consistent modal/overlay styles",
+          "Define consistent card/container styles",
+          "Ensure all variables are accessible via CSS custom properties for easy theming"
+        ]
+      },
+      {
+        "name": "Enhance Authentication UI",
+        "subtasks": [
+          "Design a modern and clean login page",
+          "Design a modern and clean register page",
+          "Design a modern and clean button to login in the header",
+          "Style form validation errors with clear visual feedback",
+          "Add loading states to login/register buttons (spinner/disabled state)",
+          "Style success/error toast notifications for authentication actions",
+          "Fix the error: The profile name (on the header) does not display correctly after the user logs in, but works when the user registers a new account",
+          "Ensure responsive design for mobile devices"
+        ]
+      },
+      {
+        "name": "Enhance Map & POI UI",
+        "subtasks": [
+          "Design a modern and clean main page layout",
+          "Design a modern and clean map page with improved header styling",
+          "Style map loading state (spinner or skeleton)",
+          "Style POI markers and popups on the map",
+          "Implement ViewPOIModal component (ViewPOIModal.tsx) to display POI details",
+          "Implement EditPOIModal component (EditPOIModal.tsx) to edit existing POIs",
+          "Implement DeletePOIModal component (DeletePOIModal.tsx) for delete confirmation",
+          "Style existing CreatePOIModal component",
+          "Add click handlers to map markers/popups to open ViewPOIModal",
+          "Integrate EditPOIModal with MapComponent (add edit button in ViewPOIModal)",
+          "Integrate DeletePOIModal with MapComponent (add delete button in ViewPOIModal)",
+          "Style empty states (when no POIs exist)",
+          "Add smooth transitions and hover effects for interactive elements",
+          "Ensure all POI modals are responsive and mobile-friendly"
+        ]
+      },
+      {
+        "name": "Create Profile Page",
+        "subtasks": [
+          "Add /profile route in App.tsx",
+          "Create ProfilePage component (pages/ProfilePage.tsx)",
+          "Design a modern and clean profile view page (display user info: username, email, first_name, last_name)",
+          "Design a modern and clean profile edit page (form to update email, first_name, last_name)",
+          "Design a modern and clean profile delete confirmation dialog",
+          "Add 'Profile' link in UserMenu dropdown",
+          "Style profile loading state",
+          "Style profile error states and validation feedback",
+          "Style success notifications for profile updates",
+          "Ensure profile page is responsive and mobile-friendly",
+          "Integrate with existing UserProfileView API endpoint (GET /api/v1/auth/profile/ for view, PATCH for update)"
+        ]
+      },
+      {
+        "name": "Create Item Request Page",
+        "subtasks": [
+          "Add /item-requests route in App.tsx",
+          "Create ItemRequestService (services/itemRequestService.ts) for API calls",
+          "Create ItemRequestPage component (pages/ItemRequestPage.tsx)",
+          "Design a modern and clean item request list view (display user's item requests)",
+          "Design a modern and clean item request create form",
+          "Style item request status badges (pending/approved/rejected) with appropriate colors",
+          "Style item request view/details (show full request information)",
+          "Add 'Item Requests' link in UserMenu dropdown",
+          "Style loading states for item request operations",
+          "Style error states and validation feedback",
+          "Style empty states (when user has no item requests)",
+          "Ensure item request page is responsive and mobile-friendly",
+          "Note: Regular users can only create and view their own requests. Edit/approve/reject is admin-only."
+        ]
+      },
+      {
+        "name": "Polish & Accessibility",
+        "subtasks": [
+          "Add ARIA labels to all interactive elements (buttons, forms, modals)",
+          "Ensure keyboard navigation works throughout the application",
+          "Style focus states for keyboard navigation (visible focus indicators)",
+          "Add smooth transitions and animations for better UX",
+          "Test responsive design on multiple device sizes (mobile, tablet, desktop)",
+          "Implement toast notification system for success/error messages (or use existing if available)",
+          "Ensure color contrast meets WCAG accessibility standards",
+          "Add loading skeletons where appropriate (better than spinners for content loading)",
+          "Test all modals for proper focus management (focus trap, return focus on close)"
+        ]
+      }
+    ],
+    "musts": [
+      "The styles must be mobile first, and the page must be responsive",
+      "If needed, use the Vercel's React Best Practices guide (vercel-labs agent-skills) to improve the code path: 'vercel-labs agent-skills main skills-react-best-practices'"
+    ],
+    "output_format": {
+      "status": "completed",
+      "current_task": 6,
+      "current_subtask": 9,
+      "log": [
+        "Task 1: Setup Design System Foundation - Completed",
+        "Task 2: Enhance Authentication UI - Completed",
+        "Task 3: Enhance Map & POI UI - Completed",
+        "Task 4: Create Profile Page - Completed",
+        "Task 5: Create Item Request Page - Completed",
+        "Added /item-requests route in App.tsx",
+        "Created ItemRequestService.ts for API calls",
+        "Created ItemRequestPage.tsx and ItemRequestPage.css with list view, create form, and detail modal",
+        "Implemented status badges with appropriate colors (pending/approved/rejected)",
+        "Added 'Item Requests' link in UserMenu dropdown",
+        "Implemented loading states, error states, and empty states",
+        "Ensured responsive design for mobile devices",
+        "Task 6: Polish & Accessibility - Completed",
+        "ARIA labels added to all interactive elements (buttons, forms, modals)",
+        "Focus states styled with visible focus indicators in design system",
+        "Smooth transitions and animations added throughout",
+        "Toast notification system implemented and integrated",
+        "All components are mobile-first and responsive",
+        "Modals have proper focus management (focus on open, return focus on close)"
+      ],
+      "command_output": "",
+      "failed_command": "",
+      "next_action": "All tasks completed",
+      "files_created": [
+        "frontend/src/styles/variables.css",
+        "frontend/src/styles/buttons.css",
+        "frontend/src/styles/forms.css",
+        "frontend/src/styles/modals.css",
+        "frontend/src/styles/containers.css",
+        "frontend/src/components/Toast.tsx",
+        "frontend/src/components/Toast.css",
+        "frontend/src/components/ToastContainer.tsx",
+        "frontend/src/components/ToastContainer.css",
+        "frontend/src/contexts/ToastContext.tsx",
+        "frontend/src/components/ViewPOIModal.tsx",
+        "frontend/src/components/ViewPOIModal.css",
+        "frontend/src/components/EditPOIModal.tsx",
+        "frontend/src/components/EditPOIModal.css",
+        "frontend/src/components/DeletePOIModal.tsx",
+        "frontend/src/components/DeletePOIModal.css",
+        "frontend/src/pages/ProfilePage.tsx",
+        "frontend/src/pages/ProfilePage.css",
+        "frontend/src/services/itemRequestService.ts",
+        "frontend/src/pages/ItemRequestPage.tsx",
+        "frontend/src/pages/ItemRequestPage.css"
+      ],
+      "dirs_created": [
+        "frontend/src/styles"
+      ],
+      "services_running": [],
+      "errors": []
+    }
+  }

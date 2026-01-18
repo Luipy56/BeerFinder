@@ -1,0 +1,72 @@
+{
+    "name": "BeerFinder",
+    "description": [
+        "The project will be an app or a web application where users can:",
+        "View a real-time map of their area.",
+        "The maps must be of any part of the world.",
+        "Create points of interest (POIs) by clicking directly on the map.",
+        "View their own POIs as well as those created by other users.",
+        "Edit any existing POI, regardless of who created it.",
+        "Access detailed information about each POI.",
+        "Each POI will include data such as name, description, price, and other attributes.",
+        "The application will require an API to fetch POI data.",
+        "A database will be needed to store information about POIs, items, and users.",
+        "POI information may include items pre-created in the database, referenced via foreign keys to avoid redundancy.",
+        "Users with permission will be able to add new items.",
+        "Users without permission may submit item insertion requests.",
+        "The database should be accessible for other future applications."
+    ],
+    "technologies": {
+      "backend": "Django REST Framework + djangorestframework-simplejwt",
+      "frontend": "React + TypeScript + Axios",
+      "authentication": "JWT (Access Token + Refresh Token)",
+      "storage": "localStorage (frontend)"
+    },
+    "Prompt for the user to execute the tasks": "@task.json Execute tasks SEQUENTIALLY. For each step: * Capture ALL output/error * Update output_format JSON only * Move to next step ONLY if status=completed Respond ONLY with output_format JSON. Never free text.",
+    "tasks":[ {
+      "name": "Modify migrations", 
+      "description": "Modify the migrations to add and edit the fields to the database",
+      "subtasks": [
+        "Delete First and Last name fields from the User model, and make email optional if it is not already",
+        "Delete the price field from the POI model",
+        "Create a new field to the POI model called 'last_updated_by'",
+        "Edit the Item model field 'price' to 'typical_price'",
+        "Add a new field to the Item model called 'created_by'",
+        "Add a new field to the Item model called 'updated_by'",
+        "Add a new field to the ItemRequest model called 'status_changed_by'",
+        "Add a new field to the POI-Item many-to-many relationship called 'relationship_managed_by'",
+        "Add a new field to the POI-Item many-to-many relationship called 'local_price' that is the price of the item in the POI"
+      ]
+    },
+    {
+      "name": "Modify the code to use the new fields",
+      "description": "Modify the code to use the new fields and dont use the deleted fields",
+      "subtasks": [
+        "Modify the POI model to use the new fields and dont use the deleted fields",
+        "Modify the Item model to use the new fields and dont use the deleted fields",
+        "Modify the ItemRequest model to use the new fields and dont use the deleted fields"
+      ],
+      "example":"Basic poi informaton has price, but this field will be deleted."
+    }
+ 
+  ],
+    "musts": [
+      "Edit actual migrations, dosnt matter if the migrations are already applied or not and it can delete data form de db",
+      "The *_by fields should be an FK to the User model, the user who created or updated the record, if the user is deleted, the record should be nulled"
+    ],
+    "output_format": {
+        "status": "",
+        "current_task": 0,
+        "current_subtask": 0,
+        "log": [
+          ""
+        ],
+        "command_output": "",
+        "failed_command": "",
+        "next_action": "",
+        "files_created": [""],
+        "dirs_created": [],
+        "services_running": [],
+        "errors": []
+    }
+}

@@ -1,0 +1,48 @@
+{
+    "name": "BeerFinder",
+    "description": [
+        "The project will be an app or a web application where users can:",
+        "View a real-time map of their area.",
+        "The maps must be of any part of the world.",
+        "Create points of interest (POIs) by clicking directly on the map.",
+        "View their own POIs as well as those created by other users.",
+        "Edit any existing POI, regardless of who created it.",
+        "Access detailed information about each POI.",
+        "Each POI will include data such as name, description, price, and other attributes.",
+        "The application will require an API to fetch POI data.",
+        "A database will be needed to store information about POIs, items, and users.",
+        "POI information may include items pre-created in the database, referenced via foreign keys to avoid redundancy.",
+        "Users with permission will be able to add new items.",
+        "Users without permission may submit item insertion requests.",
+        "The database should be accessible for other future applications."
+    ],
+    "technologies": {
+        "": ""
+    },
+    "Prompt": "@task.json Execute tasks SEQUENTIALLY. For each step: * Capture ALL output/error * Update output_format JSON only * Move to next step ONLY if status=completed Respond ONLY with output_format JSON. Never free text.",
+    "tasks": [
+      {"name": "", 
+      "description": "",
+      "subtasks": [
+        ""
+      ]}
+    ],
+    "musts": [
+      ""
+    ],
+    "output_format": {
+      "status": "",
+      "current_task": 0,
+      "current_subtask": 0,
+      "log": [
+        ""
+      ],
+      "command_output": "",
+      "failed_command": "",
+      "next_action": "",
+      "files_created": [""],
+      "dirs_created": [""],
+      "services_running": [""],
+      "errors": [""]
+    }
+  } 

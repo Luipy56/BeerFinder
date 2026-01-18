@@ -15,3 +15,13 @@ code {
 * {
   box-sizing: border-box;
 }
+
+/* Ensure Leaflet map panes don't interfere with header dropdowns */
+.leaflet-pane {
+  z-index: 400 !important;
+}
+
+.leaflet-top,
+.leaflet-bottom {
+  z-index: 401 !important;
+}
