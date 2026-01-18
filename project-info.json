@@ -1,0 +1,23 @@
+{
+  "project": "BeerFinder",
+  "description": "Web application for creating, viewing, and editing points of interest (POIs) on an interactive map. Users can create POIs by clicking on the map, view POIs from all users, edit any POI, and manage items with permission-based access.",
+  "technologies": {
+    "frontend": {
+      "framework": "React",
+      "language": "TypeScript",
+      "mapping": "Leaflet/Mapbox"
+    },
+    "backend": {
+      "framework": "Django",
+      "api": "Django REST Framework",
+      "language": "Python"
+    },
+    "database": {
+      "system": "PostgreSQL",
+      "extension": "PostGIS"
+    },
+    "infrastructure": {
+      "containerization": "Docker"
+    }
+  }
+}

@@ -1,0 +1,47 @@
+{
+    "name": "Decide how to build the app or web",
+    "description": [
+        "The project will be an app or a web application where users can:",
+        "View a real-time map of their area.",
+        "The maps must be of any part of the world.",
+        "Create points of interest (POIs) by clicking directly on the map.",
+        "View their own POIs as well as those created by other users.",
+        "Edit any existing POI, regardless of who created it.",
+        "Access detailed information about each POI.",
+        "Each POI will include data such as name, description, price, and other attributes.",
+        "The application will require an API to fetch POI data.",
+        "A database will be needed to store information about POIs, items, and users.",
+        "POI information may include items pre-created in the database, referenced via foreign keys to avoid redundancy.",
+        "Users with permission will be able to add new items.",
+        "Users without permission may submit item insertion requests.",
+        "The database should be accessible for other future applications."
+    ],
+    "tasks": [
+        "Decide if its better an app or a web application to start with",
+        "Investigate which framework is the best for the proyect, both frontend and backend",
+        "Investigate which database system is the best for the proyect",
+        "Decide if use docker to run the proyect"
+
+    ],
+    "musts": [
+      "No musts"
+    ],
+    "output_format": {
+      "status": "completed",
+      "current_task": 4,
+      "current_subtask": 0,
+      "log": [
+        "Task 1: Decided on web application - better for cross-platform access, easier deployment, and collaborative features. Can use PWA for app-like experience.",
+        "Task 2: Frontend: React with TypeScript + Leaflet/Mapbox for maps. Backend: Django with Django REST Framework - excellent for geospatial data (django.contrib.gis), built-in admin panel, strong ORM for relational data, authentication/permissions system, and good learning resource.",
+        "Task 3: Database: PostgreSQL with PostGIS extension - best for geospatial data, relational structure for POIs/items/users, ACID compliance, and future application access.",
+        "Task 4: Docker: Yes - recommended for consistent development environment, easy deployment, database containerization, and service orchestration."
+      ],
+      "command_output": "All tasks completed. Decision: Web application using React+TypeScript frontend, Django+Django REST Framework backend, PostgreSQL+PostGIS database, Docker for containerization.",
+      "failed_command": "",
+      "next_action": "COMPLETED",
+      "files_created": [],
+      "dirs_created": [],
+      "services_running": [],
+      "errors": []
+    }
+  }
