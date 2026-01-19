@@ -39,12 +39,31 @@
       ]
     },
     {
+      "name": "Destroy ItemRequest model",
+      "description": "Destroy the ItemRequest model, it will be merged with the Item model",
+      "subtasks": [
+        "Add the status field to the Item model",
+        "Add the status_changed_by field to the Item model",
+        "Add the thumbnail field to the Item model, Consult next task for more information and instructions",
+        "Destroy the ItemRequest model"
+      ]
+    },
+    {
+      "name": "How to use the thumbnail field",
+      "description": "The thumbnail field is a file field that will be used to store the thumbnail of the item, the thumbnail will be used to display the item in the list of items",
+      "subtasks": [
+        "Think the best way to store the thumbnail, it should be easy to use and should be efficient",
+        "It will be better if the thumbnail is stored directly in the database, not in the filesystem, but thought about the best way to do it"
+      ]
+    },
+    {
       "name": "Modify the code to use the new fields",
       "description": "Modify the code to use the new fields and dont use the deleted fields",
       "subtasks": [
         "Modify the POI model to use the new fields and dont use the deleted fields",
         "Modify the Item model to use the new fields and dont use the deleted fields",
-        "Modify the ItemRequest model to use the new fields and dont use the deleted fields"
+        "Modify the ItemRequest model to use the new fields and dont use the deleted fields",
+        "Make sure that, if the thumbnail is not in the db, the app doesnt crash"
       ],
       "example":"Basic poi informaton has price, but this field will be deleted."
     }

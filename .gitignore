@@ -74,3 +74,4 @@ htmlcov/
 *.bak
 *.tmp
 .cache/
+ssh-tunnel.sh
