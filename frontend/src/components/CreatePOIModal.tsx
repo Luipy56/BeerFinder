@@ -4,7 +4,7 @@ import './CreatePOIModal.css';
 interface CreatePOIModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (name: string, description: string, price?: number) => void;
+  onSubmit: (name: string, description: string) => void;
   latitude: number;
   longitude: number;
 }
@@ -18,7 +18,6 @@ const CreatePOIModal: React.FC<CreatePOIModalProps> = ({
 }) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [price, setPrice] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const nameInputRef = useRef<HTMLInputElement>(null);
 
@@ -32,7 +31,6 @@ const CreatePOIModal: React.FC<CreatePOIModalProps> = ({
     if (!isOpen) {
       setName('');
       setDescription('');
-      setPrice('');
       setIsSubmitting(false);
     }
   }, [isOpen]);
@@ -42,7 +40,7 @@ const CreatePOIModal: React.FC<CreatePOIModalProps> = ({
     if (name.trim() && !isSubmitting) {
       setIsSubmitting(true);
       try {
-        await onSubmit(name, description, price ? parseFloat(price) : undefined);
+        await onSubmit(name, description);
         onClose();
       } catch (error) {
         setIsSubmitting(false);
@@ -108,22 +106,6 @@ const CreatePOIModal: React.FC<CreatePOIModalProps> = ({
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Enter description (optional)"
                 rows={3}
-                disabled={isSubmitting}
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="price" className="form-label">
-                Price
-              </label>
-              <input
-                type="number"
-                id="price"
-                className="form-input"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                placeholder="Enter price (optional)"
-                step="0.01"
-                min="0"
                 disabled={isSubmitting}
               />
             </div>

@@ -52,20 +52,22 @@ class POIViewSet(viewsets.ModelViewSet):
             except (ValueError, TypeError):
                 pass
         
+        user = self.request.user if self.request.user.is_authenticated else None
         if location:
-            serializer.save(location=location, created_by=self.request.user if self.request.user.is_authenticated else None)
+            serializer.save(location=location, created_by=user, last_updated_by=user)
         else:
             # If no location provided and serializer has it, use that
-            serializer.save(created_by=self.request.user if self.request.user.is_authenticated else None)
+            serializer.save(created_by=user, last_updated_by=user)
 
     def perform_update(self, serializer):
         # Handle location update
+        user = self.request.user if self.request.user.is_authenticated else None
         data = self.request.data
         if 'latitude' in data and 'longitude' in data:
             point = Point(float(data['longitude']), float(data['latitude']))
-            serializer.save(location=point)
+            serializer.save(location=point, last_updated_by=user)
         else:
-            serializer.save()
+            serializer.save(last_updated_by=user)
 
     @action(detail=True, methods=['post'])
     def add_item(self, request, pk=None):
@@ -112,6 +114,14 @@ class ItemViewSet(viewsets.ModelViewSet):
         else:
             permission_classes = [IsAdminUser]
         return [permission() for permission in permission_classes]
+    
+    def perform_create(self, serializer):
+        user = self.request.user if self.request.user.is_authenticated else None
+        serializer.save(created_by=user, updated_by=user)
+    
+    def perform_update(self, serializer):
+        user = self.request.user if self.request.user.is_authenticated else None
+        serializer.save(updated_by=user)
 
 
 class ItemRequestViewSet(viewsets.ModelViewSet):
@@ -141,4 +151,11 @@ class ItemRequestViewSet(viewsets.ModelViewSet):
         return queryset
 
     def perform_create(self, serializer):
-        serializer.save(requested_by=self.request.user)
+        serializer.save(requested_by=self.request.user, status_changed_by=self.request.user)
+    
+    def perform_update(self, serializer):
+        # Update status_changed_by when status is changed
+        if 'status' in serializer.validated_data:
+            serializer.save(status_changed_by=self.request.user)
+        else:
+            serializer.save()

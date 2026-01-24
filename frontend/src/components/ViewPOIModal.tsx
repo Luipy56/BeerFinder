@@ -77,12 +77,6 @@ const ViewPOIModal: React.FC<ViewPOIModalProps> = ({
                 <p className="poi-detail-value">{poi.description}</p>
               </div>
             )}
-            {poi.price !== undefined && poi.price !== null && (
-              <div className="poi-detail-item">
-                <h3 className="poi-detail-label">Price</h3>
-                <p className="poi-detail-value">${formatPrice(poi.price)}</p>
-              </div>
-            )}
             <div className="poi-detail-item">
               <h3 className="poi-detail-label">Location</h3>
               <p className="poi-detail-value">
@@ -96,8 +90,8 @@ const ViewPOIModal: React.FC<ViewPOIModalProps> = ({
                   {poi.items.map((item) => (
                     <li key={item.id} className="poi-item">
                       <span className="poi-item-name">{item.name}</span>
-                      {item.price !== undefined && item.price !== null && (
-                        <span className="poi-item-price">${formatPrice(item.price)}</span>
+                      {item.typical_price !== undefined && item.typical_price !== null && (
+                        <span className="poi-item-price">${formatPrice(item.typical_price)}</span>
                       )}
                     </li>
                   ))}

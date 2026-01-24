@@ -6,7 +6,7 @@ interface EditPOIModalProps {
   isOpen: boolean;
   onClose: () => void;
   poi: POI | null;
-  onSubmit: (name: string, description: string, price?: number) => Promise<void>;
+  onSubmit: (name: string, description: string) => Promise<void>;
 }
 
 const EditPOIModal: React.FC<EditPOIModalProps> = ({
@@ -17,7 +17,6 @@ const EditPOIModal: React.FC<EditPOIModalProps> = ({
 }) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-  const [price, setPrice] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const nameInputRef = useRef<HTMLInputElement>(null);
@@ -26,7 +25,6 @@ const EditPOIModal: React.FC<EditPOIModalProps> = ({
     if (poi) {
       setName(poi.name);
       setDescription(poi.description || '');
-      setPrice(poi.price !== undefined && poi.price !== null ? poi.price.toString() : '');
       setError(null);
     }
   }, [poi]);
@@ -52,7 +50,7 @@ const EditPOIModal: React.FC<EditPOIModalProps> = ({
     setIsSubmitting(true);
 
     try {
-      await onSubmit(name, description, price ? parseFloat(price) : undefined);
+      await onSubmit(name, description);
       onClose();
     } catch (err: any) {
       setError(err.message || 'Failed to update POI. Please try again.');
@@ -124,22 +122,6 @@ const EditPOIModal: React.FC<EditPOIModalProps> = ({
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Enter description (optional)"
                 rows={3}
-                disabled={isSubmitting}
-              />
-            </div>
-            <div className="form-group">
-              <label htmlFor="edit-price" className="form-label">
-                Price
-              </label>
-              <input
-                type="number"
-                id="edit-price"
-                className="form-input"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                placeholder="Enter price (optional)"
-                step="0.01"
-                min="0"
                 disabled={isSubmitting}
               />
             </div>

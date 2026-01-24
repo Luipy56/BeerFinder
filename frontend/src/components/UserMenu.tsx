@@ -43,9 +43,7 @@ const UserMenu: React.FC = () => {
     );
   }
 
-  const displayName = user.first_name && user.last_name
-    ? `${user.first_name} ${user.last_name}`
-    : user.first_name || user.last_name || user.username;
+  const displayName = user.username;
 
   return (
     <div className="user-menu" ref={menuRef}>
@@ -71,11 +69,6 @@ const UserMenu: React.FC = () => {
             {user.email && (
               <div className="user-info-item">
                 <strong>Email:</strong> {user.email}
-              </div>
-            )}
-            {(user.first_name || user.last_name) && (
-              <div className="user-info-item">
-                <strong>Name:</strong> {displayName}
               </div>
             )}
           </div>

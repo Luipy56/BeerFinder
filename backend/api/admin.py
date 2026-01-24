@@ -15,7 +15,7 @@ class POIAdmin(gis_admin.GISModelAdmin):
 
 @admin.register(Item)
 class ItemAdmin(admin.ModelAdmin):
-    list_display = ['name', 'price', 'created_at']
+    list_display = ['name', 'typical_price', 'created_at']
     list_filter = ['created_at']
     search_fields = ['name', 'description']
 

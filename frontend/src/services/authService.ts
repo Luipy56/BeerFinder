@@ -10,19 +10,15 @@ export interface LoginCredentials {
 
 export interface RegisterData {
   username: string;
-  email: string;
+  email?: string;
   password: string;
   password_confirm: string;
-  first_name?: string;
-  last_name?: string;
 }
 
 export interface User {
   id: number;
   username: string;
-  email: string;
-  first_name?: string;
-  last_name?: string;
+  email?: string;
 }
 
 export interface AuthResponse {
@@ -107,7 +103,7 @@ const authService = {
     return response.data;
   },
 
-  updateProfile: async (userData: Partial<Pick<User, 'email' | 'first_name' | 'last_name'>>): Promise<User> => {
+  updateProfile: async (userData: Partial<Pick<User, 'email'>>): Promise<User> => {
     const response = await api.patch<User>('/auth/profile/', userData);
     return response.data;
   },

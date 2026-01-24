@@ -13,8 +13,6 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
     email: '',
     password: '',
     password_confirm: '',
-    first_name: '',
-    last_name: '',
   });
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -35,10 +33,12 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
       setError('Password must be at least 8 characters long');
       return false;
     }
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(formData.email)) {
-      setError('Please enter a valid email address');
-      return false;
+    if (formData.email && formData.email.trim()) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(formData.email)) {
+        setError('Please enter a valid email address');
+        return false;
+      }
     }
     return true;
   };
@@ -111,8 +111,8 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
         />
       </div>
       <div className="form-group">
-        <label htmlFor="email" className="form-label required">
-          Email
+        <label htmlFor="email" className="form-label">
+          Email (optional)
         </label>
         <input
           type="email"
@@ -121,38 +121,8 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
           className={`form-input ${error ? 'error' : ''}`}
           value={formData.email}
           onChange={handleChange}
-          required
           disabled={isLoading}
-          aria-required="true"
           aria-invalid={error ? 'true' : 'false'}
-        />
-      </div>
-      <div className="form-group">
-        <label htmlFor="first_name" className="form-label">
-          First Name
-        </label>
-        <input
-          type="text"
-          id="first_name"
-          name="first_name"
-          className="form-input"
-          value={formData.first_name}
-          onChange={handleChange}
-          disabled={isLoading}
-        />
-      </div>
-      <div className="form-group">
-        <label htmlFor="last_name" className="form-label">
-          Last Name
-        </label>
-        <input
-          type="text"
-          id="last_name"
-          name="last_name"
-          className="form-input"
-          value={formData.last_name}
-          onChange={handleChange}
-          disabled={isLoading}
         />
       </div>
       <div className="form-group">

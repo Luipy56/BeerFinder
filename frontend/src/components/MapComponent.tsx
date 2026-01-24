@@ -78,7 +78,7 @@ const MapComponent: React.FC = () => {
     setIsViewModalOpen(true);
   };
 
-  const handleCreatePOI = async (name: string, description: string, price?: number) => {
+  const handleCreatePOI = async (name: string, description: string) => {
     if (!clickedLocation) return;
 
     try {
@@ -87,7 +87,6 @@ const MapComponent: React.FC = () => {
         description,
         latitude: clickedLocation.lat,
         longitude: clickedLocation.lng,
-        price,
       };
 
       const createdPOI = await POIService.createPOI(newPOI);
@@ -100,14 +99,13 @@ const MapComponent: React.FC = () => {
     }
   };
 
-  const handleEditPOI = async (name: string, description: string, price?: number) => {
+  const handleEditPOI = async (name: string, description: string) => {
     if (!selectedPOI) return;
 
     try {
       const updatedPOI = await POIService.updatePOI(selectedPOI.id, {
         name,
         description,
-        price,
       });
       setPois(pois.map((p) => (p.id === selectedPOI.id ? updatedPOI : p)));
       setIsEditModalOpen(false);
@@ -173,9 +171,6 @@ const MapComponent: React.FC = () => {
               <div className="poi-popup">
                 <h3>{poi.name}</h3>
                 {poi.description && <p>{poi.description}</p>}
-                {poi.price !== undefined && poi.price !== null && (
-                  <p><strong>Price:</strong> ${formatPrice(poi.price)}</p>
-                )}
                 <button
                   className="btn btn-sm btn-primary"
                   onClick={(e) => {

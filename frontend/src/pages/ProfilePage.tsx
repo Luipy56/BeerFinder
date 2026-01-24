@@ -16,8 +16,6 @@ const ProfilePage: React.FC = () => {
   const [user, setUser] = useState(contextUser);
   const [formData, setFormData] = useState({
     email: '',
-    first_name: '',
-    last_name: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -32,8 +30,6 @@ const ProfilePage: React.FC = () => {
       setUser(userData);
       setFormData({
         email: userData.email || '',
-        first_name: userData.first_name || '',
-        last_name: userData.last_name || '',
       });
     } catch (error: any) {
       console.error('Error loading profile:', error);
@@ -54,9 +50,7 @@ const ProfilePage: React.FC = () => {
   const validateForm = (): boolean => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
-    } else {
+    if (formData.email && formData.email.trim()) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(formData.email)) {
         newErrors.email = 'Please enter a valid email address';
@@ -106,8 +100,6 @@ const ProfilePage: React.FC = () => {
     if (user) {
       setFormData({
         email: user.email || '',
-        first_name: user.first_name || '',
-        last_name: user.last_name || '',
       });
     }
     setErrors({});
@@ -187,8 +179,8 @@ const ProfilePage: React.FC = () => {
                 </div>
 
                 <div className="form-group">
-                  <label htmlFor="email" className="form-label required">
-                    Email
+                  <label htmlFor="email" className="form-label">
+                    Email (optional)
                   </label>
                   <input
                     type="email"
@@ -197,59 +189,13 @@ const ProfilePage: React.FC = () => {
                     className={`form-input ${errors.email ? 'error' : ''}`}
                     value={formData.email}
                     onChange={handleChange}
-                    required
                     disabled={isSaving}
-                    aria-required="true"
                     aria-invalid={errors.email ? 'true' : 'false'}
                     aria-describedby={errors.email ? 'email-error' : undefined}
                   />
                   {errors.email && (
                     <span id="email-error" className="form-error" role="alert">
                       {errors.email}
-                    </span>
-                  )}
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="first_name" className="form-label">
-                    First Name
-                  </label>
-                  <input
-                    type="text"
-                    id="first_name"
-                    name="first_name"
-                    className={`form-input ${errors.first_name ? 'error' : ''}`}
-                    value={formData.first_name}
-                    onChange={handleChange}
-                    disabled={isSaving}
-                    aria-invalid={errors.first_name ? 'true' : 'false'}
-                    aria-describedby={errors.first_name ? 'first_name-error' : undefined}
-                  />
-                  {errors.first_name && (
-                    <span id="first_name-error" className="form-error" role="alert">
-                      {errors.first_name}
-                    </span>
-                  )}
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="last_name" className="form-label">
-                    Last Name
-                  </label>
-                  <input
-                    type="text"
-                    id="last_name"
-                    name="last_name"
-                    className={`form-input ${errors.last_name ? 'error' : ''}`}
-                    value={formData.last_name}
-                    onChange={handleChange}
-                    disabled={isSaving}
-                    aria-invalid={errors.last_name ? 'true' : 'false'}
-                    aria-describedby={errors.last_name ? 'last_name-error' : undefined}
-                  />
-                  {errors.last_name && (
-                    <span id="last_name-error" className="form-error" role="alert">
-                      {errors.last_name}
                     </span>
                   )}
                 </div>
@@ -283,14 +229,6 @@ const ProfilePage: React.FC = () => {
                 <div className="profile-info-item">
                   <span className="profile-info-label">Email</span>
                   <span className="profile-info-value">{user.email || 'Not provided'}</span>
-                </div>
-                <div className="profile-info-item">
-                  <span className="profile-info-label">First Name</span>
-                  <span className="profile-info-value">{user.first_name || 'Not provided'}</span>
-                </div>
-                <div className="profile-info-item">
-                  <span className="profile-info-label">Last Name</span>
-                  <span className="profile-info-value">{user.last_name || 'Not provided'}</span>
                 </div>
               </div>
             </div>

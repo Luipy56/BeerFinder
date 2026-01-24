@@ -6,7 +6,10 @@ class Item(models.Model):
     """Items that can be associated with POIs"""
     name = models.CharField(max_length=200)
     description = models.TextField(blank=True)
-    price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    typical_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    thumbnail = models.BinaryField(null=True, blank=True)
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='created_items')
+    updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='updated_items')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -23,11 +26,11 @@ class POI(models.Model):
     name = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     location = models.PointField()  # PostGIS Point field
-    price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
-    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
+    created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='created_pois')
+    last_updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='last_updated_pois')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    items = models.ManyToManyField(Item, blank=True, related_name='pois')
+    items = models.ManyToManyField(Item, blank=True, related_name='pois', through='POIItem')
 
     class Meta:
         db_table = 'beerfinder_poi'
@@ -45,6 +48,19 @@ class POI(models.Model):
         return self.location.x if self.location else None
 
 
+class POIItem(models.Model):
+    """Intermediate model for POI-Item many-to-many relationship with additional fields"""
+    poi = models.ForeignKey(POI, on_delete=models.CASCADE)
+    item = models.ForeignKey(Item, on_delete=models.CASCADE)
+    relationship_created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='created_poi_items')
+    local_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'beerfinder_poi_item'
+        unique_together = ('poi', 'item')
+
+
 class ItemRequest(models.Model):
     """Requests from users without permission to add new items"""
     name = models.CharField(max_length=200)
@@ -60,6 +76,7 @@ class ItemRequest(models.Model):
         ],
         default='pending'
     )
+    status_changed_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='status_changed_item_requests')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

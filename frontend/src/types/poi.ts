@@ -4,10 +4,10 @@ export interface POI {
   description: string;
   latitude: number;
   longitude: number;
-  price?: number;
   created_at: string;
   updated_at: string;
   created_by?: number;
+  last_updated_by?: number;
   items?: Item[];
 }
 
@@ -15,7 +15,10 @@ export interface Item {
   id: number;
   name: string;
   description: string;
-  price?: number;
+  typical_price?: number;
+  thumbnail?: string | null;
+  created_by?: number;
+  updated_by?: number;
 }
 
 export interface CreatePOIDto {
@@ -23,6 +26,5 @@ export interface CreatePOIDto {
   description: string;
   latitude: number;
   longitude: number;
-  price?: number;
   item_ids?: number[];
 }
