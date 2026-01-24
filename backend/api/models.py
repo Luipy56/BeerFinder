@@ -11,6 +11,7 @@ class Item(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
+        db_table = 'beerfinder_item'
         ordering = ['name']
 
     def __str__(self):
@@ -29,6 +30,7 @@ class POI(models.Model):
     items = models.ManyToManyField(Item, blank=True, related_name='pois')
 
     class Meta:
+        db_table = 'beerfinder_poi'
         ordering = ['-created_at']
 
     def __str__(self):
@@ -62,6 +64,7 @@ class ItemRequest(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
+        db_table = 'beerfinder_item_request'
         ordering = ['-created_at']
 
     def __str__(self):

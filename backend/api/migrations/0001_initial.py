@@ -26,6 +26,7 @@ class Migration(migrations.Migration):
                 ('updated_at', models.DateTimeField(auto_now=True)),
             ],
             options={
+                'db_table': 'beerfinder_item',
                 'ordering': ['name'],
             },
         ),
@@ -42,6 +43,7 @@ class Migration(migrations.Migration):
                 ('requested_by', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to=settings.AUTH_USER_MODEL)),
             ],
             options={
+                'db_table': 'beerfinder_item_request',
                 'ordering': ['-created_at'],
             },
         ),
@@ -59,6 +61,7 @@ class Migration(migrations.Migration):
                 ('items', models.ManyToManyField(blank=True, related_name='pois', to='api.item')),
             ],
             options={
+                'db_table': 'beerfinder_poi',
                 'ordering': ['-created_at'],
             },
         ),
