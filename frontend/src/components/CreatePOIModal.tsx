@@ -4,7 +4,7 @@ import './CreatePOIModal.css';
 interface CreatePOIModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSubmit: (name: string, description: string) => void;
+  onSubmit: (name: string, description: string, thumbnail?: string) => void;
   latitude: number;
   longitude: number;
 }
@@ -18,6 +18,8 @@ const CreatePOIModal: React.FC<CreatePOIModalProps> = ({
 }) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
+  const [thumbnail, setThumbnail] = useState<string | undefined>(undefined);
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const nameInputRef = useRef<HTMLInputElement>(null);
 
@@ -31,16 +33,37 @@ const CreatePOIModal: React.FC<CreatePOIModalProps> = ({
     if (!isOpen) {
       setName('');
       setDescription('');
+      setThumbnail(undefined);
+      setThumbnailFile(null);
       setIsSubmitting(false);
     }
   }, [isOpen]);
+
+  const handleThumbnailChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setThumbnailFile(file);
+      // Convert file to base64
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        // Remove data:image/...;base64, prefix
+        const base64Data = base64String.split(',')[1];
+        setThumbnail(base64Data);
+      };
+      reader.readAsDataURL(file);
+    } else {
+      setThumbnail(undefined);
+      setThumbnailFile(null);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (name.trim() && !isSubmitting) {
       setIsSubmitting(true);
       try {
-        await onSubmit(name, description);
+        await onSubmit(name, description, thumbnail);
         onClose();
       } catch (error) {
         setIsSubmitting(false);
@@ -108,6 +131,28 @@ const CreatePOIModal: React.FC<CreatePOIModalProps> = ({
                 rows={3}
                 disabled={isSubmitting}
               />
+            </div>
+            <div className="form-group">
+              <label htmlFor="poi-thumbnail" className="form-label">
+                Thumbnail (optional)
+              </label>
+              <input
+                type="file"
+                id="poi-thumbnail"
+                accept="image/*"
+                onChange={handleThumbnailChange}
+                disabled={isSubmitting}
+                className="form-input"
+              />
+              {thumbnailFile && (
+                <div style={{ marginTop: '8px' }}>
+                  <img
+                    src={URL.createObjectURL(thumbnailFile)}
+                    alt="Thumbnail preview"
+                    style={{ maxWidth: '200px', maxHeight: '200px', objectFit: 'contain' }}
+                  />
+                </div>
+              )}
             </div>
             <div className="form-group">
               <span className="form-help">

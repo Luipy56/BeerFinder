@@ -12,7 +12,7 @@ class ItemSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Item
-        fields = ['id', 'name', 'description', 'typical_price', 'thumbnail', 'thumbnail_write', 'flavor_type', 'created_by', 'updated_by', 'created_at', 'updated_at']
+        fields = ['id', 'name', 'description', 'typical_price', 'thumbnail', 'thumbnail_write', 'flavor_type', 'percentage', 'created_by', 'updated_by', 'created_at', 'updated_at']
         read_only_fields = ['created_by', 'updated_by', 'created_at', 'updated_at']
     
     def get_thumbnail(self, obj):
@@ -65,6 +65,8 @@ class POISerializer(GeoFeatureModelSerializer):
     items = ItemSerializer(many=True, read_only=True)
     latitude = serializers.ReadOnlyField()
     longitude = serializers.ReadOnlyField()
+    thumbnail = serializers.SerializerMethodField()
+    thumbnail_write = serializers.CharField(write_only=True, required=False, allow_blank=True, allow_null=True)
     # Allow latitude/longitude to be written (will be converted to location in view)
     latitude_write = serializers.FloatField(write_only=True, required=False)
     longitude_write = serializers.FloatField(write_only=True, required=False)
@@ -74,13 +76,57 @@ class POISerializer(GeoFeatureModelSerializer):
         geo_field = 'location'
         fields = [
             'id', 'name', 'description', 'location', 'latitude', 'longitude',
-            'latitude_write', 'longitude_write',
+            'latitude_write', 'longitude_write', 'thumbnail', 'thumbnail_write',
             'created_by', 'last_updated_by', 'created_at', 'updated_at', 'items'
         ]
         read_only_fields = ['created_by', 'created_at', 'updated_at']
         extra_kwargs = {
             'location': {'required': False}  # Make location optional
         }
+    
+    def get_thumbnail(self, obj):
+        """Convert binary thumbnail to base64 string for JSON serialization"""
+        if obj.thumbnail:
+            try:
+                return base64.b64encode(obj.thumbnail).decode('utf-8')
+            except Exception:
+                return None
+        return None
+    
+    def create(self, validated_data):
+        """Create POI and handle thumbnail conversion"""
+        # Extract thumbnail_write from validated_data
+        thumbnail_data = validated_data.pop('thumbnail_write', None)
+        
+        # Convert base64 to binary if provided
+        if thumbnail_data:
+            try:
+                # Decode base64 string to binary
+                validated_data['thumbnail'] = base64.b64decode(thumbnail_data)
+            except Exception as e:
+                # If decoding fails, set to None
+                validated_data['thumbnail'] = None
+        else:
+            # If no thumbnail_write provided, ensure thumbnail is not set
+            validated_data.pop('thumbnail', None)
+        
+        return super().create(validated_data)
+    
+    def update(self, instance, validated_data):
+        """Update POI and handle thumbnail conversion"""
+        # Extract thumbnail_write from validated_data
+        thumbnail_data = validated_data.pop('thumbnail_write', None)
+        
+        # Convert base64 to binary if provided
+        if thumbnail_data:
+            try:
+                # Decode base64 string to binary
+                validated_data['thumbnail'] = base64.b64decode(thumbnail_data)
+            except Exception as e:
+                # If decoding fails, set to None
+                validated_data['thumbnail'] = None
+        
+        return super().update(instance, validated_data)
     
     def validate(self, data):
         # For updates (partial), location is not required if not being changed
@@ -109,14 +155,24 @@ class POIListSerializer(serializers.ModelSerializer):
     items = ItemSerializer(many=True, read_only=True)
     latitude = serializers.ReadOnlyField()
     longitude = serializers.ReadOnlyField()
+    thumbnail = serializers.SerializerMethodField()
 
     class Meta:
         model = POI
         fields = [
-            'id', 'name', 'description', 'latitude', 'longitude',
+            'id', 'name', 'description', 'latitude', 'longitude', 'thumbnail',
             'created_by', 'last_updated_by', 'created_at', 'updated_at', 'items'
         ]
         read_only_fields = ['created_by', 'created_at', 'updated_at']
+    
+    def get_thumbnail(self, obj):
+        """Convert binary thumbnail to base64 string for JSON serialization"""
+        if obj.thumbnail:
+            try:
+                return base64.b64encode(obj.thumbnail).decode('utf-8')
+            except Exception:
+                return None
+        return None
 
 
 class ItemRequestSerializer(serializers.ModelSerializer):

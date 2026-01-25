@@ -123,6 +123,18 @@ const ViewPOIModal: React.FC<ViewPOIModalProps> = ({
             ×
           </button>
         </div>
+        {poi.thumbnail && (
+          <div className="poi-thumbnail-container">
+            <img
+              src={`data:image/png;base64,${poi.thumbnail}`}
+              alt={poi.name}
+              className="poi-thumbnail"
+              onError={(e) => {
+                (e.target as HTMLImageElement).style.display = 'none';
+              }}
+            />
+          </div>
+        )}
         <div className="modal-body">
           <div className="poi-details">
             {poi.description && (

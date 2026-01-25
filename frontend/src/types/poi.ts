@@ -4,6 +4,7 @@ export interface POI {
   description: string;
   latitude: number;
   longitude: number;
+  thumbnail?: string | null;
   created_at: string;
   updated_at: string;
   created_by?: number;
@@ -51,6 +52,7 @@ export interface Item {
   typical_price?: number;
   thumbnail?: string | null;
   flavor_type?: FlavorType;
+  percentage?: number;
   created_by?: number;
   updated_by?: number;
 }
@@ -60,5 +62,6 @@ export interface CreatePOIDto {
   description: string;
   latitude: number;
   longitude: number;
+  thumbnail?: string;
   item_ids?: number[];
 }

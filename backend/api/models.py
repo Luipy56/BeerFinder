@@ -45,6 +45,7 @@ class Item(models.Model):
     typical_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     thumbnail = models.BinaryField(null=True, blank=True)
     flavor_type = models.CharField(max_length=20, choices=FLAVOR_CHOICES, default='other')
+    percentage = models.FloatField(null=True, blank=True)
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='created_items')
     updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='updated_items')
     created_at = models.DateTimeField(auto_now_add=True)
@@ -63,6 +64,7 @@ class POI(models.Model):
     name = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     location = models.PointField()  # PostGIS Point field
+    thumbnail = models.BinaryField(null=True, blank=True)
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='created_pois')
     last_updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='last_updated_pois')
     created_at = models.DateTimeField(auto_now_add=True)

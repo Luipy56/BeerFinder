@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import './MapComponent.css';
 import { POI, CreatePOIDto } from '../types/poi';
@@ -63,6 +63,15 @@ const MapComponent: React.FC = () => {
     return null;
   };
 
+  // Component to update map center when userLocation changes
+  const MapCenterUpdater: React.FC<{ center: [number, number] }> = ({ center }) => {
+    const map = useMap();
+    useEffect(() => {
+      map.setView(center, map.getZoom());
+    }, [center, map]);
+    return null;
+  };
+
   const handleMapClick = (lat: number, lng: number) => {
     // Close ViewPOIModal if open when clicking on map
     if (isViewModalOpen) {
@@ -91,7 +100,7 @@ const MapComponent: React.FC = () => {
     setIsViewModalOpen(true);
   };
 
-  const handleCreatePOI = async (name: string, description: string) => {
+  const handleCreatePOI = async (name: string, description: string, thumbnail?: string) => {
     if (!clickedLocation) return;
 
     try {
@@ -100,6 +109,7 @@ const MapComponent: React.FC = () => {
         description,
         latitude: clickedLocation.lat,
         longitude: clickedLocation.lng,
+        ...(thumbnail && { thumbnail }),
       };
 
       const createdPOI = await POIService.createPOI(newPOI);
@@ -118,7 +128,7 @@ const MapComponent: React.FC = () => {
     }
   };
 
-  const handleEditPOI = async (name: string, description: string) => {
+  const handleEditPOI = async (name: string, description: string, thumbnail?: string) => {
     if (!selectedPOI || !selectedPOI.id) {
       console.error('handleEditPOI called with invalid POI:', selectedPOI);
       showError('Invalid POI: missing ID');
@@ -126,19 +136,27 @@ const MapComponent: React.FC = () => {
     }
 
     try {
-      await POIService.updatePOI(selectedPOI.id, {
+      const updateData: any = {
         name,
         description,
-      });
+      };
+      
+      // Only include thumbnail if a new one was provided
+      if (thumbnail !== undefined) {
+        updateData.thumbnail = thumbnail;
+      }
+      
+      const updatedPOIResponse = await POIService.updatePOI(selectedPOI.id, updateData);
       // Always preserve original coordinates (coordinates are never edited)
       const updatedPOI = {
         ...selectedPOI,
         name,
         description,
+        thumbnail: updatedPOIResponse.thumbnail || selectedPOI.thumbnail,
       };
       setPois(pois.map((p) => (p.id === selectedPOI.id ? updatedPOI : p)));
       setIsEditModalOpen(false);
-      setIsViewModalOpen(false);
+      setIsViewModalOpen(true);
       setSelectedPOI(updatedPOI);
       showSuccess('POI updated successfully!');
     } catch (error: any) {
@@ -192,6 +210,7 @@ const MapComponent: React.FC = () => {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
+        <MapCenterUpdater center={userLocation} />
         <MapClickHandler onMapClick={handleMapClick} />
         {pois.map((poi) => {
           // Only render marker if coordinates are valid
@@ -265,7 +284,7 @@ const MapComponent: React.FC = () => {
             isOpen={isEditModalOpen}
             onClose={() => {
               setIsEditModalOpen(false);
-              setSelectedPOI(null);
+              setIsViewModalOpen(true);
             }}
             poi={selectedPOI}
             onSubmit={handleEditPOI}

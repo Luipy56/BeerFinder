@@ -15,9 +15,10 @@ const POIService = {
             ...item.properties,
             latitude: item.geometry.coordinates[1],
             longitude: item.geometry.coordinates[0],
+            thumbnail: item.properties?.thumbnail || null,
           };
         }
-        return item;
+        return { ...item, thumbnail: item.thumbnail || null };
       });
     }
     // Handle regular list format (non-paginated)
@@ -31,9 +32,10 @@ const POIService = {
             ...item.properties,
             latitude: item.geometry.coordinates[1],
             longitude: item.geometry.coordinates[0],
+            thumbnail: item.properties?.thumbnail || null,
           };
         }
-        return item;
+        return { ...item, thumbnail: item.thumbnail || null };
       });
     }
     return [];
@@ -50,14 +52,28 @@ const POIService = {
         ...geoData.properties,
         latitude: geoData.geometry.coordinates[1],
         longitude: geoData.geometry.coordinates[0],
+        thumbnail: geoData.properties?.thumbnail || null,
       };
     }
     // Handle regular format (non-GeoJSON)
-    return response.data;
+    return { ...response.data, thumbnail: response.data?.thumbnail || null };
   },
 
   createPOI: async (poiData: CreatePOIDto): Promise<POI> => {
-    const response = await api.post('/pois/', poiData);
+    // Send thumbnail as thumbnail_write for the backend to process
+    const requestPayload: any = {
+      name: poiData.name,
+      description: poiData.description,
+      latitude: poiData.latitude,
+      longitude: poiData.longitude,
+    };
+    
+    // Add thumbnail_write if thumbnail is provided
+    if (poiData.thumbnail) {
+      requestPayload.thumbnail_write = poiData.thumbnail;
+    }
+    
+    const response = await api.post('/pois/', requestPayload);
     // Handle GeoJSON format from DRF-GIS
     // GeoJSON Feature format: { type: "Feature", id: X, geometry: {...}, properties: {...} }
     if (response.data && response.data.geometry) {
@@ -69,6 +85,7 @@ const POIService = {
         ...geoData.properties,
         latitude: geoData.geometry.coordinates[1],
         longitude: geoData.geometry.coordinates[0],
+        thumbnail: geoData.properties?.thumbnail || null,
       };
       // Ensure id is present
       if (poi.id === undefined || poi.id === null) {
@@ -82,12 +99,23 @@ const POIService = {
       console.error('POI created but missing id in response:', response.data);
       throw new Error('POI created but response missing ID');
     }
-    return response.data;
+    return { ...response.data, thumbnail: response.data?.thumbnail || null };
   },
 
   updatePOI: async (id: number, poiData: Partial<CreatePOIDto>): Promise<POI> => {
-    // Note: coordinates are never updated, only name and description
-    const response = await api.patch(`/pois/${id}/`, poiData);
+    // Note: coordinates are never updated, only name, description, and thumbnail
+    // Send thumbnail as thumbnail_write for the backend to process
+    const requestPayload: any = {
+      name: poiData.name,
+      description: poiData.description,
+    };
+    
+    // Add thumbnail_write if thumbnail is provided
+    if (poiData.thumbnail !== undefined) {
+      requestPayload.thumbnail_write = poiData.thumbnail;
+    }
+    
+    const response = await api.patch(`/pois/${id}/`, requestPayload);
     // Handle GeoJSON format from DRF-GIS
     if (response.data && response.data.geometry) {
       const geoData = response.data;
@@ -97,14 +125,15 @@ const POIService = {
         ...geoData.properties,
         latitude: geoData.geometry.coordinates[1],
         longitude: geoData.geometry.coordinates[0],
+        thumbnail: geoData.properties?.thumbnail || null,
       };
     }
     // Handle regular format (non-GeoJSON)
     // Ensure id is present
     if (response.data && (response.data.id === undefined || response.data.id === null)) {
-      return { ...response.data, id };
+      return { ...response.data, id, thumbnail: response.data?.thumbnail || null };
     }
-    return response.data;
+    return { ...response.data, thumbnail: response.data?.thumbnail || null };
   },
 
   deletePOI: async (id: number): Promise<void> => {
