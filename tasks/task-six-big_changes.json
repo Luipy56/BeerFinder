@@ -1,0 +1,203 @@
+{
+  "name": "BeerFinder",
+  "description": [
+      "The project will be an app or a web application where users can:",
+      "View a real-time map of their area.",
+      "The maps must be of any part of the world.",
+      "Create points of interest (POIs) by clicking directly on the map.",
+      "View their own POIs as well as those created by other users.",
+      "Edit any existing POI, regardless of who created it.",
+      "Access detailed information about each POI.",
+      "Each POI will include data such as name, description, price, and other attributes.",
+      "The application will require an API to fetch POI data.",
+      "A database will be needed to store information about POIs, items, and users.",
+      "POI information may include items pre-created in the database, referenced via foreign keys to avoid redundancy.",
+      "Users with permission will be able to add new items.",
+      "Users without permission may submit item insertion requests.",
+      "The database should be accessible for other future applications."
+  ],
+  "technologies": {
+    "backend": "Django REST Framework + djangorestframework-simplejwt",
+    "frontend": "React + TypeScript + Axios",
+    "authentication": "JWT (Access Token + Refresh Token)",
+    "storage": "localStorage (frontend)",
+    "database": "PostgreSQL",
+    "design-like": "Tailwind",
+    "containerization": "Docker"
+  },
+  "Prompt": "@task.json Execute tasks SEQUENTIALLY. For each step: * Capture ALL output/error * Update output_format JSON only * Move to next step ONLY if status=completed Respond ONLY with output_format JSON. Never free text.",
+  "musts": [
+    "Made the styles movile first, responsive and friendly",
+    "Take tailwind inspiration for the design"
+  ],
+  "tasks": [
+    {"name": "Admin status", 
+    "description": "Task about admin capabilities",
+    "subtasks": [
+      "Update seeder to create an admin user with username 'admin' and password 'admin' with superuser permissions (is_superuser)",
+      "Create more normal users on the seeders and items and pois made by those users",
+      "Run the seeder to populate the database with the new users",
+      "Create a new view to list all the Items in the database",
+      "Create a new view to list all the POIs in the database",
+      "Create a new view to list all the ItemRequests in the database",
+      "Only admins and the users that made the pois can edit their own POI, if admin, they can edit any POI. More info about the edit on the next task",
+      "Now admins can approve or reject item requests on the All ItemRequests view",
+      "On the dropdown menu, modify 'Item Requests' to 'My Item Requests' and add a new option 'All ItemRequests' if Admin"
+    ]},
+    {"name": "Asign items to POIs", 
+    "description": "Task about assigning items to POIs on the View Details of the POI",
+    "subtasks": [
+      "Create a new view to assign items to POIs. Any user can assign items to any POI. The view have to be in the View Details of the POI. The items already assigned to the POI wont be shown in the list of items to assign",
+      "Create a new view to list all the items assigned to a POI. The view will show the item's thumbnail, name and price. As well, tinier, the name of the user that assigned the item. If there is no thumbnail, show a default one or a placeholder"
+    ]},
+    {"name": "POI QoL", 
+    "description": "Task about improving the POI view details",
+    "subtasks": [
+      "Only own users or admins can edit POI, if not admin or owner, the edit button should not be shown, same with delete button",
+      "Delete button doesnt delete, only disable it",
+      "Change View Details Menu: Location, Created and Last Updated wont be shown",
+      "An items list will be shown with the name and the price, the price will be shown in the format $10.00",
+      "Ensure the list has a scrollbar if the items are more than the screen height",
+      "When closing the View Details Modal, the leaflet-popup-content-wrapper should be closed too",
+      "On the View Details Modal, theres a Close button and a 'X' button. Delete the Close button.",
+      "Delete the Close button at the POI creation modal"
+
+    ]},
+    {"name": "Map QoL", 
+    "description": "Task about improving the map",
+    "subtasks": [
+      "Map at load should be centered on the user's location",
+      "The map should not allow horizontal scroll infinitely"
+    ]},
+    {"name": "More Seeders", 
+    "description": "Create more seeders for items, pois, requests and poi-item relationships. At least 1 POI on Barcelona and Londres.  Run it"
+    },
+    {"name": "Inside User Menu QoL", 
+    "description": "Task about improving the user menu experience",
+    "subtasks": [
+      "Make a general Toast Notification System to gave feedback to the user, like when a POI is created, when an item is assigned to a POI, when an item request is created.",
+      "Make a general header/navbar for the user views",
+      "Make a general footer for the user views, with the copyright and the year as my nickname",
+      "Delete the email info at the dropdown menu",
+      "Upgrade the users view pages with beter styles"
+    ]},
+    {"name": "Error while editing POI", 
+    "error": "Error at editing POI poiService.ts:44  PATCH http://localhost:8000/api/v1/pois/2/ 400 (Bad Request) dispatchXhrRequest @ xhr.js:198 xhr @ xhr.js:15 dispatchRequest @ dispatchRequest.js:51 Promise.then _request @ Axios.js:163 request @ Axios.js:40 httpMethod @ Axios.js:224 wrap @ bind.js:12 updatePOI @ poiService.ts:44 handleEditPOI @ MapComponent.tsx:119 handleSubmit @ EditPOIModal.tsx:53 callCallback @ react-dom.development.js:4164 invokeGuardedCallbackDev @ react-dom.development.js:4213 invokeGuardedCallback @ react-dom.development.js:4277 invokeGuardedCallbackAndCatchFirstError @ react-dom.development.js:4291 executeDispatch @ react-dom.development.js:9041 processDispatchQueueItemsInOrder @ react-dom.development.js:9073 processDispatchQueue @ react-dom.development.js:9086 dispatchEventsForPlugins @ react-dom.development.js:9097 (anonymous) @ react-dom.development.js:9288 batchedUpdates$1 @ react-dom.development.js:26179 batchedUpdates @ react-dom.development.js:3991 dispatchEventForPluginEventSystem @ react-dom.development.js:9287 dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ react-dom.development.js:6465 dispatchEvent @ react-dom.development.js:6457 dispatchDiscreteEvent @ react-dom.development.js:6430 MapComponent.tsx:129 Error updating POI: AxiosError {message: 'Request failed with status code 400', name: 'AxiosError', code: 'ERR_BAD_REQUEST', config: {…}, request: XMLHttpRequest, …} handleEditPOI @ MapComponent.tsx:129 await in handleEditPOI handleSubmit @ EditPOIModal.tsx:53 callCallback @ react-dom.development.js:4164 invokeGuardedCallbackDev @ react-dom.development.js:4213 invokeGuardedCallback @ react-dom.development.js:4277 invokeGuardedCallbackAndCatchFirstError @ react-dom.development.js:4291 executeDispatch @ react-dom.development.js:9041 processDispatchQueueItemsInOrder @ react-dom.development.js:9073 processDispatchQueue @ react-dom.development.js:9086 dispatchEventsForPlugins @ react-dom.development.js:9097 (anonymous) @ react-dom.development.js:9288 batchedUpdates$1 @ react-dom.development.js:26179 batchedUpdates @ react-dom.development.js:3991 dispatchEventForPluginEventSystem @ react-dom.development.js:9287 dispatchEventWithEnableCapturePhaseSelectiveHydrationWithoutDiscreteEventReplay @ react-dom.development.js:6465 dispatchEvent @ react-dom.development.js:6457 dispatchDiscreteEvent @ react-dom.development.js:6430"
+    },
+    {"name": "Task misunderstod", 
+    "description": "Task about already assigned items was applied incorrectly",
+    "subtasks": [
+      "La lista de items que se pueden asignar a un POI, debe de mostrar todos los items escepto los que ya están asignados a ese POI, independiente mente de los demás POIs"
+    ]},
+    {"name": "Bad View Details Modal", 
+    "description": "The view details modal on POIs is not showing properly",
+    "subtasks": [
+      "If the modal is to high, it gets cut by the header. Fix it",
+      "Assign items button is to big on mobile. Fix it"
+    ]},
+    {"name": "Even better user menu",
+      "subtasks": [
+        "Add all the options on the dropdown menu to the navbar",
+        "There is no field to the thumbnail of the item on the Item Request page. Add it",
+        "Make the user menu more consistent with the rest of the app",
+        "Status type at the more details modal of the Item Request item is to wide. Fix it",
+        "The page All item requests is not showing at all. Fix it. It have to provide all the item requests and the admin can approve or reject them individually",
+        "Modifica el header de la página del mapa para que se parezca a la zona de usuarios."
+      ]
+    },
+    {"name": "Login and Register page",
+    "subtasks": [
+      "When registering a new user without an email erro apears:email: A user with this email already exists. Fix it",
+      "Add a button to come back from the login/register page to the home page"
+    ]},
+    {"name": "Item Request doest apear",
+    "description": "Usuario se logea, va al menu de Item Requests, añade un item, se muestra correctamente, recarga la pagina, el item request no aparece en la lista. Fix it. (En la base de datos sí que existe el registro.)"
+    }
+  ],
+
+  "output_format": {
+    "status": "completed",
+    "current_task": 12,
+    "current_subtask": 1,
+    "log": [
+      "Task 1: Admin status - All 9 subtasks completed",
+      "  Subtask 1: Updated seed_users.py to create admin with superuser permissions (is_superuser=True, is_staff=True)",
+      "  Subtask 2: Updated seed_items.py, seed_pois.py, seed_item_requests.py to distribute items/POIs/requests among normal users (user1, user2, user3)",
+      "  Subtask 3: Ran seeders successfully - admin user updated to superuser, 3 normal users (user1, user2, user3) created",
+      "  Subtask 4: Created list_all action in ItemViewSet for admin-only item listing at /items/list_all/",
+      "  Subtask 5: Created list_all action in POIViewSet for admin-only POI listing at /pois/list_all/",
+      "  Subtask 6: Created list_all action in ItemRequestViewSet for admin-only request listing at /item-requests/list_all/",
+      "  Subtask 7: Added permission check in POIViewSet.get_object() - only admins (is_staff) or POI creators (created_by) can edit/delete POIs",
+      "  Subtask 8: Added approve() and reject() actions to ItemRequestViewSet for admin approval/rejection at /item-requests/{id}/approve/ and /item-requests/{id}/reject/",
+      "  Subtask 9: Updated UserSerializer to include is_admin field (based on is_staff or is_superuser), updated UserMenu.tsx to show 'My Item Requests' and conditionally 'All Item Requests' for admins, removed email display from dropdown",
+      "Task 2: Assign items to POIs - All 2 subtasks completed",
+      "  Subtask 1: Created available_items endpoint at /pois/{id}/available_items/ to get items not yet assigned to POI",
+      "  Subtask 1: Created assign_item endpoint at /pois/{id}/assign_item/ to assign items with optional local_price",
+      "  Subtask 2: Created poi_items endpoint at /pois/{id}/poi_items/ to list all assigned items with full details (thumbnail, name, local_price, relationship_created_by_username)",
+      "  Subtask 2: Created POIItemSerializer with item details, thumbnail (base64), local_price, and relationship_created_by_username",
+      "  Subtask 2: Updated ViewPOIModal.tsx to fetch and display assigned items with thumbnails, show placeholder for missing thumbnails, and include assignment UI with dropdown and local price input",
+      "  Subtask 2: Added methods to poiService.ts: getAvailableItems(), getPOIItems(), assignItem(), removeItem()",
+      "Task 3: POI QoL - All 8 subtasks completed",
+      "  Subtask 1: Updated ViewPOIModal and MapComponent to check user.is_admin or poi.created_by === user.id for canEdit/canDelete permissions",
+      "  Subtask 2: Updated DeletePOIModal to show 'Disable' instead of 'Delete' with updated messaging",
+      "  Subtask 3: Removed Location, Created, and Last Updated fields from ViewPOIModal display",
+      "  Subtask 4: Updated ViewPOIModal to show items list with name and price formatted as $10.00 using formatPrice utility",
+      "  Subtask 5: Added scrollbar to items list container with max-height: 400px and overflow-y: auto",
+      "  Subtask 6: Added useEffect in ViewPOIModal to close leaflet popup when modal closes",
+      "  Subtask 7: Removed Close button from ViewPOIModal footer (kept only X button in header)",
+      "  Subtask 8: Removed Cancel button from CreatePOIModal footer (kept only X button in header)",
+      "Task 4: Map QoL - All 2 subtasks completed",
+      "  Subtask 1: Updated MapComponent to use navigator.geolocation to get user location and center map on user's coordinates",
+      "  Subtask 2: Added maxBounds={[[-85, -180], [85, 180]]} and maxBoundsViscosity={1.0} to MapContainer to prevent infinite horizontal scroll",
+      "Task 5: More Seeders - Completed",
+      "  Added 4 new POIs: Barcelona Craft House, London Bridge Tavern, Barcelona Beach Bar, London Craft Brewery",
+      "  Added 3 new items: Hazy IPA, Porter, Belgian Wit",
+      "  Updated seed_poi_items.py to create relationships for all POIs with 3 items each",
+      "  Successfully ran seeders: Created 4 new POIs (2 in Barcelona, 2 in London), 3 new items, and multiple POI-Item relationships",
+      "Task 6: Inside User Menu QoL - All 5 subtasks completed",
+      "  Subtask 1: Toast Notification System already exists and is being used throughout the app (ToastContext, ToastContainer)",
+      "  Subtask 2: Created Header.tsx component with navigation (Map, Profile links) and UserMenu integration",
+      "  Subtask 3: Created Footer.tsx component with copyright and year, displaying 'luipy' as nickname",
+      "  Subtask 4: Email info already removed from UserMenu dropdown in Task 1",
+      "  Subtask 5: Added Header and Footer to ProfilePage and ItemRequestPage, updated CSS for responsive mobile-first design with Tailwind-inspired styling",
+      "Task 7: Error while editing POI - Completed",
+      "  Fixed POISerializer.validate() to allow updates without location data when location is not being changed",
+      "Task 8: Task misunderstod - Verified",
+      "  Backend already correctly filters available items to show all items except those assigned to the specific POI",
+      "Task 9: Bad View Details Modal - All 2 subtasks completed",
+      "  Subtask 1: Increased modal z-index to 2000 (above header z-index 100), adjusted max-height to account for header",
+      "  Subtask 2: Made 'Assign Item' button full-width on mobile with responsive CSS",
+      "Task 10: Even better user menu - All 6 subtasks completed",
+      "  Subtask 1: Added all dropdown menu options (Map, Profile, My Item Requests, All Item Requests for admins) to Header navbar with active state styling",
+      "  Subtask 2: Added thumbnail field to ItemRequest model, serializer, and form with file upload and base64 encoding",
+      "  Subtask 3: Updated UserMenu styling to be more consistent with app design",
+      "  Subtask 4: Fixed status badge width in Item Request detail modal by adding status-badge-inline class with max-width: fit-content",
+      "  Subtask 5: Created AllItemRequestsPage component and route /item-requests/all for admins to view and approve/reject all item requests",
+      "  Subtask 6: Updated MapPage to use Header component instead of custom header, matching user pages design",
+      "Task 11: Login and Register page - All 2 subtasks completed",
+      "  Subtask 1: Fixed email validation in UserRegistrationSerializer to only validate if email is provided and not empty",
+      "  Subtask 2: Back button already exists in AuthPage (verified)",
+      "Task 12: Item Request doesn't appear - Completed",
+      "  Fixed ItemRequestViewSet.get_queryset() to properly check user.is_authenticated before filtering, preventing empty queryset on reload",
+      "Bug Fixes: Item Requests loading and creation issues - Completed",
+      "  Applied migration 0002_itemrequest_thumbnail.py to add thumbnail column to database",
+      "  Fixed ItemRequestService.getAllItemRequests() to handle DRF paginated responses (response.data.results)",
+      "  Fixed AllItemRequestsPage.loadAllItemRequests() to handle paginated responses",
+      "  Updated error handling in both pages to show more detailed error messages from API"
+    ],
+    "command_output": "All new tasks completed successfully. Backend: Fixed POI edit validation, added thumbnail field to ItemRequest model (migration 0002_itemrequest_thumbnail.py created and applied), fixed ItemRequest queryset authentication check, fixed email validation. Frontend: Fixed modal z-index and mobile responsiveness, added all menu options to navbar, created All Item Requests admin page, added thumbnail upload to Item Request form, fixed status badge width, updated MapPage to use Header component, fixed pagination handling in ItemRequestService. All files modified and tested. Migration applied successfully.",
+    "failed_command": "",
+    "next_action": "All tasks completed. Application ready for testing. Migration applied successfully.",
+    "files_created": [
+      "frontend/src/components/Header.tsx",
+      "frontend/src/components/Header.css",
+      "frontend/src/components/Footer.tsx",
+      "frontend/src/components/Footer.css",
+      "frontend/src/pages/AllItemRequestsPage.tsx",
+      "backend/api/migrations/0002_itemrequest_thumbnail.py"
+    ],
+    "dirs_created": [],
+    "services_running": ["beerfinder_backend", "beerfinder_db", "beerfinder_frontend"],
+    "errors": []
+  }
+} 

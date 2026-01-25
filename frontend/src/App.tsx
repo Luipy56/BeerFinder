@@ -7,6 +7,7 @@ import MapPage from './pages/MapPage';
 import AuthPage from './pages/AuthPage';
 import ProfilePage from './pages/ProfilePage';
 import ItemRequestPage from './pages/ItemRequestPage';
+import AllItemRequestsPage from './pages/AllItemRequestsPage';
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
               <Route path="/auth" element={<AuthPage />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/item-requests" element={<ItemRequestPage />} />
+              <Route path="/item-requests/all" element={<AllItemRequestsPage />} />
             </Routes>
           </div>
         </Router>

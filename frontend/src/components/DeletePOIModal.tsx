@@ -65,7 +65,7 @@ const DeletePOIModal: React.FC<DeletePOIModalProps> = ({
     >
       <div className="modal modal-small" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2 id="delete-poi-title" className="modal-title">Delete Point of Interest</h2>
+          <h2 id="delete-poi-title" className="modal-title">Disable Point of Interest</h2>
           <button
             className="modal-close"
             onClick={onClose}
@@ -83,7 +83,7 @@ const DeletePOIModal: React.FC<DeletePOIModalProps> = ({
             </div>
           )}
           <p className="delete-confirmation-text">
-            Are you sure you want to delete <strong>"{poi.name}"</strong>? This action cannot be undone.
+            Are you sure you want to disable <strong>"{poi.name}"</strong>? This will hide it from the map.
           </p>
         </div>
         <div className="modal-footer">
@@ -101,9 +101,9 @@ const DeletePOIModal: React.FC<DeletePOIModalProps> = ({
             onClick={handleConfirm}
             className={`btn btn-danger ${isDeleting ? 'btn-loading' : ''}`}
             disabled={isDeleting}
-            aria-label="Confirm delete POI"
+            aria-label="Confirm disable POI"
           >
-            {isDeleting ? 'Deleting...' : 'Delete'}
+            {isDeleting ? 'Disabling...' : 'Disable'}
           </button>
         </div>
       </div>

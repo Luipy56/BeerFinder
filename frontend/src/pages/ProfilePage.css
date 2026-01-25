@@ -1,7 +1,7 @@
 .profile-page {
-  min-height: 100vh;
   background-color: var(--color-surface);
   padding: var(--spacing-lg);
+  flex: 1;
 }
 
 .profile-container {

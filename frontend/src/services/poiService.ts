@@ -1,5 +1,5 @@
 import api from '../utils/axiosConfig';
-import { POI, CreatePOIDto } from '../types/poi';
+import { POI, CreatePOIDto, Item } from '../types/poi';
 
 const POIService = {
   getAllPOIs: async (): Promise<POI[]> => {
@@ -47,6 +47,28 @@ const POIService = {
 
   deletePOI: async (id: number): Promise<void> => {
     await api.delete(`/pois/${id}/`);
+  },
+
+  getAvailableItems: async (poiId: number): Promise<Item[]> => {
+    const response = await api.get(`/pois/${poiId}/available_items/`);
+    return response.data;
+  },
+
+  getPOIItems: async (poiId: number): Promise<any[]> => {
+    const response = await api.get(`/pois/${poiId}/poi_items/`);
+    return response.data;
+  },
+
+  assignItem: async (poiId: number, itemId: number, localPrice?: number): Promise<any> => {
+    const response = await api.post(`/pois/${poiId}/assign_item/`, {
+      item_id: itemId,
+      local_price: localPrice,
+    });
+    return response.data;
+  },
+
+  removeItem: async (poiId: number, itemId: number): Promise<void> => {
+    await api.post(`/pois/${poiId}/remove_item/`, { item_id: itemId });
   },
 };
 

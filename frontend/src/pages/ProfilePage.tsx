@@ -4,6 +4,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import authService from '../services/authService';
 import ProtectedRoute from '../components/ProtectedRoute';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
 import './ProfilePage.css';
 
 const ProfilePage: React.FC = () => {
@@ -136,8 +138,10 @@ const ProfilePage: React.FC = () => {
 
   return (
     <ProtectedRoute>
-      <div className="profile-page">
-        <div className="profile-container">
+      <div className="page-layout">
+        <Header />
+        <div className="profile-page">
+          <div className="profile-container">
           <div className="profile-header">
             <div className="profile-header-left">
               <button
@@ -233,7 +237,9 @@ const ProfilePage: React.FC = () => {
               </div>
             </div>
           )}
+          </div>
         </div>
+        <Footer />
       </div>
     </ProtectedRoute>
   );

@@ -14,7 +14,7 @@ import { useToast } from '../contexts/ToastContext';
 import { formatPrice } from '../utils/format';
 
 const MapComponent: React.FC = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const { showSuccess, showError } = useToast();
   const navigate = useNavigate();
   const [pois, setPois] = useState<POI[]>([]);
@@ -25,9 +25,22 @@ const MapComponent: React.FC = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
   const [clickedLocation, setClickedLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [selectedPOI, setSelectedPOI] = useState<POI | null>(null);
+  const [userLocation, setUserLocation] = useState<[number, number]>([51.505, -0.09]); // Default to London
 
   useEffect(() => {
     loadPOIs();
+    // Get user's location
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation([position.coords.latitude, position.coords.longitude]);
+        },
+        (error) => {
+          console.warn('Error getting user location:', error);
+          // Keep default location
+        }
+      );
+    }
   }, []);
 
   const loadPOIs = async () => {
@@ -153,9 +166,11 @@ const MapComponent: React.FC = () => {
   return (
     <div className="map-container">
       <MapContainer
-        center={[51.505, -0.09]}
+        center={userLocation}
         zoom={13}
         style={{ height: '100%', width: '100%' }}
+        maxBounds={[[-85, -180], [85, 180]]}
+        maxBoundsViscosity={1.0}
       >
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -215,8 +230,8 @@ const MapComponent: React.FC = () => {
             poi={selectedPOI}
             onEdit={handleOpenEdit}
             onDelete={handleOpenDelete}
-            canEdit={isAuthenticated}
-            canDelete={isAuthenticated}
+            canEdit={isAuthenticated && selectedPOI ? (user?.is_admin || selectedPOI.created_by === user?.id) : false}
+            canDelete={isAuthenticated && selectedPOI ? (user?.is_admin || selectedPOI.created_by === user?.id) : false}
           />
           <EditPOIModal
             isOpen={isEditModalOpen}

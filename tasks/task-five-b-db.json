@@ -1,0 +1,72 @@
+{
+    "name": "BeerFinder",
+    "description": [
+        "The project will be an app or a web application where users can:",
+        "View a real-time map of their area.",
+        "The maps must be of any part of the world.",
+        "Create points of interest (POIs) by clicking directly on the map.",
+        "View their own POIs as well as those created by other users.",
+        "Edit any existing POI, regardless of who created it.",
+        "Access detailed information about each POI.",
+        "Each POI will include data such as name, description, price, and other attributes.",
+        "The application will require an API to fetch POI data.",
+        "A database will be needed to store information about POIs, items, and users.",
+        "POI information may include items pre-created in the database, referenced via foreign keys to avoid redundancy.",
+        "Users with permission will be able to add new items.",
+        "Users without permission may submit item insertion requests.",
+        "The database should be accessible for other future applications."
+    ],
+    "technologies": {
+        "": ""
+    },
+    "Prompt": "@task.json Execute tasks SEQUENTIALLY. For each step: * Capture ALL output/error * Update output_format JSON only * Move to next step ONLY if status=completed Respond ONLY with output_format JSON. Never free text.",
+    "tasks": [
+      {"name": "Seeder for the database", 
+      "description": "Create a seeder for the database to populate the database with some data",
+      "subtasks": [
+        "Create a seeder for the POI model to populate the database with some data",
+        "Create a seeder for the Item model to populate the database with some data",
+        "Create a seeder for the ItemRequest model to populate the database with some data",
+        "Create a seeder for the POI-Item many-to-many relationship to populate the database with some data",
+        "Create a seeder for the User model to populate the database with some data: only username with 'admin' as password"
+      ]}
+    ],
+    "musts": [
+      ""
+    ],
+    "output_format": {
+      "status": "completed",
+      "current_task": 1,
+      "current_subtask": 5,
+      "log": [
+        "Task 1: Seeder for the database - All 5 subtasks completed",
+        "  Subtask 1: Created seeder for POI model (seed_pois.py) - Successfully created 5 POIs",
+        "  Subtask 2: Created seeder for Item model (seed_items.py) - Successfully created 5 items",
+        "  Subtask 3: Created seeder for ItemRequest model (seed_item_requests.py) - Successfully created 3 item requests",
+        "  Subtask 4: Created seeder for POI-Item many-to-many relationship (seed_poi_items.py) - Successfully created 6 POI-Item relationships",
+        "  Subtask 5: Created seeder for User model (seed_users.py) - Admin user already exists or created successfully"
+      ],
+      "command_output": "All seeders created and executed successfully:\n- seed_users: User 'admin' already exists or created\n- seed_pois: Created 5 POIs (Downtown Brewery, Riverside Beer Garden, Mountain View Taproom, Beachside Pub, Historic District Brewery)\n- seed_items: Created 5 items (Craft Beer IPA, Lager Beer, Stout Beer, Wheat Beer, Pilsner)\n- seed_item_requests: Created 3 item requests (Hazy IPA, Sour Beer, Barley Wine)\n- seed_poi_items: Created 6 POI-Item relationships",
+      "failed_command": "",
+      "next_action": "All database seeders have been created and tested successfully. Ready for use.",
+      "files_created": [
+        "backend/api/management/__init__.py",
+        "backend/api/management/commands/__init__.py",
+        "backend/api/management/commands/seed_users.py",
+        "backend/api/management/commands/seed_pois.py",
+        "backend/api/management/commands/seed_items.py",
+        "backend/api/management/commands/seed_item_requests.py",
+        "backend/api/management/commands/seed_poi_items.py"
+      ],
+      "dirs_created": [
+        "backend/api/management",
+        "backend/api/management/commands"
+      ],
+      "services_running": [
+        "beerfinder_backend",
+        "beerfinder_db",
+        "beerfinder_frontend"
+      ],
+      "errors": []
+    }
+  } 

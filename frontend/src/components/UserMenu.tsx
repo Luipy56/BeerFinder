@@ -66,11 +66,6 @@ const UserMenu: React.FC = () => {
             <div className="user-info-item">
               <strong>Username:</strong> {user.username}
             </div>
-            {user.email && (
-              <div className="user-info-item">
-                <strong>Email:</strong> {user.email}
-              </div>
-            )}
           </div>
           <div className="menu-divider"></div>
           <button
@@ -91,10 +86,23 @@ const UserMenu: React.FC = () => {
               setIsOpen(false);
             }}
             role="menuitem"
-            aria-label="View item requests"
+            aria-label="View my item requests"
           >
-            Item Requests
+            My Item Requests
           </button>
+          {user.is_admin && (
+            <button
+              className="menu-item"
+              onClick={() => {
+                navigate('/item-requests/all');
+                setIsOpen(false);
+              }}
+              role="menuitem"
+              aria-label="View all item requests"
+            >
+              All Item Requests
+            </button>
+          )}
           <button
             className="menu-item"
             onClick={handleLogout}

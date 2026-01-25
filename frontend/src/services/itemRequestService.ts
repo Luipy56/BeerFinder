@@ -5,6 +5,7 @@ export interface ItemRequest {
   name: string;
   description: string;
   price?: number | null;
+  thumbnail?: string | null;
   requested_by?: number;
   status: 'pending' | 'approved' | 'rejected';
   created_at: string;
@@ -15,11 +16,17 @@ export interface CreateItemRequestDto {
   name: string;
   description?: string;
   price?: number;
+  thumbnail?: string;
 }
 
 const ItemRequestService = {
   getAllItemRequests: async (): Promise<ItemRequest[]> => {
-    const response = await api.get<ItemRequest[]>('/item-requests/');
+    const response = await api.get<any>('/item-requests/');
+    // Handle paginated response from DRF
+    if (response.data && response.data.results) {
+      return response.data.results;
+    }
+    // Handle non-paginated response
     return Array.isArray(response.data) ? response.data : [];
   },
 

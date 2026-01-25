@@ -1,7 +1,7 @@
 .item-request-page {
-  min-height: 100vh;
   background-color: var(--color-surface);
   padding: var(--spacing-lg);
+  flex: 1;
 }
 
 .item-request-container {
@@ -227,6 +227,21 @@
   font-size: var(--font-size-base);
   color: var(--color-text);
   line-height: 1.6;
+}
+
+.status-badge-inline {
+  display: inline-block;
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  max-width: fit-content;
+}
+
+.thumbnail-preview {
+  margin-top: var(--spacing-sm);
 }
 
 @media (max-width: 767px) {

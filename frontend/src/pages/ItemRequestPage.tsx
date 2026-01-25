@@ -4,6 +4,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import ItemRequestService, { ItemRequest, CreateItemRequestDto } from '../services/itemRequestService';
 import ProtectedRoute from '../components/ProtectedRoute';
+import Header from '../components/Header';
+import Footer from '../components/Footer';
 import './ItemRequestPage.css';
 import { formatPrice } from '../utils/format';
 
@@ -20,7 +22,9 @@ const ItemRequestPage: React.FC = () => {
     name: '',
     description: '',
     price: undefined,
+    thumbnail: undefined,
   });
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
@@ -36,7 +40,7 @@ const ItemRequestPage: React.FC = () => {
       setItemRequests(data);
     } catch (error: any) {
       console.error('Error loading item requests:', error);
-      showError('Failed to load item requests. Please try again.');
+      showError(error.response?.data?.detail || 'Failed to load item requests. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -50,6 +54,22 @@ const ItemRequestPage: React.FC = () => {
     }));
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: '' }));
+    }
+  };
+
+  const handleThumbnailChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setThumbnailFile(file);
+      // Convert file to base64
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        // Remove data:image/...;base64, prefix
+        const base64Data = base64String.split(',')[1];
+        setFormData((prev) => ({ ...prev, thumbnail: base64Data }));
+      };
+      reader.readAsDataURL(file);
     }
   };
 
@@ -102,7 +122,8 @@ const ItemRequestPage: React.FC = () => {
   };
 
   const handleCancel = () => {
-    setFormData({ name: '', description: '', price: undefined });
+    setFormData({ name: '', description: '', price: undefined, thumbnail: undefined });
+    setThumbnailFile(null);
     setErrors({});
     setShowCreateForm(false);
   };
@@ -131,11 +152,15 @@ const ItemRequestPage: React.FC = () => {
   if (isLoading) {
     return (
       <ProtectedRoute>
-        <div className="item-request-page">
-          <div className="item-request-loading">
-            <div className="loading-spinner"></div>
-            <p>Loading item requests...</p>
+        <div className="page-layout">
+          <Header />
+          <div className="item-request-page">
+            <div className="item-request-loading">
+              <div className="loading-spinner"></div>
+              <p>Loading item requests...</p>
+            </div>
           </div>
+          <Footer />
         </div>
       </ProtectedRoute>
     );
@@ -143,8 +168,10 @@ const ItemRequestPage: React.FC = () => {
 
   return (
     <ProtectedRoute>
-      <div className="item-request-page">
-        <div className="item-request-container">
+      <div className="page-layout">
+        <Header />
+        <div className="item-request-page">
+          <div className="item-request-container">
           <div className="item-request-header">
             <div className="item-request-header-left">
               <button
@@ -223,6 +250,29 @@ const ItemRequestPage: React.FC = () => {
                     min="0"
                     disabled={isCreating}
                   />
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="request-thumbnail" className="form-label">
+                    Thumbnail (optional)
+                  </label>
+                  <input
+                    type="file"
+                    id="request-thumbnail"
+                    accept="image/*"
+                    onChange={handleThumbnailChange}
+                    disabled={isCreating}
+                    className="form-input"
+                  />
+                  {thumbnailFile && (
+                    <div className="thumbnail-preview">
+                      <img
+                        src={URL.createObjectURL(thumbnailFile)}
+                        alt="Thumbnail preview"
+                        style={{ maxWidth: '200px', maxHeight: '200px', marginTop: 'var(--spacing-sm)' }}
+                      />
+                    </div>
+                  )}
                 </div>
 
                 <div className="form-actions">
@@ -311,12 +361,12 @@ const ItemRequestPage: React.FC = () => {
                 </div>
                 <div className="modal-body">
                   <div className="item-request-detail">
-                    <div className="detail-item">
-                      <span className="detail-label">Status</span>
-                      <span className={getStatusBadgeClass(selectedRequest.status)}>
-                        {selectedRequest.status.charAt(0).toUpperCase() + selectedRequest.status.slice(1)}
-                      </span>
-                    </div>
+                      <div className="detail-item">
+                        <span className="detail-label">Status</span>
+                        <span className={`${getStatusBadgeClass(selectedRequest.status)} status-badge-inline`}>
+                          {selectedRequest.status.charAt(0).toUpperCase() + selectedRequest.status.slice(1)}
+                        </span>
+                      </div>
                     {selectedRequest.description && (
                       <div className="detail-item">
                         <span className="detail-label">Description</span>
@@ -353,7 +403,9 @@ const ItemRequestPage: React.FC = () => {
               </div>
             </div>
           )}
+          </div>
         </div>
+        <Footer />
       </div>
     </ProtectedRoute>
   );

@@ -117,14 +117,6 @@ const CreatePOIModal: React.FC<CreatePOIModalProps> = ({
           </div>
           <div className="modal-footer">
             <button
-              type="button"
-              onClick={onClose}
-              className="btn btn-secondary"
-              disabled={isSubmitting}
-            >
-              Cancel
-            </button>
-            <button
               type="submit"
               className={`btn btn-primary ${isSubmitting ? 'btn-loading' : ''}`}
               disabled={isSubmitting || !name.trim()}

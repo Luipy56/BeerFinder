@@ -2,7 +2,7 @@ from rest_framework import serializers
 from rest_framework_gis.serializers import GeoFeatureModelSerializer
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
-from .models import POI, Item, ItemRequest
+from .models import POI, Item, ItemRequest, POIItem
 import base64
 
 
@@ -58,7 +58,12 @@ class POISerializer(GeoFeatureModelSerializer):
         }
     
     def validate(self, data):
-        # If latitude/longitude are provided, location is not required
+        # For updates (partial), location is not required if not being changed
+        if self.instance is not None:
+            # This is an update - location is optional
+            return data
+        
+        # For creates, location or latitude/longitude is required
         has_lat_lng = ('latitude_write' in data and 'longitude_write' in data) or \
                       ('latitude' in self.initial_data and 'longitude' in self.initial_data)
         
@@ -90,13 +95,35 @@ class POIListSerializer(serializers.ModelSerializer):
 
 
 class ItemRequestSerializer(serializers.ModelSerializer):
+    thumbnail = serializers.SerializerMethodField()
+    
     class Meta:
         model = ItemRequest
         fields = [
-            'id', 'name', 'description', 'price', 'requested_by',
+            'id', 'name', 'description', 'price', 'thumbnail', 'requested_by',
             'status', 'status_changed_by', 'created_at', 'updated_at'
         ]
         read_only_fields = ['requested_by', 'status', 'status_changed_by', 'created_at', 'updated_at']
+    
+    def get_thumbnail(self, obj):
+        """Convert binary thumbnail to base64 string for JSON serialization"""
+        if obj.thumbnail:
+            try:
+                return base64.b64encode(obj.thumbnail).decode('utf-8')
+            except Exception:
+                return None
+        return None
+    
+    def to_internal_value(self, data):
+        """Convert base64 string back to binary for storage"""
+        if 'thumbnail' in data and data['thumbnail']:
+            try:
+                # If it's a base64 string, decode it
+                if isinstance(data['thumbnail'], str):
+                    data['thumbnail'] = base64.b64decode(data['thumbnail'])
+            except Exception:
+                pass
+        return super().to_internal_value(data)
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
@@ -116,8 +143,9 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         return attrs
 
     def validate_email(self, value):
-        if User.objects.filter(email=value).exists():
-            raise serializers.ValidationError("A user with this email already exists.")
+        if value and value.strip():  # Only validate if email is provided and not empty
+            if User.objects.filter(email=value).exists():
+                raise serializers.ValidationError("A user with this email already exists.")
         return value
 
     def create(self, validated_data):
@@ -128,7 +156,24 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
+    is_admin = serializers.SerializerMethodField()
+    
     class Meta:
         model = User
-        fields = ('id', 'username', 'email')
-        read_only_fields = ('id', 'username')
+        fields = ('id', 'username', 'email', 'is_admin')
+        read_only_fields = ('id', 'username', 'is_admin')
+    
+    def get_is_admin(self, obj):
+        return obj.is_staff or obj.is_superuser
+
+
+class POIItemSerializer(serializers.ModelSerializer):
+    """Serializer for POI-Item relationship with full details"""
+    item = ItemSerializer(read_only=True)
+    relationship_created_by_username = serializers.CharField(source='relationship_created_by.username', read_only=True)
+    local_price = serializers.DecimalField(max_digits=10, decimal_places=2, required=False, allow_null=True)
+    
+    class Meta:
+        model = POIItem
+        fields = ['id', 'item', 'local_price', 'relationship_created_by_username', 'created_at']
+        read_only_fields = ['id', 'created_at']
