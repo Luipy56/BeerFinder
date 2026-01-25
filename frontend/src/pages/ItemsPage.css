@@ -136,6 +136,24 @@
   line-height: 1.3;
 }
 
+.item-card-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: var(--font-size-sm);
+  margin-bottom: var(--spacing-xs);
+}
+
+.item-card-brand-label {
+  color: var(--color-text-secondary);
+  font-weight: 500;
+}
+
+.item-card-brand-value {
+  color: var(--color-text);
+  font-weight: 600;
+}
+
 .item-card-flavor {
   display: flex;
   align-items: center;

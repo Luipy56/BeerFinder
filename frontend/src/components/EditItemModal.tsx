@@ -29,6 +29,7 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
   const { showSuccess, showError } = useToast();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
+  const [brand, setBrand] = useState('');
   const [typicalPrice, setTypicalPrice] = useState<string>('');
   const [percentage, setPercentage] = useState<string>('');
   const [flavorType, setFlavorType] = useState<FlavorType>('other');
@@ -42,6 +43,7 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
     if (item) {
       setName(item.name || '');
       setDescription(item.description || '');
+      setBrand(item.brand || '');
       setTypicalPrice(item.typical_price?.toString() || '');
       setPercentage(item.percentage?.toString() || '');
       setFlavorType(item.flavor_type || 'other');
@@ -120,6 +122,7 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
       const updateData: any = {
         name: name.trim(),
         description: description.trim(),
+        brand: brand.trim() || '',
         flavor_type: flavorType,
       };
 
@@ -228,6 +231,20 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Enter description (optional)"
                 rows={3}
+                disabled={isSubmitting}
+              />
+            </div>
+            <div className="form-group">
+              <label htmlFor="edit-item-brand" className="form-label">
+                Brand
+              </label>
+              <input
+                type="text"
+                id="edit-item-brand"
+                className="form-input"
+                value={brand}
+                onChange={(e) => setBrand(e.target.value)}
+                placeholder="Enter brand (optional)"
                 disabled={isSubmitting}
               />
             </div>

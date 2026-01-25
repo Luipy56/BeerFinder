@@ -44,7 +44,7 @@ const AssignItemModal: React.FC<AssignItemModalProps> = ({
     }
   }, [isOpen, poiId]);
 
-  // Disable body scroll when modal is open
+  // Disable body scroll and reduce header z-index when modal is open
   useEffect(() => {
     if (isOpen) {
       // Save current scroll position
@@ -58,6 +58,12 @@ const AssignItemModal: React.FC<AssignItemModalProps> = ({
       document.body.style.overflow = 'hidden';
       document.body.style.paddingRight = `${scrollbarWidth}px`;
       
+      // Reduce header z-index so overlay can cover it
+      const header = document.querySelector('.app-header') as HTMLElement;
+      if (header) {
+        header.classList.add('modal-open');
+      }
+      
       return () => {
         // Restore scroll when modal closes
         document.body.style.position = '';
@@ -66,6 +72,11 @@ const AssignItemModal: React.FC<AssignItemModalProps> = ({
         document.body.style.overflow = '';
         document.body.style.paddingRight = '';
         window.scrollTo(0, scrollY);
+        
+        // Restore header z-index
+        if (header) {
+          header.classList.remove('modal-open');
+        }
       };
     }
   }, [isOpen]);
@@ -89,7 +100,7 @@ const AssignItemModal: React.FC<AssignItemModalProps> = ({
     }
   };
 
-  // Filter items by search query (case-insensitive) - searches name and flavor_type
+  // Filter items by search query (case-insensitive) - searches name, brand, and flavor_type
   const filteredItems = useMemo(() => {
     if (!searchQuery.trim()) {
       return availableItems;
@@ -97,11 +108,12 @@ const AssignItemModal: React.FC<AssignItemModalProps> = ({
     const query = searchQuery.toLowerCase();
     return availableItems.filter((item) => {
       const nameMatch = item.name.toLowerCase().includes(query);
+      const brandMatch = item.brand ? item.brand.toLowerCase().includes(query) : false;
       const flavorMatch = item.flavor_type 
         ? item.flavor_type.toLowerCase().includes(query) || 
           item.flavor_type.replace('-', ' ').toLowerCase().includes(query)
         : false;
-      return nameMatch || flavorMatch;
+      return nameMatch || brandMatch || flavorMatch;
     });
   }, [availableItems, searchQuery]);
 
@@ -192,7 +204,7 @@ const AssignItemModal: React.FC<AssignItemModalProps> = ({
               ref={searchInputRef}
               type="text"
               className="assign-item-search-input"
-              placeholder="Search items by name or flavor type..."
+              placeholder="Search items by name, brand, or flavor type..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -302,6 +314,12 @@ const AssignItemModal: React.FC<AssignItemModalProps> = ({
                     </div>
                     <div className="assign-item-card-content">
                       <h3 className="assign-item-card-name">{item.name}</h3>
+                      {item.brand && (
+                        <div className="assign-item-card-brand">
+                          <span className="assign-item-card-brand-label">Brand:</span>
+                          <span className="assign-item-card-brand-value">{item.brand}</span>
+                        </div>
+                      )}
                       {item.flavor_type && (
                         <div className="assign-item-card-flavor">
                           <span className="assign-item-card-flavor-label">Flavor:</span>
@@ -319,34 +337,11 @@ const AssignItemModal: React.FC<AssignItemModalProps> = ({
                         </div>
                       )}
                     </div>
-                    <div className="assign-item-card-action">
-                      <button
-                        type="button"
-                        className="btn btn-sm btn-primary"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleItemSelect(item);
-                        }}
-                      >
-                        Select
-                      </button>
-                    </div>
                   </div>
                 ))}
               </div>
             )}
           </div>
-        </div>
-
-        <div className="modal-footer">
-          <button
-            type="button"
-            onClick={onClose}
-            className="btn btn-secondary"
-            disabled={isSubmitting}
-          >
-            Close
-          </button>
         </div>
       </div>
     </div>

@@ -3,7 +3,7 @@
   width: 100%;
   position: relative;
   background-color: var(--color-surface);
-  z-index: 1;
+  /* Removed z-index to prevent stacking context issues with modals */
 }
 
 .map-loading {

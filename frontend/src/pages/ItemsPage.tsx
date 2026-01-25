@@ -53,6 +53,9 @@ const ItemsPage: React.FC = () => {
       // Search by name
       if (item.name?.toLowerCase().includes(query)) return true;
       
+      // Search by brand
+      if (item.brand?.toLowerCase().includes(query)) return true;
+      
       // Search by flavor
       if (item.flavor_type?.toLowerCase().includes(query)) return true;
       
@@ -137,7 +140,7 @@ const ItemsPage: React.FC = () => {
             <input
               type="text"
               className="items-search-input"
-              placeholder="Search by name, flavor, price, or percentage..."
+              placeholder="Search by name, brand, flavor, price, or percentage..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -196,6 +199,12 @@ const ItemsPage: React.FC = () => {
                 </div>
                 <div className="item-card-content">
                   <h3 className="item-card-name">{item.name}</h3>
+                  {item.brand && (
+                    <div className="item-card-brand">
+                      <span className="item-card-brand-label">Brand:</span>
+                      <span className="item-card-brand-value">{item.brand}</span>
+                    </div>
+                  )}
                   {item.flavor_type && (
                     <div className="item-card-flavor">
                       <span className="item-card-flavor-label">Flavor:</span>

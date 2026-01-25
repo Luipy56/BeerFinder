@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { POI, Item } from '../types/poi';
 import './ViewPOIModal.css';
 import { formatPrice } from '../utils/format';
@@ -63,7 +64,7 @@ const ViewPOIModal: React.FC<ViewPOIModalProps> = ({
     }
   }, [isOpen]);
 
-  // Disable body scroll when modal is open
+  // Disable body scroll and reduce header z-index when modal is open
   useEffect(() => {
     if (isOpen) {
       // Save current scroll position
@@ -77,6 +78,12 @@ const ViewPOIModal: React.FC<ViewPOIModalProps> = ({
       document.body.style.overflow = 'hidden';
       document.body.style.paddingRight = `${scrollbarWidth}px`;
       
+      // Reduce header z-index so overlay can cover it
+      const header = document.querySelector('.app-header') as HTMLElement;
+      if (header) {
+        header.classList.add('modal-open');
+      }
+      
       return () => {
         // Restore scroll when modal closes
         document.body.style.position = '';
@@ -85,6 +92,11 @@ const ViewPOIModal: React.FC<ViewPOIModalProps> = ({
         document.body.style.overflow = '';
         document.body.style.paddingRight = '';
         window.scrollTo(0, scrollY);
+        
+        // Restore header z-index
+        if (header) {
+          header.classList.remove('modal-open');
+        }
       };
     }
   }, [isOpen]);
@@ -128,7 +140,7 @@ const ViewPOIModal: React.FC<ViewPOIModalProps> = ({
   const canEditPOI = canEdit && (isAdmin || isOwner);
   const canDeletePOI = canDelete && (isAdmin || isOwner);
 
-  return (
+  const modalContent = (
     <div
       className="modal-overlay"
       onClick={handleOverlayClick}
@@ -255,6 +267,8 @@ const ViewPOIModal: React.FC<ViewPOIModalProps> = ({
       )}
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 };
 
 export default ViewPOIModal;

@@ -132,6 +132,12 @@ const ViewItemDetailsModal: React.FC<ViewItemDetailsModalProps> = ({
                 <p className="poi-detail-value">{item.description}</p>
               </div>
             )}
+            {item.brand && (
+              <div className="poi-detail-item">
+                <h3 className="poi-detail-label">Brand</h3>
+                <p className="poi-detail-value">{item.brand}</p>
+              </div>
+            )}
             {item.flavor_type && (
               <div className="poi-detail-item">
                 <h3 className="poi-detail-label">Flavor Type</h3>

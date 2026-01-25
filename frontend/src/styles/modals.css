@@ -9,10 +9,17 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 2000;
+  z-index: 9999; /* High z-index to ensure it's above header (100) and all other elements */
   padding: var(--spacing-md);
   animation: fadeIn var(--transition-base);
   overflow-y: auto;
+}
+
+.assign-item-modal-overlay {
+  z-index: 9999; /* Same high z-index as other modals, above header (100) */
+  padding: var(--spacing-md); /* Same padding as other modals */
+  align-items: center; /* Center like other modals */
+  overflow-y: auto; /* Allow scroll like other modals */
 }
 
 @keyframes fadeIn {

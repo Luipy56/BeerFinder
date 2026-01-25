@@ -266,6 +266,7 @@ class ItemRequestViewSet(viewsets.ModelViewSet):
         new_item = Item.objects.create(
             name=item_request.name,
             description=item_request.description,
+            brand=item_request.brand,  # Copy brand
             typical_price=item_request.price,  # Map price to typical_price
             percentage=item_request.percentage,  # Copy percentage
             thumbnail=item_request.thumbnail,

@@ -43,7 +43,7 @@ const Header: React.FC = () => {
                   className={`header-nav-link ${isActive('/item-requests/all') ? 'active' : ''}`}
                   onClick={() => navigate('/item-requests/all')}
                 >
-                  All Item Requests
+                  All Item Request
                 </button>
               )}
               <button

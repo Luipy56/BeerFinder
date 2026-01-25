@@ -42,6 +42,7 @@ class Item(models.Model):
     """Items that can be associated with POIs"""
     name = models.CharField(max_length=200)
     description = models.TextField(blank=True)
+    brand = models.CharField(max_length=100, blank=True)
     typical_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     thumbnail = models.BinaryField(null=True, blank=True)
     flavor_type = models.CharField(max_length=20, choices=FLAVOR_CHOICES, default='other')
@@ -104,6 +105,7 @@ class ItemRequest(models.Model):
     """Requests from users without permission to add new items"""
     name = models.CharField(max_length=200)
     description = models.TextField(blank=True)
+    brand = models.CharField(max_length=100, blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     percentage = models.FloatField(null=True, blank=True)
     thumbnail = models.BinaryField(null=True, blank=True)

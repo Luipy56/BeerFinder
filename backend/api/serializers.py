@@ -12,7 +12,7 @@ class ItemSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Item
-        fields = ['id', 'name', 'description', 'typical_price', 'thumbnail', 'thumbnail_write', 'flavor_type', 'percentage', 'created_by', 'updated_by', 'created_at', 'updated_at']
+        fields = ['id', 'name', 'description', 'brand', 'typical_price', 'thumbnail', 'thumbnail_write', 'flavor_type', 'percentage', 'created_by', 'updated_by', 'created_at', 'updated_at']
         read_only_fields = ['created_by', 'updated_by', 'created_at', 'updated_at']
     
     def get_thumbnail(self, obj):
@@ -183,7 +183,7 @@ class ItemRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = ItemRequest
         fields = [
-            'id', 'name', 'description', 'price', 'percentage', 'thumbnail', 'thumbnail_write', 'flavor_type', 'requested_by',
+            'id', 'name', 'description', 'brand', 'price', 'percentage', 'thumbnail', 'thumbnail_write', 'flavor_type', 'requested_by',
             'requested_by_username', 'status', 'status_changed_by', 'created_at', 'updated_at'
         ]
         read_only_fields = ['requested_by', 'requested_by_username', 'status', 'status_changed_by', 'created_at', 'updated_at']

@@ -49,6 +49,7 @@ export interface Item {
   id: number;
   name: string;
   description: string;
+  brand?: string;
   typical_price?: number;
   thumbnail?: string | null;
   flavor_type?: FlavorType;

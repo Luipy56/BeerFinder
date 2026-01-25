@@ -11,7 +11,6 @@ import EditPOIModal from './EditPOIModal';
 import DeletePOIModal from './DeletePOIModal';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
-import { formatPrice } from '../utils/format';
 
 const MapComponent: React.FC = () => {
   const { isAuthenticated, user } = useAuth();
@@ -88,11 +87,6 @@ const MapComponent: React.FC = () => {
     }
     setClickedLocation({ lat, lng });
     setIsCreateModalOpen(true);
-  };
-
-  const handleMarkerClick = (poi: POI) => {
-    setSelectedPOI(poi);
-    // Don't open ViewPOIModal here - only open it when "View Details" button is clicked
   };
 
   const handleViewDetails = (poi: POI) => {

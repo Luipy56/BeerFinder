@@ -5,6 +5,7 @@ export interface ItemRequest {
   id: number;
   name: string;
   description: string;
+  brand?: string;
   price?: number | null;
   percentage?: number | null;
   thumbnail?: string | null;
@@ -19,6 +20,7 @@ export interface ItemRequest {
 export interface CreateItemRequestDto {
   name: string;
   description?: string;
+  brand?: string;
   price?: number;
   percentage?: number | null;
   thumbnail?: string;
@@ -46,6 +48,7 @@ const ItemRequestService = {
     const requestPayload: any = {
       name: itemRequestData.name,
       description: itemRequestData.description,
+      brand: itemRequestData.brand,
       price: itemRequestData.price,
       flavor_type: itemRequestData.flavor_type,
     };

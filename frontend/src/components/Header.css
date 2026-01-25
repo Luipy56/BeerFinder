@@ -8,6 +8,11 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
+/* When a modal is open, reduce header z-index so overlay can cover it */
+.app-header.modal-open {
+  z-index: 50;
+}
+
 .header-container {
   max-width: 1200px;
   margin: 0 auto;

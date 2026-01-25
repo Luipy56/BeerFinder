@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import { POI } from '../types/poi';
 import './DeletePOIModal.css';
 
@@ -32,7 +33,7 @@ const DeletePOIModal: React.FC<DeletePOIModalProps> = ({
     }
   }, [isOpen]);
 
-  // Disable body scroll when modal is open
+  // Disable body scroll and reduce header z-index when modal is open
   useEffect(() => {
     if (isOpen) {
       // Save current scroll position
@@ -46,6 +47,12 @@ const DeletePOIModal: React.FC<DeletePOIModalProps> = ({
       document.body.style.overflow = 'hidden';
       document.body.style.paddingRight = `${scrollbarWidth}px`;
       
+      // Reduce header z-index so overlay can cover it
+      const header = document.querySelector('.app-header') as HTMLElement;
+      if (header) {
+        header.classList.add('modal-open');
+      }
+      
       return () => {
         // Restore scroll when modal closes
         document.body.style.position = '';
@@ -54,6 +61,11 @@ const DeletePOIModal: React.FC<DeletePOIModalProps> = ({
         document.body.style.overflow = '';
         document.body.style.paddingRight = '';
         window.scrollTo(0, scrollY);
+        
+        // Restore header z-index
+        if (header) {
+          header.classList.remove('modal-open');
+        }
       };
     }
   }, [isOpen]);
@@ -81,7 +93,7 @@ const DeletePOIModal: React.FC<DeletePOIModalProps> = ({
 
   if (!isOpen || !poi) return null;
 
-  return (
+  const modalContent = (
     <div
       className="modal-overlay"
       onClick={handleOverlayClick}
@@ -135,6 +147,8 @@ const DeletePOIModal: React.FC<DeletePOIModalProps> = ({
       </div>
     </div>
   );
+
+  return createPortal(modalContent, document.body);
 };
 
 export default DeletePOIModal;

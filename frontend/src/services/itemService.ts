@@ -22,6 +22,7 @@ const ItemService = {
     const requestPayload: any = {
       name: itemData.name,
       description: itemData.description,
+      brand: itemData.brand,
       typical_price: itemData.typical_price,
       flavor_type: itemData.flavor_type,
       percentage: itemData.percentage,

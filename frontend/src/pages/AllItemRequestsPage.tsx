@@ -241,6 +241,12 @@ const AllItemRequestsPage: React.FC = () => {
                           <p className="detail-value">{selectedRequest.description}</p>
                         </div>
                       )}
+                      {selectedRequest.brand && (
+                        <div className="detail-item">
+                          <span className="detail-label">Brand</span>
+                          <span className="detail-value">{selectedRequest.brand}</span>
+                        </div>
+                      )}
                       {selectedRequest.flavor_type && (
                         <div className="detail-item">
                           <span className="detail-label">Flavor Type</span>

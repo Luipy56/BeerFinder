@@ -22,6 +22,7 @@ const ItemRequestPage: React.FC = () => {
   const [formData, setFormData] = useState<CreateItemRequestDto>({
     name: '',
     description: '',
+    brand: '',
     price: undefined,
     percentage: null,
     thumbnail: undefined,
@@ -281,6 +282,22 @@ const ItemRequestPage: React.FC = () => {
                 </div>
 
                 <div className="form-group">
+                  <label htmlFor="request-brand" className="form-label">
+                    Brand
+                  </label>
+                  <input
+                    type="text"
+                    id="request-brand"
+                    name="brand"
+                    className="form-input"
+                    value={formData.brand || ''}
+                    onChange={handleChange}
+                    disabled={isCreating}
+                    placeholder="Enter brand (optional)"
+                  />
+                </div>
+
+                <div className="form-group">
                   <label htmlFor="request-price" className="form-label">
                     Price
                   </label>
@@ -481,6 +498,12 @@ const ItemRequestPage: React.FC = () => {
                       <div className="detail-item">
                         <span className="detail-label">Description</span>
                         <p className="detail-value">{selectedRequest.description}</p>
+                      </div>
+                    )}
+                    {selectedRequest.brand && (
+                      <div className="detail-item">
+                        <span className="detail-label">Brand</span>
+                        <span className="detail-value">{selectedRequest.brand}</span>
                       </div>
                     )}
                     {selectedRequest.flavor_type && (
