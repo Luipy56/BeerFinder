@@ -31,4 +31,19 @@
   .footer-container {
     padding: 0 var(--spacing-md);
   }
+
+  .footer-text {
+    font-size: var(--font-size-xs);
+    line-height: 1.5;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-footer {
+    padding: var(--spacing-sm) 0;
+  }
+
+  .footer-container {
+    padding: 0 var(--spacing-sm);
+  }
 }

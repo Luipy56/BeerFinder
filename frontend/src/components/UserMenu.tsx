@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import './UserMenu.css';
 
@@ -8,6 +8,14 @@ const UserMenu: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const isActive = (path: string) => location.pathname === path;
+
+  const handleNavClick = (path: string) => {
+    navigate(path);
+    setIsOpen(false);
+  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -69,22 +77,24 @@ const UserMenu: React.FC = () => {
           </div>
           <div className="menu-divider"></div>
           <button
-            className="menu-item"
-            onClick={() => {
-              navigate('/profile');
-              setIsOpen(false);
-            }}
+            className={`menu-item ${isActive('/') ? 'active' : ''}`}
+            onClick={() => handleNavClick('/')}
+            role="menuitem"
+            aria-label="View map"
+          >
+            Map
+          </button>
+          <button
+            className={`menu-item ${isActive('/profile') ? 'active' : ''}`}
+            onClick={() => handleNavClick('/profile')}
             role="menuitem"
             aria-label="View profile"
           >
             Profile
           </button>
           <button
-            className="menu-item"
-            onClick={() => {
-              navigate('/item-requests');
-              setIsOpen(false);
-            }}
+            className={`menu-item ${isActive('/item-requests') ? 'active' : ''}`}
+            onClick={() => handleNavClick('/item-requests')}
             role="menuitem"
             aria-label="View my item requests"
           >
@@ -92,17 +102,31 @@ const UserMenu: React.FC = () => {
           </button>
           {user.is_admin && (
             <button
-              className="menu-item"
-              onClick={() => {
-                navigate('/item-requests/all');
-                setIsOpen(false);
-              }}
+              className={`menu-item ${isActive('/item-requests/all') ? 'active' : ''}`}
+              onClick={() => handleNavClick('/item-requests/all')}
               role="menuitem"
               aria-label="View all item requests"
             >
               All Item Requests
             </button>
           )}
+          <button
+            className={`menu-item ${isActive('/items') ? 'active' : ''}`}
+            onClick={() => handleNavClick('/items')}
+            role="menuitem"
+            aria-label="View items"
+          >
+            Items
+          </button>
+          <button
+            className={`menu-item ${isActive('/pois') ? 'active' : ''}`}
+            onClick={() => handleNavClick('/pois')}
+            role="menuitem"
+            aria-label="View POIs"
+          >
+            POIs
+          </button>
+          <div className="menu-divider"></div>
           <button
             className="menu-item"
             onClick={handleLogout}

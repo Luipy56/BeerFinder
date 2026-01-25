@@ -112,7 +112,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
       </div>
       <div className="form-group">
         <label htmlFor="email" className="form-label">
-          Email (optional)
+          Email
         </label>
         <input
           type="email"

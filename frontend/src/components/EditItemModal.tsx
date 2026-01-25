@@ -229,7 +229,7 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
                 className="form-textarea"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Enter description (optional)"
+                placeholder="Enter description"
                 rows={3}
                 disabled={isSubmitting}
               />
@@ -244,7 +244,7 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
                 className="form-input"
                 value={brand}
                 onChange={(e) => setBrand(e.target.value)}
-                placeholder="Enter brand (optional)"
+                placeholder="Enter brand"
                 disabled={isSubmitting}
               />
             </div>
@@ -307,7 +307,7 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
             </div>
             <div className="form-group">
               <label htmlFor="edit-item-thumbnail" className="form-label">
-                Thumbnail (optional)
+                Thumbnail
               </label>
               <input
                 type="file"

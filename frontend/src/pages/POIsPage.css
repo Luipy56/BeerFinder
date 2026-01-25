@@ -2,6 +2,7 @@
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  background-color: var(--color-block-background);
 }
 
 .pois-container {
@@ -43,7 +44,7 @@
   font-size: var(--font-size-base);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
-  background-color: var(--color-background);
+  background-color: var(--color-block-white);
   color: var(--color-text);
   transition: border-color var(--transition-base), box-shadow var(--transition-base);
 }
@@ -79,7 +80,7 @@
 }
 
 .poi-card {
-  background-color: var(--color-background);
+  background-color: var(--color-block-white);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   overflow: hidden;
@@ -99,7 +100,7 @@
   width: 200px;
   min-width: 200px;
   height: 150px;
-  background-color: var(--color-surface);
+  background-color: var(--color-block-above);
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -174,7 +175,7 @@
   align-items: center;
   justify-content: center;
   padding: var(--spacing-sm);
-  background-color: var(--color-surface);
+  background-color: var(--color-block-above);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   cursor: pointer;
@@ -185,7 +186,7 @@
 }
 
 .view-toggle-btn:hover {
-  background-color: var(--color-surface-hover, var(--color-surface));
+  background-color: var(--color-block-background);
   border-color: var(--color-primary);
   color: var(--color-text);
 }
@@ -235,7 +236,24 @@
 
 @media (max-width: 768px) {
   .pois-container {
-    padding: var(--spacing-md);
+    padding: var(--spacing-lg);
+  }
+
+  .pois-header {
+    margin-bottom: var(--spacing-lg);
+    padding: 0 var(--spacing-sm);
+  }
+
+  .pois-title {
+    font-size: var(--font-size-xl);
+  }
+
+  .pois-subtitle {
+    font-size: var(--font-size-sm);
+  }
+
+  .pois-search-container {
+    margin-top: var(--spacing-sm);
   }
 
   .poi-card {
@@ -250,5 +268,56 @@
 
   .pois-grid {
     grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-md);
+  }
+
+  .pois-list {
+    gap: var(--spacing-md);
+    margin-top: var(--spacing-md);
+    padding: 0 var(--spacing-sm);
+  }
+
+  .poi-card-content {
+    padding: var(--spacing-lg);
+  }
+
+  .poi-card-name {
+    font-size: var(--font-size-lg);
+  }
+
+  .pois-view-toggle {
+    margin-top: var(--spacing-sm);
+  }
+
+  .view-toggle-btn {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 480px) {
+  .pois-container {
+    padding: var(--spacing-md);
+  }
+
+  .pois-header {
+    padding: 0 var(--spacing-xs);
+  }
+
+  .pois-list {
+    padding: 0 var(--spacing-xs);
+  }
+
+  .poi-card-content {
+    padding: var(--spacing-md);
+  }
+
+  .pois-title {
+    font-size: var(--font-size-lg);
+  }
+
+  .poi-card-thumbnail {
+    height: 180px;
   }
 }

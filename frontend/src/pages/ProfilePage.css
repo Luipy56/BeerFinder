@@ -1,5 +1,5 @@
 .profile-page {
-  background-color: var(--color-surface);
+  background-color: var(--color-block-background);
   padding: var(--spacing-lg);
   flex: 1;
 }
@@ -7,7 +7,7 @@
 .profile-container {
   max-width: 800px;
   margin: 0 auto;
-  background-color: var(--color-background);
+  background-color: var(--color-block-above);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-md);
   overflow: hidden;
@@ -19,7 +19,7 @@
   align-items: center;
   padding: var(--spacing-lg);
   border-bottom: 1px solid var(--color-border);
-  background-color: var(--color-surface);
+  background-color: var(--color-block-white);
 }
 
 .profile-header-left {
@@ -103,7 +103,7 @@
   gap: var(--spacing-sm);
   padding: var(--spacing-md) var(--spacing-lg);
   border-top: 1px solid var(--color-border);
-  background-color: var(--color-surface);
+  background-color: var(--color-block-white);
 }
 
 .profile-view {
@@ -121,7 +121,7 @@
   flex-direction: column;
   gap: var(--spacing-xs);
   padding: var(--spacing-md);
-  background-color: var(--color-surface);
+  background-color: var(--color-block-white);
   border-radius: var(--radius-md);
   border: 1px solid var(--color-border);
 }
@@ -145,21 +145,51 @@
     padding: var(--spacing-sm);
   }
 
+  .profile-container {
+    border-radius: var(--radius-md);
+  }
+
   .profile-header {
     flex-direction: column;
     align-items: flex-start;
     gap: var(--spacing-md);
+    padding: var(--spacing-md);
   }
 
   .profile-header h1 {
     font-size: var(--font-size-xl);
   }
 
+  .profile-form-content {
+    padding: var(--spacing-md);
+  }
+
+  .profile-view {
+    padding: var(--spacing-md);
+  }
+
+  .profile-info {
+    gap: var(--spacing-sm);
+  }
+
+  .profile-info-item {
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+
   .profile-form-actions {
     flex-direction: column-reverse;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
   }
 
   .profile-form-actions .btn {
     width: 100%;
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-header h1 {
+    font-size: var(--font-size-lg);
   }
 }

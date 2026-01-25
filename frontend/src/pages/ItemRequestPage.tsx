@@ -293,7 +293,7 @@ const ItemRequestPage: React.FC = () => {
                     value={formData.brand || ''}
                     onChange={handleChange}
                     disabled={isCreating}
-                    placeholder="Enter brand (optional)"
+                    placeholder="Enter brand"
                   />
                 </div>
 
@@ -388,7 +388,7 @@ const ItemRequestPage: React.FC = () => {
 
                 <div className="form-group">
                   <label htmlFor="request-thumbnail" className="form-label">
-                    Thumbnail (optional)
+                    Thumbnail
                   </label>
                   <input
                     type="file"

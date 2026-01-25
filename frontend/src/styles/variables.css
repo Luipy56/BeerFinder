@@ -12,6 +12,11 @@
   --color-text-secondary: #6c757d;
   --color-border: #dee2e6;
 
+  /* Block Colors (per CSSRULES.txt) */
+  --color-block-background: #eeeeee; /* Color del fondo */
+  --color-block-above: #f7f7f7; /* Color del siguiente bloque por encima */
+  --color-block-white: #ffffff; /* Siguiente color (blanco) */
+
   /* Breakpoints */
   --breakpoint-mobile: 320px;
   --breakpoint-tablet: 768px;

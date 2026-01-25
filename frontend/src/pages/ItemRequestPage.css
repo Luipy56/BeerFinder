@@ -1,5 +1,5 @@
 .item-request-page {
-  background-color: var(--color-surface);
+  background-color: var(--color-block-background);
   padding: var(--spacing-lg);
   flex: 1;
 }
@@ -97,6 +97,9 @@
 .item-request-create-form {
   margin-bottom: var(--spacing-lg);
   padding: var(--spacing-lg);
+  background-color: var(--color-block-above);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
 }
 
 .item-request-create-form h2 {
@@ -144,6 +147,8 @@
   padding: var(--spacing-md);
   cursor: pointer;
   transition: all var(--transition-base);
+  background-color: var(--color-block-white);
+  border-radius: var(--radius-md);
 }
 
 .item-request-card:hover {
@@ -329,28 +334,90 @@ p.detail-value {
 
 @media (max-width: 767px) {
   .item-request-page {
-    padding: var(--spacing-sm);
+    padding: var(--spacing-lg);
+  }
+
+  .item-request-container {
+    padding: 0;
   }
 
   .item-request-header {
     flex-direction: column;
     align-items: flex-start;
     gap: var(--spacing-md);
+    margin-bottom: var(--spacing-lg);
+    padding: 0 var(--spacing-sm);
   }
 
   .item-request-header h1 {
     font-size: var(--font-size-xl);
   }
 
+  .item-request-create-form {
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+  }
+
+  .item-request-create-form h2 {
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--spacing-md);
+  }
+
   .item-request-list {
     grid-template-columns: 1fr;
+    gap: var(--spacing-md);
+  }
+
+  .item-request-card {
+    padding: var(--spacing-lg);
+  }
+
+  .item-request-card-header h3 {
+    font-size: var(--font-size-base);
+  }
+
+  .item-request-sections {
+    gap: var(--spacing-lg);
+    padding: 0 var(--spacing-sm);
+  }
+
+  .item-request-section-title {
+    font-size: var(--font-size-lg);
   }
 
   .form-actions {
     flex-direction: column-reverse;
+    gap: var(--spacing-sm);
   }
 
   .form-actions .btn {
     width: 100%;
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 480px) {
+  .item-request-page {
+    padding: var(--spacing-md);
+  }
+
+  .item-request-header {
+    padding: 0 var(--spacing-xs);
+  }
+
+  .item-request-create-form {
+    padding: var(--spacing-md);
+  }
+
+  .item-request-card {
+    padding: var(--spacing-md);
+  }
+
+  .item-request-sections {
+    padding: 0 var(--spacing-xs);
+  }
+
+  .item-request-header h1 {
+    font-size: var(--font-size-lg);
   }
 }

@@ -1,0 +1,6 @@
+
+Si es blanco:
+* Color del fondo: #eeeeee
+* Color del siguiente bloque por encima: #f7f7f7
+* Siguiente color: #ffffff
+Si sólo hay 2 bloques, se utilizarán los 2 últimos

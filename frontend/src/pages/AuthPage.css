@@ -90,13 +90,38 @@
 @media (max-width: 767px) {
   .auth-page {
     padding: var(--spacing-sm);
+    min-height: 100vh;
+    align-items: flex-start;
+    padding-top: var(--spacing-lg);
   }
 
   .auth-container {
     border-radius: var(--radius-md);
+    max-width: 100%;
+  }
+
+  .auth-header {
+    padding: var(--spacing-sm) var(--spacing-md);
   }
 
   .auth-content {
-    padding: var(--spacing-lg);
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+
+  .tab-button {
+    padding: var(--spacing-sm) var(--spacing-md);
+    min-height: 44px;
+    font-size: var(--font-size-sm);
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-page {
+    padding: var(--spacing-xs);
+    padding-top: var(--spacing-md);
+  }
+
+  .auth-content {
+    padding: var(--spacing-md) var(--spacing-sm);
   }
 }

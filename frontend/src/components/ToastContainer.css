@@ -18,5 +18,15 @@
   .toast-container {
     padding: var(--spacing-sm);
     left: 0;
+    right: 0;
+    top: var(--spacing-sm);
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .toast-container {
+    padding: var(--spacing-xs);
+    top: var(--spacing-xs);
   }
 }

@@ -183,14 +183,14 @@ const EditPOIModal: React.FC<EditPOIModalProps> = ({
                 className="form-textarea"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Enter description (optional)"
+                placeholder="Enter description"
                 rows={3}
                 disabled={isSubmitting}
               />
             </div>
             <div className="form-group">
               <label htmlFor="edit-poi-thumbnail" className="form-label">
-                Thumbnail (optional)
+                Thumbnail
               </label>
               <input
                 type="file"

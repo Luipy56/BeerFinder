@@ -37,7 +37,7 @@
   width: 100%;
   max-width: 500px;
   max-height: calc(100vh - 4 * var(--spacing-md));
-  background-color: var(--color-background);
+  background-color: var(--color-block-above);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-xl);
   animation: slideUp var(--transition-base);
@@ -82,13 +82,14 @@
   padding: var(--spacing-md) var(--spacing-lg);
   border-bottom: 1px solid var(--color-border);
   flex-shrink: 0;
+  background-color: var(--color-block-white);
 }
 
 /* Sticky header for scrollable modals */
 .modal.modal-scrollable .modal-header {
   position: sticky;
   top: 0;
-  background-color: var(--color-background);
+  background-color: var(--color-block-white);
   z-index: 10;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
@@ -118,7 +119,7 @@
 }
 
 .modal-close:hover {
-  background-color: var(--color-surface);
+  background-color: var(--color-block-background);
   color: var(--color-text);
 }
 
@@ -156,7 +157,7 @@
 }
 
 .modal-edit-button:hover {
-  background-color: var(--color-surface);
+  background-color: var(--color-block-background);
   color: var(--color-text);
 }
 
@@ -171,6 +172,7 @@
   flex: 1;
   min-height: 0;
   overflow-y: auto;
+  background-color: var(--color-block-above);
 }
 
 /* Scrollable body for modals with sticky header */
@@ -190,6 +192,7 @@
   border-top: 1px solid var(--color-border);
   flex-wrap: wrap;
   flex-shrink: 0;
+  background-color: var(--color-block-white);
 }
 
 .modal-footer .btn {
@@ -201,18 +204,22 @@
   .modal-overlay {
     padding: 0;
     align-items: flex-end;
+    -webkit-overflow-scrolling: touch;
   }
 
   .modal {
     max-width: 100%;
-    max-height: calc(100vh - 4 * var(--spacing-md));
+    max-height: 90vh;
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
     animation: slideUpMobile var(--transition-base);
-    margin: var(--spacing-md) 0 0;
+    margin: 0;
+    margin-top: auto;
+    display: flex;
+    flex-direction: column;
   }
   
   .modal.modal-scrollable {
-    max-height: calc(100vh - 4 * var(--spacing-md));
+    max-height: 90vh;
   }
 
   @keyframes slideUpMobile {
@@ -224,18 +231,54 @@
     }
   }
 
-  .modal-header,
-  .modal-body,
-  .modal-footer {
+  .modal-header {
     padding: var(--spacing-md);
+    flex-shrink: 0;
+  }
+
+  .modal-title {
+    font-size: var(--font-size-lg);
+  }
+
+  .modal-close {
+    min-width: 44px;
+    min-height: 44px;
+  }
+
+  .modal-body {
+    padding: var(--spacing-md);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    flex: 1;
+    min-height: 0;
   }
 
   .modal-footer {
+    padding: var(--spacing-md);
     flex-direction: column-reverse;
+    gap: var(--spacing-sm);
+    flex-shrink: 0;
   }
 
   .modal-footer .btn {
     width: 100%;
+    min-height: 44px;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal {
+    max-height: 95vh;
+  }
+
+  .modal.modal-scrollable {
+    max-height: 95vh;
+  }
+
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    padding: var(--spacing-sm) var(--spacing-md);
   }
 }
 

@@ -86,5 +86,23 @@
     left: var(--spacing-sm);
     min-width: auto;
     max-width: none;
+    padding: var(--spacing-sm) var(--spacing-md);
+  }
+
+  .toast-message {
+    font-size: var(--font-size-xs);
+  }
+
+  .toast-close {
+    min-width: 44px;
+    min-height: 44px;
+    width: 2rem;
+    height: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .toast {
+    padding: var(--spacing-xs) var(--spacing-sm);
   }
 }

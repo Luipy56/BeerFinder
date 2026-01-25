@@ -19,3 +19,16 @@
   border: 1px solid #ef5350;
   font-size: var(--font-size-sm);
 }
+
+@media (max-width: 767px) {
+  .form-title {
+    font-size: var(--font-size-xl);
+    margin-bottom: var(--spacing-lg);
+  }
+
+  .form-error-message {
+    font-size: var(--font-size-xs);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    margin-bottom: var(--spacing-sm);
+  }
+}
