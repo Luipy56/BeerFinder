@@ -96,14 +96,21 @@ class POIListSerializer(serializers.ModelSerializer):
 
 class ItemRequestSerializer(serializers.ModelSerializer):
     thumbnail = serializers.SerializerMethodField()
+    requested_by_username = serializers.SerializerMethodField()
     
     class Meta:
         model = ItemRequest
         fields = [
             'id', 'name', 'description', 'price', 'thumbnail', 'requested_by',
-            'status', 'status_changed_by', 'created_at', 'updated_at'
+            'requested_by_username', 'status', 'status_changed_by', 'created_at', 'updated_at'
         ]
-        read_only_fields = ['requested_by', 'status', 'status_changed_by', 'created_at', 'updated_at']
+        read_only_fields = ['requested_by', 'requested_by_username', 'status', 'status_changed_by', 'created_at', 'updated_at']
+    
+    def get_requested_by_username(self, obj):
+        """Return the username of the user who requested the item"""
+        if obj.requested_by:
+            return obj.requested_by.username
+        return None
     
     def get_thumbnail(self, obj):
         """Convert binary thumbnail to base64 string for JSON serialization"""

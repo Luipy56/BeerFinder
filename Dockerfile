@@ -50,6 +50,10 @@ ENV REACT_APP_API_URL=$REACT_APP_API_URL
 FROM frontend-dev as frontend
 
 # Build frontend for production
+# ARG and ENV need to be set before the build
+ARG REACT_APP_API_URL=http://localhost:8000/api/v1
+ENV REACT_APP_API_URL=$REACT_APP_API_URL
+
 RUN npm run build
 
 # Stage 3: Production

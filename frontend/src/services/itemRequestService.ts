@@ -7,6 +7,7 @@ export interface ItemRequest {
   price?: number | null;
   thumbnail?: string | null;
   requested_by?: number;
+  requested_by_username?: string;
   status: 'pending' | 'approved' | 'rejected';
   created_at: string;
   updated_at: string;

@@ -207,12 +207,14 @@ class ItemRequestViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """
-        Filter queryset: users see their own requests, admins see all.
+        Filter queryset: users always see their own requests (even if admin).
+        Admins can see all requests via the list_all action.
         """
         queryset = super().get_queryset()
         if self.request.user.is_authenticated:
-            if not self.request.user.is_staff:
-                queryset = queryset.filter(requested_by=self.request.user)
+            # Always filter by user for the list action, even if admin
+            # Admins can use list_all to see all requests
+            queryset = queryset.filter(requested_by=self.request.user)
         else:
             queryset = queryset.none()
         return queryset

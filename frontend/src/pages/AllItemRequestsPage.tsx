@@ -89,6 +89,55 @@ const AllItemRequestsPage: React.FC = () => {
     });
   };
 
+  // Group requests by status
+  const groupedRequests = {
+    pending: itemRequests.filter((r) => r.status === 'pending'),
+    approved: itemRequests.filter((r) => r.status === 'approved'),
+    rejected: itemRequests.filter((r) => r.status === 'rejected'),
+  };
+
+  const renderRequestSection = (title: string, requests: ItemRequest[], status: 'pending' | 'approved' | 'rejected') => {
+    if (requests.length === 0) return null;
+
+    return (
+      <div className="item-request-section" key={status}>
+        <h2 className="item-request-section-title">{title} ({requests.length})</h2>
+        <div className="item-request-list">
+          {requests.map((request) => (
+            <div
+              key={request.id}
+              className="item-request-card card"
+              onClick={() => setSelectedRequest(request)}
+            >
+              <div className="item-request-card-header">
+                <h3>{request.name}</h3>
+                <span className={getStatusBadgeClass(request.status)}>
+                  {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                </span>
+              </div>
+              {request.requested_by_username && (
+                <p className="item-request-user">
+                  {request.requested_by_username}
+                </p>
+              )}
+              {request.description && (
+                <p className="item-request-description">{request.description}</p>
+              )}
+              <div className="item-request-card-footer">
+                {request.price !== undefined && request.price !== null && (
+                  <span className="item-request-price">${formatPrice(request.price)}</span>
+                )}
+                <span className="item-request-date">
+                  {formatDate(request.created_at)}
+                </span>
+              </div>
+            </div>
+            ))}
+        </div>
+      </div>
+    );
+  };
+
   if (isLoading) {
     return (
       <ProtectedRoute>
@@ -114,13 +163,6 @@ const AllItemRequestsPage: React.FC = () => {
           <div className="item-request-container">
             <div className="item-request-header">
               <div className="item-request-header-left">
-                <button
-                  className="btn-back"
-                  onClick={() => navigate('/')}
-                  aria-label="Back to map"
-                >
-                  ← Back to map
-                </button>
                 <h1>All Item Requests</h1>
               </div>
             </div>
@@ -131,32 +173,10 @@ const AllItemRequestsPage: React.FC = () => {
                 <p>There are no item requests in the system.</p>
               </div>
             ) : (
-              <div className="item-request-list">
-                {itemRequests.map((request) => (
-                  <div
-                    key={request.id}
-                    className="item-request-card card"
-                    onClick={() => setSelectedRequest(request)}
-                  >
-                    <div className="item-request-card-header">
-                      <h3>{request.name}</h3>
-                      <span className={getStatusBadgeClass(request.status)}>
-                        {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
-                      </span>
-                    </div>
-                    {request.description && (
-                      <p className="item-request-description">{request.description}</p>
-                    )}
-                    <div className="item-request-card-footer">
-                      {request.price !== undefined && request.price !== null && (
-                        <span className="item-request-price">${formatPrice(request.price)}</span>
-                      )}
-                      <span className="item-request-date">
-                        {formatDate(request.created_at)}
-                      </span>
-                    </div>
-                  </div>
-                ))}
+              <div className="item-request-sections">
+                {renderRequestSection('Pending', groupedRequests.pending, 'pending')}
+                {renderRequestSection('Approved', groupedRequests.approved, 'approved')}
+                {renderRequestSection('Rejected', groupedRequests.rejected, 'rejected')}
               </div>
             )}
 
@@ -189,6 +209,12 @@ const AllItemRequestsPage: React.FC = () => {
                           {selectedRequest.status.charAt(0).toUpperCase() + selectedRequest.status.slice(1)}
                         </span>
                       </div>
+                      {selectedRequest.requested_by_username && (
+                        <div className="detail-item">
+                          <span className="detail-label">Requested by</span>
+                          <span className="detail-value">{selectedRequest.requested_by_username}</span>
+                        </div>
+                      )}
                       {selectedRequest.description && (
                         <div className="detail-item">
                           <span className="detail-label">Description</span>

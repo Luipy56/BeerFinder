@@ -144,13 +144,6 @@ const ProfilePage: React.FC = () => {
           <div className="profile-container">
           <div className="profile-header">
             <div className="profile-header-left">
-              <button
-                className="btn-back"
-                onClick={() => navigate('/')}
-                aria-label="Back to map"
-              >
-                ← Back to map
-              </button>
               <h1>Profile</h1>
             </div>
             {!isEditing && (
