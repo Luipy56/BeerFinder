@@ -94,7 +94,8 @@ class POIViewSet(viewsets.ModelViewSet):
     def available_items(self, request, pk=None):
         """Get items available to assign to this POI (excluding already assigned ones)"""
         poi = self.get_object()
-        assigned_item_ids = poi.items.values_list('id', flat=True)
+        # Use POIItem directly to get assigned item IDs (more explicit and reliable)
+        assigned_item_ids = POIItem.objects.filter(poi=poi).values_list('item_id', flat=True)
         available_items = Item.objects.exclude(id__in=assigned_item_ids)
         serializer = ItemSerializer(available_items, many=True)
         return Response(serializer.data)
@@ -212,12 +213,31 @@ class ItemRequestViewSet(viewsets.ModelViewSet):
         """
         queryset = super().get_queryset()
         if self.request.user.is_authenticated:
+            # For admin actions (approve, reject), don't filter - admins need access to all requests
+            if self.action in ['approve', 'reject'] and self.request.user.is_staff:
+                return queryset
             # Always filter by user for the list action, even if admin
             # Admins can use list_all to see all requests
             queryset = queryset.filter(requested_by=self.request.user)
         else:
             queryset = queryset.none()
         return queryset
+    
+    def get_object(self):
+        """
+        Override to allow admins to access any item request for approve/reject actions.
+        """
+        # For admin actions, allow admins to access any item request
+        if self.action in ['approve', 'reject'] and self.request.user.is_staff:
+            # Use the base queryset without filtering by user
+            queryset = ItemRequest.objects.all()
+            lookup_url_kwarg = self.lookup_url_kwarg or self.lookup_field
+            filter_kwargs = {self.lookup_field: self.kwargs[lookup_url_kwarg]}
+            obj = queryset.get(**filter_kwargs)
+            self.check_object_permissions(self.request, obj)
+            return obj
+        # For other actions, use the default behavior (filtered by user)
+        return super().get_object()
     
     @action(detail=False, methods=['get'], permission_classes=[IsAdminUser])
     def list_all(self, request):
@@ -238,11 +258,26 @@ class ItemRequestViewSet(viewsets.ModelViewSet):
     
     @action(detail=True, methods=['post'], permission_classes=[IsAdminUser])
     def approve(self, request, pk=None):
-        """Admin-only action to approve an item request"""
+        """Admin-only action to approve an item request and create an Item"""
         item_request = self.get_object()
+        
+        # Always create a new Item from the approved ItemRequest, even if name is duplicated
+        # Multiple items can have the same name (they are different records)
+        new_item = Item.objects.create(
+            name=item_request.name,
+            description=item_request.description,
+            typical_price=item_request.price,  # Map price to typical_price
+            thumbnail=item_request.thumbnail,
+            flavor_type=item_request.flavor_type,  # Copy flavor_type
+            created_by=item_request.requested_by,  # The user who requested it
+            updated_by=request.user  # The admin who approved it
+        )
+        
+        # Update the request status
         item_request.status = 'approved'
         item_request.status_changed_by = request.user
         item_request.save()
+        
         serializer = self.get_serializer(item_request)
         return Response(serializer.data)
     

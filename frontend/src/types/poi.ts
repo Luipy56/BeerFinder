@@ -11,12 +11,46 @@ export interface POI {
   items?: Item[];
 }
 
+export type FlavorType =
+  | 'bitter'
+  | 'caramel'
+  | 'chocolatey'
+  | 'coffee-like'
+  | 'creamy'
+  | 'crisp'
+  | 'dry'
+  | 'earthy'
+  | 'floral'
+  | 'fruity'
+  | 'full-bodied'
+  | 'funky'
+  | 'herbal'
+  | 'honeyed'
+  | 'hoppy'
+  | 'light-bodied'
+  | 'malty'
+  | 'nutty'
+  | 'refreshing'
+  | 'roasty'
+  | 'session'
+  | 'smoky'
+  | 'smooth'
+  | 'sour'
+  | 'spicy'
+  | 'strong'
+  | 'sweet'
+  | 'tart'
+  | 'toasted'
+  | 'woody'
+  | 'other';
+
 export interface Item {
   id: number;
   name: string;
   description: string;
   typical_price?: number;
   thumbnail?: string | null;
+  flavor_type?: FlavorType;
   created_by?: number;
   updated_by?: number;
 }

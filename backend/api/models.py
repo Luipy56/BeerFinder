@@ -2,12 +2,49 @@ from django.contrib.gis.db import models
 from django.contrib.auth.models import User
 
 
+# Flavor type choices shared by Item and ItemRequest models
+FLAVOR_CHOICES = [
+    ('bitter', 'Bitter'),
+    ('caramel', 'Caramel'),
+    ('chocolatey', 'Chocolatey'),
+    ('coffee-like', 'Coffee-like'),
+    ('creamy', 'Creamy'),
+    ('crisp', 'Crisp'),
+    ('dry', 'Dry'),
+    ('earthy', 'Earthy'),
+    ('floral', 'Floral'),
+    ('fruity', 'Fruity'),
+    ('full-bodied', 'Full-bodied'),
+    ('funky', 'Funky'),
+    ('herbal', 'Herbal'),
+    ('honeyed', 'Honeyed'),
+    ('hoppy', 'Hoppy'),
+    ('light-bodied', 'Light-bodied'),
+    ('malty', 'Malty'),
+    ('nutty', 'Nutty'),
+    ('refreshing', 'Refreshing'),
+    ('roasty', 'Roasty'),
+    ('session', 'Session'),
+    ('smoky', 'Smoky'),
+    ('smooth', 'Smooth'),
+    ('sour', 'Sour'),
+    ('spicy', 'Spicy'),
+    ('strong', 'Strong'),
+    ('sweet', 'Sweet'),
+    ('tart', 'Tart'),
+    ('toasted', 'Toasted'),
+    ('woody', 'Woody'),
+    ('other', 'Other'),
+]
+
+
 class Item(models.Model):
     """Items that can be associated with POIs"""
     name = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     typical_price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     thumbnail = models.BinaryField(null=True, blank=True)
+    flavor_type = models.CharField(max_length=20, choices=FLAVOR_CHOICES, default='other')
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='created_items')
     updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='updated_items')
     created_at = models.DateTimeField(auto_now_add=True)
@@ -67,6 +104,7 @@ class ItemRequest(models.Model):
     description = models.TextField(blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     thumbnail = models.BinaryField(null=True, blank=True)
+    flavor_type = models.CharField(max_length=20, choices=FLAVOR_CHOICES, default='other')
     requested_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     status = models.CharField(
         max_length=20,

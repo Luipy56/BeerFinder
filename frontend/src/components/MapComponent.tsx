@@ -103,6 +103,12 @@ const MapComponent: React.FC = () => {
       };
 
       const createdPOI = await POIService.createPOI(newPOI);
+      // Ensure the POI has a valid id
+      if (!createdPOI.id) {
+        console.error('Created POI missing id:', createdPOI);
+        showError('Failed to create POI: missing ID in response');
+        return;
+      }
       setPois([...pois, createdPOI]);
       showSuccess('POI created successfully!');
     } catch (error: any) {
@@ -113,13 +119,23 @@ const MapComponent: React.FC = () => {
   };
 
   const handleEditPOI = async (name: string, description: string) => {
-    if (!selectedPOI) return;
+    if (!selectedPOI || !selectedPOI.id) {
+      console.error('handleEditPOI called with invalid POI:', selectedPOI);
+      showError('Invalid POI: missing ID');
+      return;
+    }
 
     try {
-      const updatedPOI = await POIService.updatePOI(selectedPOI.id, {
+      await POIService.updatePOI(selectedPOI.id, {
         name,
         description,
       });
+      // Always preserve original coordinates (coordinates are never edited)
+      const updatedPOI = {
+        ...selectedPOI,
+        name,
+        description,
+      };
       setPois(pois.map((p) => (p.id === selectedPOI.id ? updatedPOI : p)));
       setIsEditModalOpen(false);
       setIsViewModalOpen(false);
@@ -177,15 +193,26 @@ const MapComponent: React.FC = () => {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
         <MapClickHandler onMapClick={handleMapClick} />
-        {pois.map((poi) => (
-          <Marker
-            key={poi.id}
-            position={[poi.latitude, poi.longitude]}
-          >
+        {pois.map((poi) => {
+          // Only render marker if coordinates are valid
+          if (poi.latitude == null || poi.longitude == null) {
+            return null;
+          }
+          return (
+            <Marker
+              key={poi.id}
+              position={[poi.latitude, poi.longitude]}
+            >
             <Popup>
               <div className="poi-popup">
                 <h3>{poi.name}</h3>
-                {poi.description && <p>{poi.description}</p>}
+                {poi.description && (
+                  <p>
+                    {poi.description.length > 100
+                      ? `${poi.description.substring(0, 100)}...`
+                      : poi.description}
+                  </p>
+                )}
                 <button
                   className="btn btn-sm btn-primary"
                   onClick={(e) => {
@@ -199,7 +226,8 @@ const MapComponent: React.FC = () => {
               </div>
             </Popup>
           </Marker>
-        ))}
+          );
+        })}
       </MapContainer>
       {pois.length === 0 && !loading && (
         <div className="map-empty-state">

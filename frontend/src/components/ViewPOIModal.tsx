@@ -5,6 +5,7 @@ import { formatPrice } from '../utils/format';
 import POIService from '../services/poiService';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
+import AssignItemModal from './AssignItemModal';
 
 interface POIItem {
   id: number;
@@ -37,11 +38,7 @@ const ViewPOIModal: React.FC<ViewPOIModalProps> = ({
   const { showSuccess, showError } = useToast();
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const [poiItems, setPoiItems] = useState<POIItem[]>([]);
-  const [availableItems, setAvailableItems] = useState<Item[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [showAssignForm, setShowAssignForm] = useState(false);
-  const [selectedItemId, setSelectedItemId] = useState<number | null>(null);
-  const [localPrice, setLocalPrice] = useState<string>('');
+  const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
 
   useEffect(() => {
     if (isOpen && closeButtonRef.current) {
@@ -49,7 +46,6 @@ const ViewPOIModal: React.FC<ViewPOIModalProps> = ({
     }
     if (isOpen && poi) {
       loadPOIItems();
-      loadAvailableItems();
     }
   }, [isOpen, poi]);
 
@@ -67,42 +63,22 @@ const ViewPOIModal: React.FC<ViewPOIModalProps> = ({
   }, [isOpen]);
 
   const loadPOIItems = async () => {
-    if (!poi) return;
+    if (!poi || !poi.id) {
+      console.error('loadPOIItems called with invalid POI:', poi);
+      return;
+    }
     try {
       const items = await POIService.getPOIItems(poi.id);
       setPoiItems(items);
-    } catch (error) {
-      console.error('Error loading POI items:', error);
-    }
-  };
-
-  const loadAvailableItems = async () => {
-    if (!poi) return;
-    try {
-      const items = await POIService.getAvailableItems(poi.id);
-      setAvailableItems(items);
-    } catch (error) {
-      console.error('Error loading available items:', error);
-    }
-  };
-
-  const handleAssignItem = async () => {
-    if (!poi || !selectedItemId) return;
-    setLoading(true);
-    try {
-      const price = localPrice ? parseFloat(localPrice) : undefined;
-      await POIService.assignItem(poi.id, selectedItemId, price);
-      showSuccess('Item assigned successfully!');
-      setShowAssignForm(false);
-      setSelectedItemId(null);
-      setLocalPrice('');
-      await loadPOIItems();
-      await loadAvailableItems();
     } catch (error: any) {
-      showError(error.response?.data?.error || 'Failed to assign item');
-    } finally {
-      setLoading(false);
+      console.error('Error loading POI items:', error);
+      const errorMessage = error.response?.data?.detail || error.response?.data?.error || 'Failed to load POI items';
+      showError(errorMessage);
     }
+  };
+
+  const handleItemAssigned = async () => {
+    await loadPOIItems();
   };
 
   const handleOverlayClick = (e: React.MouseEvent) => {
@@ -160,48 +136,13 @@ const ViewPOIModal: React.FC<ViewPOIModalProps> = ({
                 {user && (
                   <button
                     type="button"
-                    onClick={() => setShowAssignForm(!showAssignForm)}
+                    onClick={() => setIsAssignModalOpen(true)}
                     className="btn btn-sm btn-primary"
                   >
-                    {showAssignForm ? 'Cancel' : 'Assign Item'}
+                    Assign Item
                   </button>
                 )}
               </div>
-              {showAssignForm && availableItems.length > 0 && (
-                <div className="assign-item-form">
-                  <select
-                    value={selectedItemId || ''}
-                    onChange={(e) => setSelectedItemId(Number(e.target.value))}
-                    className="form-input"
-                  >
-                    <option value="">Select an item...</option>
-                    {availableItems.map((item) => (
-                      <option key={item.id} value={item.id}>
-                        {item.name} {item.typical_price ? `($${formatPrice(item.typical_price)})` : ''}
-                      </option>
-                    ))}
-                  </select>
-                  <input
-                    type="number"
-                    step="0.01"
-                    placeholder="Local price (optional)"
-                    value={localPrice}
-                    onChange={(e) => setLocalPrice(e.target.value)}
-                    className="form-input"
-                  />
-                  <button
-                    type="button"
-                    onClick={handleAssignItem}
-                    disabled={!selectedItemId || loading}
-                    className="btn btn-sm btn-primary"
-                  >
-                    {loading ? 'Assigning...' : 'Assign'}
-                  </button>
-                </div>
-              )}
-              {showAssignForm && availableItems.length === 0 && (
-                <p className="poi-detail-value">No items available to assign</p>
-              )}
               <div className="poi-items-container">
                 <ul className="poi-items-list">
                   {poiItems.length > 0 ? (
@@ -218,6 +159,11 @@ const ViewPOIModal: React.FC<ViewPOIModalProps> = ({
                         </div>
                         <div className="poi-item-info">
                           <span className="poi-item-name">{poiItem.item.name}</span>
+                          {poiItem.item.flavor_type && (
+                            <span className="poi-item-flavor">
+                              {poiItem.item.flavor_type.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join('-')}
+                            </span>
+                          )}
                           {poiItem.relationship_created_by_username && (
                             <span className="poi-item-assigned-by">
                               by {poiItem.relationship_created_by_username}
@@ -260,6 +206,14 @@ const ViewPOIModal: React.FC<ViewPOIModalProps> = ({
           )}
         </div>
       </div>
+      {poi && (
+        <AssignItemModal
+          isOpen={isAssignModalOpen}
+          onClose={() => setIsAssignModalOpen(false)}
+          poiId={poi.id}
+          onItemAssigned={handleItemAssigned}
+        />
+      )}
     </div>
   );
 };

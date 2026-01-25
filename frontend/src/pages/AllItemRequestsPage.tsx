@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
@@ -11,22 +11,14 @@ import { formatPrice } from '../utils/format';
 import api from '../utils/axiosConfig';
 
 const AllItemRequestsPage: React.FC = () => {
-  const { user } = useAuth();
+  const { user, isLoading: authLoading } = useAuth();
   const { showSuccess, showError } = useToast();
   const navigate = useNavigate();
   const [itemRequests, setItemRequests] = useState<ItemRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedRequest, setSelectedRequest] = useState<ItemRequest | null>(null);
 
-  useEffect(() => {
-    if (user && user.is_admin) {
-      loadAllItemRequests();
-    } else {
-      navigate('/item-requests');
-    }
-  }, [user]);
-
-  const loadAllItemRequests = async () => {
+  const loadAllItemRequests = useCallback(async () => {
     try {
       setIsLoading(true);
       const response = await api.get('/item-requests/list_all/');
@@ -44,7 +36,20 @@ const AllItemRequestsPage: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [showError]);
+
+  useEffect(() => {
+    // Wait for auth to finish loading before checking permissions
+    if (authLoading) {
+      return;
+    }
+    
+    if (user && user.is_admin) {
+      loadAllItemRequests();
+    } else {
+      navigate('/item-requests');
+    }
+  }, [user, authLoading, navigate, loadAllItemRequests]);
 
   const handleApprove = async (requestId: number) => {
     try {
@@ -215,10 +220,33 @@ const AllItemRequestsPage: React.FC = () => {
                           <span className="detail-value">{selectedRequest.requested_by_username}</span>
                         </div>
                       )}
+                      {selectedRequest.thumbnail && (
+                        <div className="detail-item">
+                          <span className="detail-label">Image</span>
+                          <div className="item-request-thumbnail-container">
+                            <img
+                              src={`data:image/png;base64,${selectedRequest.thumbnail}`}
+                              alt={selectedRequest.name}
+                              className="item-request-thumbnail"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).style.display = 'none';
+                              }}
+                            />
+                          </div>
+                        </div>
+                      )}
                       {selectedRequest.description && (
                         <div className="detail-item">
                           <span className="detail-label">Description</span>
                           <p className="detail-value">{selectedRequest.description}</p>
+                        </div>
+                      )}
+                      {selectedRequest.flavor_type && (
+                        <div className="detail-item">
+                          <span className="detail-label">Flavor Type</span>
+                          <span className="detail-value">
+                            {selectedRequest.flavor_type.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join('-')}
+                          </span>
                         </div>
                       )}
                       {selectedRequest.price !== undefined && selectedRequest.price !== null && (

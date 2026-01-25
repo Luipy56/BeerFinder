@@ -114,6 +114,10 @@
   font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
   font-family: var(--font-family);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-wrap: break-word;
+  max-width: 250px;
 }
 
 .poi-popup strong {

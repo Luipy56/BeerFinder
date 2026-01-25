@@ -8,6 +8,7 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import './ItemRequestPage.css';
 import { formatPrice } from '../utils/format';
+import { FlavorType } from '../types/poi';
 
 const ItemRequestPage: React.FC = () => {
   const { isAuthenticated } = useAuth();
@@ -23,6 +24,7 @@ const ItemRequestPage: React.FC = () => {
     description: '',
     price: undefined,
     thumbnail: undefined,
+    flavor_type: 'other',
   });
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -92,7 +94,8 @@ const ItemRequestPage: React.FC = () => {
     try {
       const newRequest = await ItemRequestService.createItemRequest(formData);
       setItemRequests([newRequest, ...itemRequests]);
-      setFormData({ name: '', description: '', price: undefined });
+      setFormData({ name: '', description: '', price: undefined, thumbnail: undefined, flavor_type: 'other' });
+      setThumbnailFile(null);
       setErrors({});
       setShowCreateForm(false);
       showSuccess('Item request submitted successfully!');
@@ -122,7 +125,7 @@ const ItemRequestPage: React.FC = () => {
   };
 
   const handleCancel = () => {
-    setFormData({ name: '', description: '', price: undefined, thumbnail: undefined });
+    setFormData({ name: '', description: '', price: undefined, thumbnail: undefined, flavor_type: 'other' });
     setThumbnailFile(null);
     setErrors({});
     setShowCreateForm(false);
@@ -276,17 +279,67 @@ const ItemRequestPage: React.FC = () => {
                   <label htmlFor="request-price" className="form-label">
                     Price
                   </label>
-                  <input
-                    type="number"
-                    id="request-price"
-                    name="price"
+                  <div className="item-request-price-input-wrapper">
+                    <span className="item-request-price-currency">$</span>
+                    <input
+                      type="number"
+                      id="request-price"
+                      name="price"
+                      className="form-input item-request-price-input"
+                      value={formData.price || ''}
+                      onChange={handleChange}
+                      step="0.01"
+                      min="0"
+                      disabled={isCreating}
+                      placeholder="0.00"
+                    />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="request-flavor-type" className="form-label">
+                    Flavor Type
+                  </label>
+                  <select
+                    id="request-flavor-type"
+                    name="flavor_type"
                     className="form-input"
-                    value={formData.price || ''}
-                    onChange={handleChange}
-                    step="0.01"
-                    min="0"
+                    value={formData.flavor_type || 'other'}
+                    onChange={(e) => setFormData({ ...formData, flavor_type: e.target.value as FlavorType })}
                     disabled={isCreating}
-                  />
+                  >
+                    <option value="bitter">Bitter</option>
+                    <option value="caramel">Caramel</option>
+                    <option value="chocolatey">Chocolatey</option>
+                    <option value="coffee-like">Coffee-like</option>
+                    <option value="creamy">Creamy</option>
+                    <option value="crisp">Crisp</option>
+                    <option value="dry">Dry</option>
+                    <option value="earthy">Earthy</option>
+                    <option value="floral">Floral</option>
+                    <option value="fruity">Fruity</option>
+                    <option value="full-bodied">Full-bodied</option>
+                    <option value="funky">Funky</option>
+                    <option value="herbal">Herbal</option>
+                    <option value="honeyed">Honeyed</option>
+                    <option value="hoppy">Hoppy</option>
+                    <option value="light-bodied">Light-bodied</option>
+                    <option value="malty">Malty</option>
+                    <option value="nutty">Nutty</option>
+                    <option value="refreshing">Refreshing</option>
+                    <option value="roasty">Roasty</option>
+                    <option value="session">Session</option>
+                    <option value="smoky">Smoky</option>
+                    <option value="smooth">Smooth</option>
+                    <option value="sour">Sour</option>
+                    <option value="spicy">Spicy</option>
+                    <option value="strong">Strong</option>
+                    <option value="sweet">Sweet</option>
+                    <option value="tart">Tart</option>
+                    <option value="toasted">Toasted</option>
+                    <option value="woody">Woody</option>
+                    <option value="other">Other</option>
+                  </select>
                 </div>
 
                 <div className="form-group">
@@ -382,10 +435,33 @@ const ItemRequestPage: React.FC = () => {
                           {selectedRequest.status.charAt(0).toUpperCase() + selectedRequest.status.slice(1)}
                         </span>
                       </div>
+                    {selectedRequest.thumbnail && (
+                      <div className="detail-item">
+                        <span className="detail-label">Image</span>
+                        <div className="item-request-thumbnail-container">
+                          <img
+                            src={`data:image/png;base64,${selectedRequest.thumbnail}`}
+                            alt={selectedRequest.name}
+                            className="item-request-thumbnail"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).style.display = 'none';
+                            }}
+                          />
+                        </div>
+                      </div>
+                    )}
                     {selectedRequest.description && (
                       <div className="detail-item">
                         <span className="detail-label">Description</span>
                         <p className="detail-value">{selectedRequest.description}</p>
+                      </div>
+                    )}
+                    {selectedRequest.flavor_type && (
+                      <div className="detail-item">
+                        <span className="detail-label">Flavor Type</span>
+                        <span className="detail-value">
+                          {selectedRequest.flavor_type.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join('-')}
+                        </span>
                       </div>
                     )}
                     {selectedRequest.price !== undefined && selectedRequest.price !== null && (

@@ -8,10 +8,11 @@ import base64
 
 class ItemSerializer(serializers.ModelSerializer):
     thumbnail = serializers.SerializerMethodField()
+    thumbnail_write = serializers.CharField(write_only=True, required=False, allow_blank=True, allow_null=True)
     
     class Meta:
         model = Item
-        fields = ['id', 'name', 'description', 'typical_price', 'thumbnail', 'created_by', 'updated_by', 'created_at', 'updated_at']
+        fields = ['id', 'name', 'description', 'typical_price', 'thumbnail', 'thumbnail_write', 'flavor_type', 'created_by', 'updated_by', 'created_at', 'updated_at']
         read_only_fields = ['created_by', 'updated_by', 'created_at', 'updated_at']
     
     def get_thumbnail(self, obj):
@@ -23,16 +24,40 @@ class ItemSerializer(serializers.ModelSerializer):
                 return None
         return None
     
-    def to_internal_value(self, data):
-        """Convert base64 string back to binary for storage"""
-        if 'thumbnail' in data and data['thumbnail']:
+    def create(self, validated_data):
+        """Create Item and handle thumbnail conversion"""
+        # Extract thumbnail_write from validated_data
+        thumbnail_data = validated_data.pop('thumbnail_write', None)
+        
+        # Convert base64 to binary if provided
+        if thumbnail_data:
             try:
-                # If it's a base64 string, decode it
-                if isinstance(data['thumbnail'], str):
-                    data['thumbnail'] = base64.b64decode(data['thumbnail'])
-            except Exception:
-                pass
-        return super().to_internal_value(data)
+                # Decode base64 string to binary
+                validated_data['thumbnail'] = base64.b64decode(thumbnail_data)
+            except Exception as e:
+                # If decoding fails, set to None
+                validated_data['thumbnail'] = None
+        else:
+            # If no thumbnail_write provided, ensure thumbnail is not set
+            validated_data.pop('thumbnail', None)
+        
+        return super().create(validated_data)
+    
+    def update(self, instance, validated_data):
+        """Update Item and handle thumbnail conversion"""
+        # Extract thumbnail_write from validated_data
+        thumbnail_data = validated_data.pop('thumbnail_write', None)
+        
+        # Convert base64 to binary if provided
+        if thumbnail_data:
+            try:
+                # Decode base64 string to binary
+                validated_data['thumbnail'] = base64.b64decode(thumbnail_data)
+            except Exception as e:
+                # If decoding fails, set to None
+                validated_data['thumbnail'] = None
+        
+        return super().update(instance, validated_data)
 
 
 class POISerializer(GeoFeatureModelSerializer):
@@ -96,15 +121,19 @@ class POIListSerializer(serializers.ModelSerializer):
 
 class ItemRequestSerializer(serializers.ModelSerializer):
     thumbnail = serializers.SerializerMethodField()
+    thumbnail_write = serializers.CharField(write_only=True, required=False, allow_blank=True, allow_null=True)
     requested_by_username = serializers.SerializerMethodField()
     
     class Meta:
         model = ItemRequest
         fields = [
-            'id', 'name', 'description', 'price', 'thumbnail', 'requested_by',
+            'id', 'name', 'description', 'price', 'thumbnail', 'thumbnail_write', 'flavor_type', 'requested_by',
             'requested_by_username', 'status', 'status_changed_by', 'created_at', 'updated_at'
         ]
         read_only_fields = ['requested_by', 'requested_by_username', 'status', 'status_changed_by', 'created_at', 'updated_at']
+        extra_kwargs = {
+            'thumbnail': {'write_only': False}  # Allow thumbnail to be written via create/update methods
+        }
     
     def get_requested_by_username(self, obj):
         """Return the username of the user who requested the item"""
@@ -121,16 +150,38 @@ class ItemRequestSerializer(serializers.ModelSerializer):
                 return None
         return None
     
-    def to_internal_value(self, data):
-        """Convert base64 string back to binary for storage"""
-        if 'thumbnail' in data and data['thumbnail']:
+    def create(self, validated_data):
+        """Create ItemRequest and handle thumbnail conversion"""
+        # Extract thumbnail_write from validated_data
+        thumbnail_data = validated_data.pop('thumbnail_write', None)
+        
+        # Convert base64 to binary if provided
+        if thumbnail_data:
             try:
-                # If it's a base64 string, decode it
-                if isinstance(data['thumbnail'], str):
-                    data['thumbnail'] = base64.b64decode(data['thumbnail'])
-            except Exception:
-                pass
-        return super().to_internal_value(data)
+                # Decode base64 string to binary
+                validated_data['thumbnail'] = base64.b64decode(thumbnail_data)
+            except Exception as e:
+                # If decoding fails, set to None
+                validated_data['thumbnail'] = None
+        else:
+            # If no thumbnail_write provided, ensure thumbnail is not set
+            validated_data.pop('thumbnail', None)
+        
+        return super().create(validated_data)
+    
+    def update(self, instance, validated_data):
+        """Update ItemRequest and handle thumbnail conversion"""
+        # Extract thumbnail_write from validated_data
+        thumbnail_data = validated_data.pop('thumbnail_write', None)
+        
+        # Convert base64 to binary if provided
+        if thumbnail_data:
+            try:
+                validated_data['thumbnail'] = base64.b64decode(thumbnail_data)
+            except Exception as e:
+                validated_data['thumbnail'] = None
+        
+        return super().update(instance, validated_data)
 
 
 class UserRegistrationSerializer(serializers.ModelSerializer):

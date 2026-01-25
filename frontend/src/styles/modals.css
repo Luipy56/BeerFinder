@@ -7,10 +7,10 @@
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.5);
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   justify-content: center;
   z-index: 2000;
-  padding: var(--spacing-md);
+  padding: calc(80px + var(--spacing-md)) var(--spacing-md) var(--spacing-md);
   animation: fadeIn var(--transition-base);
   overflow-y: auto;
 }
@@ -29,7 +29,7 @@
   position: relative;
   width: 100%;
   max-width: 500px;
-  max-height: calc(100vh - 2 * var(--spacing-md));
+  max-height: calc(100vh - 80px - 2 * var(--spacing-md));
   background-color: var(--color-background);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-xl);
@@ -37,7 +37,7 @@
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  margin: var(--spacing-md) 0;
+  margin: 0 auto;
 }
 
 @keyframes slideUp {

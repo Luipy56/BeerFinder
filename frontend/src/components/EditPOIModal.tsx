@@ -127,7 +127,7 @@ const EditPOIModal: React.FC<EditPOIModalProps> = ({
             </div>
             <div className="form-group">
               <span className="form-help">
-                Location: {poi.latitude.toFixed(6)}, {poi.longitude.toFixed(6)}
+                Location: {poi.latitude != null ? poi.latitude.toFixed(6) : 'N/A'}, {poi.longitude != null ? poi.longitude.toFixed(6) : 'N/A'}
               </span>
             </div>
           </div>
