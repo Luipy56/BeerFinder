@@ -3,10 +3,9 @@ import { POI, Item } from '../types/poi';
 import './ViewPOIModal.css';
 import { formatPrice } from '../utils/format';
 import POIService from '../services/poiService';
-import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
+import { useAuth } from '../contexts/AuthContext';
 import { DEFAULT_BEER_LOGO_PATH } from '../utils/constants';
-import AssignItemModal from './AssignItemModal';
 
 interface POIItem {
   id: number;
@@ -16,30 +15,24 @@ interface POIItem {
   created_at: string;
 }
 
-interface ViewPOIModalProps {
+interface ViewPOIDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
   poi: POI | null;
   onEdit?: () => void;
-  onDelete?: () => void;
-  canEdit?: boolean;
-  canDelete?: boolean;
 }
 
-const ViewPOIModal: React.FC<ViewPOIModalProps> = ({
+const ViewPOIDetailsModal: React.FC<ViewPOIDetailsModalProps> = ({
   isOpen,
   onClose,
   poi,
   onEdit,
-  onDelete,
-  canEdit = true,
-  canDelete = true,
 }) => {
   const { user } = useAuth();
-  const { showSuccess, showError } = useToast();
+  const { showError } = useToast();
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const [poiItems, setPoiItems] = useState<POIItem[]>([]);
-  const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
+  const [loadingItems, setLoadingItems] = useState(false);
 
   useEffect(() => {
     if (isOpen && closeButtonRef.current) {
@@ -49,19 +42,6 @@ const ViewPOIModal: React.FC<ViewPOIModalProps> = ({
       loadPOIItems();
     }
   }, [isOpen, poi]);
-
-  // Close leaflet popup when modal closes
-  useEffect(() => {
-    if (!isOpen) {
-      const popup = document.querySelector('.leaflet-popup-content-wrapper');
-      if (popup) {
-        const closeButton = popup.closest('.leaflet-popup')?.querySelector('.leaflet-popup-close-button') as HTMLElement;
-        if (closeButton) {
-          closeButton.click();
-        }
-      }
-    }
-  }, [isOpen]);
 
   // Disable body scroll when modal is open
   useEffect(() => {
@@ -94,18 +74,17 @@ const ViewPOIModal: React.FC<ViewPOIModalProps> = ({
       console.error('loadPOIItems called with invalid POI:', poi);
       return;
     }
+
     try {
+      setLoadingItems(true);
       const items = await POIService.getPOIItems(poi.id);
       setPoiItems(items);
     } catch (error: any) {
       console.error('Error loading POI items:', error);
-      const errorMessage = error.response?.data?.detail || error.response?.data?.error || 'Failed to load POI items';
-      showError(errorMessage);
+      showError('Failed to load POI items');
+    } finally {
+      setLoadingItems(false);
     }
-  };
-
-  const handleItemAssigned = async () => {
-    await loadPOIItems();
   };
 
   const handleOverlayClick = (e: React.MouseEvent) => {
@@ -123,11 +102,6 @@ const ViewPOIModal: React.FC<ViewPOIModalProps> = ({
     return DEFAULT_BEER_LOGO_PATH;
   };
 
-  const isOwner = user && poi.created_by === user.id;
-  const isAdmin = user?.is_admin;
-  const canEditPOI = canEdit && (isAdmin || isOwner);
-  const canDeletePOI = canDelete && (isAdmin || isOwner);
-
   return (
     <div
       className="modal-overlay"
@@ -139,15 +113,31 @@ const ViewPOIModal: React.FC<ViewPOIModalProps> = ({
       <div className="modal modal-scrollable" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <h2 id="view-poi-title" className="modal-title">{poi.name}</h2>
-          <button
-            ref={closeButtonRef}
-            className="modal-close"
-            onClick={onClose}
-            aria-label="Close modal"
-            type="button"
-          >
-            ×
-          </button>
+          <div className="modal-header-actions">
+            {user?.is_admin && onEdit && (
+              <button
+                className="modal-edit-button"
+                onClick={onEdit}
+                aria-label="Edit POI"
+                type="button"
+                title="Edit POI"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
+                  <path d="M15 5l4 4"></path>
+                </svg>
+              </button>
+            )}
+            <button
+              ref={closeButtonRef}
+              className="modal-close"
+              onClick={onClose}
+              aria-label="Close modal"
+              type="button"
+            >
+              ×
+            </button>
+          </div>
         </div>
         <div className="modal-body">
           {poi.thumbnail && (
@@ -170,22 +160,13 @@ const ViewPOIModal: React.FC<ViewPOIModalProps> = ({
               </div>
             )}
             <div className="poi-detail-item">
-              <div className="poi-items-header">
-                <h3 className="poi-detail-label">Items</h3>
-                {user && (
-                  <button
-                    type="button"
-                    onClick={() => setIsAssignModalOpen(true)}
-                    className="btn btn-sm btn-primary"
-                  >
-                    Assign Item
-                  </button>
-                )}
-              </div>
+              <h3 className="poi-detail-label">Items</h3>
               <div className="poi-items-container">
-                <ul className="poi-items-list">
-                  {poiItems.length > 0 ? (
-                    poiItems.map((poiItem) => (
+                {loadingItems ? (
+                  <div className="poi-item-empty">Loading items...</div>
+                ) : poiItems.length > 0 ? (
+                  <ul className="poi-items-list">
+                    {poiItems.map((poiItem) => (
                       <li key={poiItem.id} className="poi-item">
                         <div className="poi-item-thumbnail">
                           <img
@@ -197,64 +178,40 @@ const ViewPOIModal: React.FC<ViewPOIModalProps> = ({
                           />
                         </div>
                         <div className="poi-item-info">
-                          <span className="poi-item-name">{poiItem.item.name}</span>
+                          <div className="poi-item-name">{poiItem.item.name}</div>
                           {poiItem.item.flavor_type && (
-                            <span className="poi-item-flavor">
+                            <div className="poi-item-flavor">
                               {poiItem.item.flavor_type.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join('-')}
-                            </span>
+                            </div>
                           )}
-                          {poiItem.relationship_created_by_username && (
-                            <span className="poi-item-assigned-by">
-                              by {poiItem.relationship_created_by_username}
-                            </span>
+                          {poiItem.item.description && (
+                            <div className="poi-item-description">{poiItem.item.description}</div>
                           )}
                         </div>
-                        <span className="poi-item-price">
-                          ${formatPrice(poiItem.local_price || poiItem.item.typical_price || 0)}
-                        </span>
+                        {poiItem.local_price && (
+                          <div className="poi-item-price">
+                            {formatPrice(poiItem.local_price)}
+                          </div>
+                        )}
                       </li>
-                    ))
-                  ) : (
-                    <li className="poi-item-empty">No items assigned</li>
-                  )}
-                </ul>
+                    ))}
+                  </ul>
+                ) : (
+                  <div className="poi-item-empty">No items assigned to this POI</div>
+                )}
               </div>
+            </div>
+            <div className="poi-detail-item">
+              <h3 className="poi-detail-label">Location</h3>
+              <p className="poi-detail-value">
+                {poi.latitude?.toFixed(6)}, {poi.longitude?.toFixed(6)}
+              </p>
             </div>
           </div>
         </div>
-        <div className="modal-footer">
-          {canEditPOI && onEdit && (
-            <button
-              type="button"
-              onClick={onEdit}
-              className="btn btn-secondary"
-              aria-label="Edit POI"
-            >
-              Edit
-            </button>
-          )}
-          {canDeletePOI && onDelete && (
-            <button
-              type="button"
-              onClick={onDelete}
-              className="btn btn-danger"
-              aria-label="Disable POI"
-            >
-              Disable
-            </button>
-          )}
-        </div>
       </div>
-      {poi && (
-        <AssignItemModal
-          isOpen={isAssignModalOpen}
-          onClose={() => setIsAssignModalOpen(false)}
-          poiId={poi.id}
-          onItemAssigned={handleItemAssigned}
-        />
-      )}
     </div>
   );
 };
 
-export default ViewPOIModal;
+export default ViewPOIDetailsModal;

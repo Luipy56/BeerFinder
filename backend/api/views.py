@@ -267,6 +267,7 @@ class ItemRequestViewSet(viewsets.ModelViewSet):
             name=item_request.name,
             description=item_request.description,
             typical_price=item_request.price,  # Map price to typical_price
+            percentage=item_request.percentage,  # Copy percentage
             thumbnail=item_request.thumbnail,
             flavor_type=item_request.flavor_type,  # Copy flavor_type
             created_by=item_request.requested_by,  # The user who requested it

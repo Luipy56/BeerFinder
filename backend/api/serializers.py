@@ -183,7 +183,7 @@ class ItemRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = ItemRequest
         fields = [
-            'id', 'name', 'description', 'price', 'thumbnail', 'thumbnail_write', 'flavor_type', 'requested_by',
+            'id', 'name', 'description', 'price', 'percentage', 'thumbnail', 'thumbnail_write', 'flavor_type', 'requested_by',
             'requested_by_username', 'status', 'status_changed_by', 'created_at', 'updated_at'
         ]
         read_only_fields = ['requested_by', 'requested_by_username', 'status', 'status_changed_by', 'created_at', 'updated_at']

@@ -1,0 +1,254 @@
+.pois-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.pois-container {
+  flex: 1;
+  padding: var(--spacing-xl);
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.pois-header {
+  margin-bottom: var(--spacing-xl);
+  text-align: center;
+}
+
+.pois-title {
+  margin: 0 0 var(--spacing-sm) 0;
+  font-size: var(--font-size-2xl);
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.pois-subtitle {
+  margin: 0 0 var(--spacing-md) 0;
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+}
+
+.pois-search-container {
+  margin-top: var(--spacing-md);
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.pois-search-input {
+  width: 100%;
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: var(--font-size-base);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-background);
+  color: var(--color-text);
+  transition: border-color var(--transition-base), box-shadow var(--transition-base);
+}
+
+.pois-search-input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.pois-search-input::placeholder {
+  color: var(--color-text-secondary);
+}
+
+.pois-loading {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-xl);
+}
+
+.loading-spinner {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-secondary);
+}
+
+.pois-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  margin-top: var(--spacing-lg);
+}
+
+.poi-card {
+  background-color: var(--color-background);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: all var(--transition-base);
+  display: flex;
+  cursor: pointer;
+  box-shadow: var(--shadow-sm);
+}
+
+.poi-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-2px);
+  border-color: var(--color-primary);
+}
+
+.poi-card-thumbnail {
+  width: 200px;
+  min-width: 200px;
+  height: 150px;
+  background-color: var(--color-surface);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.poi-card-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.poi-card-content {
+  padding: var(--spacing-md);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.poi-card-name {
+  margin: 0;
+  font-size: var(--font-size-xl);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.poi-card-description {
+  margin: 0;
+  font-size: var(--font-size-base);
+  color: var(--color-text-secondary);
+  line-height: 1.5;
+  flex: 1;
+}
+
+.poi-card-location {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+}
+
+.poi-card-location-label {
+  font-weight: 500;
+}
+
+.poi-card-location-value {
+  font-family: monospace;
+}
+
+.poi-card-items-count {
+  margin-top: var(--spacing-xs);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background-color: var(--color-primary);
+  color: white;
+  border-radius: var(--radius-sm);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  align-self: flex-start;
+}
+
+.pois-view-toggle {
+  display: flex;
+  justify-content: center;
+  gap: var(--spacing-xs);
+  margin-top: var(--spacing-md);
+}
+
+.view-toggle-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--spacing-sm);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: all var(--transition-base);
+  color: var(--color-text-secondary);
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.view-toggle-btn:hover {
+  background-color: var(--color-surface-hover, var(--color-surface));
+  border-color: var(--color-primary);
+  color: var(--color-text);
+}
+
+.view-toggle-btn.active {
+  background-color: var(--color-primary);
+  border-color: var(--color-primary);
+  color: white;
+}
+
+.view-toggle-btn svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  stroke: currentColor;
+}
+
+.pois-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: var(--spacing-lg);
+  margin-top: var(--spacing-lg);
+}
+
+.pois-grid .poi-card {
+  flex-direction: column;
+}
+
+.pois-grid .poi-card-thumbnail {
+  width: 100%;
+  min-width: 100%;
+  height: 200px;
+}
+
+.pois-grid .poi-card-content {
+  padding: var(--spacing-md);
+}
+
+.pois-empty {
+  text-align: center;
+  padding: var(--spacing-xl);
+  color: var(--color-text-secondary);
+}
+
+.pois-grid .pois-empty {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 768px) {
+  .pois-container {
+    padding: var(--spacing-md);
+  }
+
+  .poi-card {
+    flex-direction: column;
+  }
+
+  .poi-card-thumbnail {
+    width: 100%;
+    min-width: 100%;
+    height: 200px;
+  }
+
+  .pois-grid {
+    grid-template-columns: 1fr;
+  }
+}

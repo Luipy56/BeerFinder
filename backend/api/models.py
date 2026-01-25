@@ -105,6 +105,7 @@ class ItemRequest(models.Model):
     name = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    percentage = models.FloatField(null=True, blank=True)
     thumbnail = models.BinaryField(null=True, blank=True)
     flavor_type = models.CharField(max_length=20, choices=FLAVOR_CHOICES, default='other')
     requested_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)

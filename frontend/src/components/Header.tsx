@@ -46,6 +46,18 @@ const Header: React.FC = () => {
                   All Item Requests
                 </button>
               )}
+              <button
+                className={`header-nav-link ${isActive('/items') ? 'active' : ''}`}
+                onClick={() => navigate('/items')}
+              >
+                Items
+              </button>
+              <button
+                className={`header-nav-link ${isActive('/pois') ? 'active' : ''}`}
+                onClick={() => navigate('/pois')}
+              >
+                POIs
+              </button>
             </>
           )}
         </nav>

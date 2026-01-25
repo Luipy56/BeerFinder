@@ -1,22 +1,37 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { POI } from '../types/poi';
-import './EditPOIModal.css';
+import { Item, FlavorType } from '../types/poi';
+import ItemService from '../services/itemService';
+import { useToast } from '../contexts/ToastContext';
+import { DEFAULT_BEER_LOGO_PATH } from '../utils/constants';
+import './EditItemModal.css';
 
-interface EditPOIModalProps {
+interface EditItemModalProps {
   isOpen: boolean;
   onClose: () => void;
-  poi: POI | null;
-  onSubmit: (name: string, description: string, thumbnail?: string) => Promise<void>;
+  item: Item | null;
+  onItemUpdated: () => void;
 }
 
-const EditPOIModal: React.FC<EditPOIModalProps> = ({
+const FLAVOR_OPTIONS: FlavorType[] = [
+  'bitter', 'caramel', 'chocolatey', 'coffee-like', 'creamy', 'crisp', 'dry',
+  'earthy', 'floral', 'fruity', 'full-bodied', 'funky', 'herbal', 'honeyed',
+  'hoppy', 'light-bodied', 'malty', 'nutty', 'refreshing', 'roasty', 'session',
+  'smoky', 'smooth', 'sour', 'spicy', 'strong', 'sweet', 'tart', 'toasted',
+  'woody', 'other'
+];
+
+const EditItemModal: React.FC<EditItemModalProps> = ({
   isOpen,
   onClose,
-  poi,
-  onSubmit,
+  item,
+  onItemUpdated,
 }) => {
+  const { showSuccess, showError } = useToast();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
+  const [typicalPrice, setTypicalPrice] = useState<string>('');
+  const [percentage, setPercentage] = useState<string>('');
+  const [flavorType, setFlavorType] = useState<FlavorType>('other');
   const [thumbnail, setThumbnail] = useState<string | undefined>(undefined);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -24,14 +39,17 @@ const EditPOIModal: React.FC<EditPOIModalProps> = ({
   const nameInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    if (poi) {
-      setName(poi.name);
-      setDescription(poi.description || '');
+    if (item) {
+      setName(item.name || '');
+      setDescription(item.description || '');
+      setTypicalPrice(item.typical_price?.toString() || '');
+      setPercentage(item.percentage?.toString() || '');
+      setFlavorType(item.flavor_type || 'other');
       setThumbnail(undefined);
       setThumbnailFile(null);
       setError(null);
     }
-  }, [poi]);
+  }, [item]);
 
   useEffect(() => {
     if (isOpen && nameInputRef.current) {
@@ -78,11 +96,9 @@ const EditPOIModal: React.FC<EditPOIModalProps> = ({
     const file = e.target.files?.[0];
     if (file) {
       setThumbnailFile(file);
-      // Convert file to base64
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64String = reader.result as string;
-        // Remove data:image/...;base64, prefix
         const base64Data = base64String.split(',')[1];
         setThumbnail(base64Data);
       };
@@ -95,16 +111,55 @@ const EditPOIModal: React.FC<EditPOIModalProps> = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim() || isSubmitting || !poi) return;
+    if (!name.trim() || isSubmitting || !item) return;
 
     setError(null);
     setIsSubmitting(true);
 
     try {
-      await onSubmit(name, description, thumbnail);
-      onClose();
+      const updateData: any = {
+        name: name.trim(),
+        description: description.trim(),
+        flavor_type: flavorType,
+      };
+
+      if (typicalPrice.trim()) {
+        const price = parseFloat(typicalPrice);
+        if (isNaN(price) || price < 0) {
+          setError('Typical price must be a valid number >= 0');
+          setIsSubmitting(false);
+          return;
+        }
+        updateData.typical_price = price;
+      } else {
+        updateData.typical_price = null;
+      }
+
+      if (percentage.trim()) {
+        const perc = parseFloat(percentage);
+        if (isNaN(perc) || perc < 0 || perc > 100) {
+          setError('Percentage must be a valid number between 0 and 100');
+          setIsSubmitting(false);
+          return;
+        }
+        updateData.percentage = perc;
+      } else {
+        updateData.percentage = null;
+      }
+
+      if (thumbnail !== undefined) {
+        updateData.thumbnail_write = thumbnail;
+      }
+
+      await ItemService.updateItem(item.id, updateData);
+      showSuccess('Item updated successfully!');
+      onItemUpdated();
     } catch (err: any) {
-      setError(err.message || 'Failed to update POI. Please try again.');
+      const errorMessage = err.response?.data?.detail || 
+                          err.response?.data?.error || 
+                          err.message || 
+                          'Failed to update item. Please try again.';
+      setError(errorMessage);
       setIsSubmitting(false);
     }
   };
@@ -115,7 +170,7 @@ const EditPOIModal: React.FC<EditPOIModalProps> = ({
     }
   };
 
-  if (!isOpen || !poi) return null;
+  if (!isOpen || !item) return null;
 
   return (
     <div
@@ -123,11 +178,11 @@ const EditPOIModal: React.FC<EditPOIModalProps> = ({
       onClick={handleOverlayClick}
       role="dialog"
       aria-modal="true"
-      aria-labelledby="edit-poi-title"
+      aria-labelledby="edit-item-title"
     >
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2 id="edit-poi-title" className="modal-title">Edit Point of Interest</h2>
+          <h2 id="edit-item-title" className="modal-title">Edit Item</h2>
           <button
             className="modal-close"
             onClick={onClose}
@@ -145,29 +200,29 @@ const EditPOIModal: React.FC<EditPOIModalProps> = ({
               </div>
             )}
             <div className="form-group">
-              <label htmlFor="edit-name" className="form-label required">
+              <label htmlFor="edit-item-name" className="form-label required">
                 Name
               </label>
               <input
                 ref={nameInputRef}
                 type="text"
-                id="edit-name"
+                id="edit-item-name"
                 className={`form-input ${error ? 'error' : ''}`}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
-                placeholder="Enter POI name"
+                placeholder="Enter item name"
                 disabled={isSubmitting}
                 aria-required="true"
                 aria-invalid={error ? 'true' : 'false'}
               />
             </div>
             <div className="form-group">
-              <label htmlFor="edit-description" className="form-label">
+              <label htmlFor="edit-item-description" className="form-label">
                 Description
               </label>
               <textarea
-                id="edit-description"
+                id="edit-item-description"
                 className="form-textarea"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
@@ -177,12 +232,69 @@ const EditPOIModal: React.FC<EditPOIModalProps> = ({
               />
             </div>
             <div className="form-group">
-              <label htmlFor="edit-poi-thumbnail" className="form-label">
+              <label htmlFor="edit-item-flavor" className="form-label">
+                Flavor Type
+              </label>
+              <select
+                id="edit-item-flavor"
+                className="form-input"
+                value={flavorType}
+                onChange={(e) => setFlavorType(e.target.value as FlavorType)}
+                disabled={isSubmitting}
+              >
+                {FLAVOR_OPTIONS.map((flavor) => (
+                  <option key={flavor} value={flavor}>
+                    {flavor.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join('-')}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="form-group">
+              <label htmlFor="edit-item-price" className="form-label">
+                Typical Price
+              </label>
+              <div className="item-request-price-input-wrapper">
+                <span className="item-request-price-currency">$</span>
+                <input
+                  type="number"
+                  id="edit-item-price"
+                  className="item-request-price-input"
+                  value={typicalPrice}
+                  onChange={(e) => setTypicalPrice(e.target.value)}
+                  placeholder="0.00"
+                  step="0.01"
+                  min="0"
+                  disabled={isSubmitting}
+                />
+              </div>
+            </div>
+            <div className="form-group">
+              <label htmlFor="edit-item-percentage" className="form-label">
+                Percentage
+              </label>
+              <div className="item-request-price-input-wrapper">
+                <input
+                  type="number"
+                  id="edit-item-percentage"
+                  className="item-request-price-input"
+                  value={percentage}
+                  onChange={(e) => setPercentage(e.target.value)}
+                  placeholder="0.0"
+                  step="0.1"
+                  min="0"
+                  max="100"
+                  disabled={isSubmitting}
+                />
+                <span className="item-request-price-currency">%</span>
+              </div>
+            </div>
+            <div className="form-group">
+              <label htmlFor="edit-item-thumbnail" className="form-label">
                 Thumbnail (optional)
               </label>
               <input
                 type="file"
-                id="edit-poi-thumbnail"
+                id="edit-item-thumbnail"
                 accept="image/*"
                 onChange={handleThumbnailChange}
                 disabled={isSubmitting}
@@ -196,21 +308,16 @@ const EditPOIModal: React.FC<EditPOIModalProps> = ({
                     style={{ maxWidth: '200px', maxHeight: '200px', objectFit: 'contain' }}
                   />
                 </div>
-              ) : poi?.thumbnail ? (
+              ) : item?.thumbnail ? (
                 <div style={{ marginTop: '8px' }}>
                   <span className="form-help">Current thumbnail:</span>
                   <img
-                    src={`data:image/png;base64,${poi.thumbnail}`}
+                    src={`data:image/png;base64,${item.thumbnail}`}
                     alt="Current thumbnail"
                     style={{ maxWidth: '200px', maxHeight: '200px', objectFit: 'contain', marginTop: '4px', display: 'block' }}
                   />
                 </div>
               ) : null}
-            </div>
-            <div className="form-group">
-              <span className="form-help">
-                Location: {poi.latitude != null ? poi.latitude.toFixed(6) : 'N/A'}, {poi.longitude != null ? poi.longitude.toFixed(6) : 'N/A'}
-              </span>
             </div>
           </div>
           <div className="modal-footer">
@@ -236,4 +343,4 @@ const EditPOIModal: React.FC<EditPOIModalProps> = ({
   );
 };
 
-export default EditPOIModal;
+export default EditItemModal;

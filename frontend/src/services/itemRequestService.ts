@@ -6,6 +6,7 @@ export interface ItemRequest {
   name: string;
   description: string;
   price?: number | null;
+  percentage?: number | null;
   thumbnail?: string | null;
   flavor_type?: FlavorType;
   requested_by?: number;
@@ -19,6 +20,7 @@ export interface CreateItemRequestDto {
   name: string;
   description?: string;
   price?: number;
+  percentage?: number | null;
   thumbnail?: string;
   flavor_type?: FlavorType;
 }
@@ -47,6 +49,13 @@ const ItemRequestService = {
       price: itemRequestData.price,
       flavor_type: itemRequestData.flavor_type,
     };
+    
+    // Add percentage if provided, otherwise set to null
+    if (itemRequestData.percentage !== undefined && itemRequestData.percentage !== null) {
+      requestPayload.percentage = itemRequestData.percentage;
+    } else {
+      requestPayload.percentage = null;
+    }
     
     // Add thumbnail_write if thumbnail is provided
     if (itemRequestData.thumbnail) {

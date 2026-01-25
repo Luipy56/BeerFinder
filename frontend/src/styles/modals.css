@@ -7,10 +7,10 @@
   bottom: 0;
   background-color: rgba(0, 0, 0, 0.5);
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: center;
   z-index: 2000;
-  padding: calc(80px + var(--spacing-md)) var(--spacing-md) var(--spacing-md);
+  padding: var(--spacing-md);
   animation: fadeIn var(--transition-base);
   overflow-y: auto;
 }
@@ -29,7 +29,7 @@
   position: relative;
   width: 100%;
   max-width: 500px;
-  max-height: calc(100vh - 80px - 2 * var(--spacing-md));
+  max-height: calc(100vh - 4 * var(--spacing-md));
   background-color: var(--color-background);
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-xl);
@@ -37,7 +37,15 @@
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  margin: 0 auto;
+  margin: var(--spacing-md) auto 0;
+}
+
+/* Modal with sticky header */
+.modal.modal-scrollable {
+  max-height: calc(100vh - 4 * var(--spacing-md));
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 @keyframes slideUp {
@@ -66,6 +74,16 @@
   justify-content: space-between;
   padding: var(--spacing-md) var(--spacing-lg);
   border-bottom: 1px solid var(--color-border);
+  flex-shrink: 0;
+}
+
+/* Sticky header for scrollable modals */
+.modal.modal-scrollable .modal-header {
+  position: sticky;
+  top: 0;
+  background-color: var(--color-background);
+  z-index: 10;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .modal-title {
@@ -102,9 +120,55 @@
   outline-offset: 2px;
 }
 
+/* Modal Header Actions */
+.modal-header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+}
+
+.modal-edit-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--spacing-xs);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  transition: background-color var(--transition-fast);
+  width: 2rem;
+  height: 2rem;
+  color: var(--color-text-secondary);
+}
+
+.modal-edit-button svg {
+  width: 1.25rem;
+  height: 1.25rem;
+  fill: currentColor;
+}
+
+.modal-edit-button:hover {
+  background-color: var(--color-surface);
+  color: var(--color-text);
+}
+
+.modal-edit-button:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
 /* Modal Body */
 .modal-body {
   padding: var(--spacing-lg);
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
+
+/* Scrollable body for modals with sticky header */
+.modal.modal-scrollable .modal-body {
+  overflow-y: auto;
   flex: 1;
   min-height: 0;
 }
@@ -118,6 +182,7 @@
   padding: var(--spacing-md) var(--spacing-lg);
   border-top: 1px solid var(--color-border);
   flex-wrap: wrap;
+  flex-shrink: 0;
 }
 
 .modal-footer .btn {
@@ -133,10 +198,14 @@
 
   .modal {
     max-width: 100%;
-    max-height: calc(100vh - 60px);
+    max-height: calc(100vh - 4 * var(--spacing-md));
     border-radius: var(--radius-lg) var(--radius-lg) 0 0;
     animation: slideUpMobile var(--transition-base);
-    margin: 0;
+    margin: var(--spacing-md) 0 0;
+  }
+  
+  .modal.modal-scrollable {
+    max-height: calc(100vh - 4 * var(--spacing-md));
   }
 
   @keyframes slideUpMobile {

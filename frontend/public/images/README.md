@@ -4,7 +4,7 @@ This directory contains the default beer logo used when items don't have a thumb
 
 ## File Required
 
-- **File name:** `beer-logo-default.jpg` (or `.svg`, `.jpg` depending on the format)
+- **File name:** `beer-logo-default.png`
 - **Source:** Vecteezy - vecteezy_beer-vector-logo_9108008_644
 - **Author:** joko sutrisno
 - **License:** Vecteezy Free License (requires attribution)

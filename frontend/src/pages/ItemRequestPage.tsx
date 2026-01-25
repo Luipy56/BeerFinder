@@ -23,6 +23,7 @@ const ItemRequestPage: React.FC = () => {
     name: '',
     description: '',
     price: undefined,
+    percentage: null,
     thumbnail: undefined,
     flavor_type: 'other',
   });
@@ -52,7 +53,11 @@ const ItemRequestPage: React.FC = () => {
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: name === 'price' ? (value ? parseFloat(value) : undefined) : value,
+      [name]: name === 'price' 
+        ? (value ? parseFloat(value) : undefined)
+        : name === 'percentage'
+        ? (value ? parseFloat(value) : null)
+        : value,
     }));
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: '' }));
@@ -94,7 +99,7 @@ const ItemRequestPage: React.FC = () => {
     try {
       const newRequest = await ItemRequestService.createItemRequest(formData);
       setItemRequests([newRequest, ...itemRequests]);
-      setFormData({ name: '', description: '', price: undefined, thumbnail: undefined, flavor_type: 'other' });
+      setFormData({ name: '', description: '', price: undefined, percentage: null, thumbnail: undefined, flavor_type: 'other' });
       setThumbnailFile(null);
       setErrors({});
       setShowCreateForm(false);
@@ -125,7 +130,7 @@ const ItemRequestPage: React.FC = () => {
   };
 
   const handleCancel = () => {
-    setFormData({ name: '', description: '', price: undefined, thumbnail: undefined, flavor_type: 'other' });
+    setFormData({ name: '', description: '', price: undefined, percentage: null, thumbnail: undefined, flavor_type: 'other' });
     setThumbnailFile(null);
     setErrors({});
     setShowCreateForm(false);
@@ -293,6 +298,28 @@ const ItemRequestPage: React.FC = () => {
                       disabled={isCreating}
                       placeholder="0.00"
                     />
+                  </div>
+                </div>
+
+                <div className="form-group">
+                  <label htmlFor="request-percentage" className="form-label">
+                    Percentage
+                  </label>
+                  <div className="item-request-price-input-wrapper">
+                    <input
+                      type="number"
+                      id="request-percentage"
+                      name="percentage"
+                      className="form-input item-request-price-input"
+                      value={formData.percentage !== null && formData.percentage !== undefined ? formData.percentage : ''}
+                      onChange={handleChange}
+                      step="0.1"
+                      min="0"
+                      max="100"
+                      disabled={isCreating}
+                      placeholder="0.0"
+                    />
+                    <span className="item-request-price-currency">%</span>
                   </div>
                 </div>
 

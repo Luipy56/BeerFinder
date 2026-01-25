@@ -8,6 +8,8 @@ import AuthPage from './pages/AuthPage';
 import ProfilePage from './pages/ProfilePage';
 import ItemRequestPage from './pages/ItemRequestPage';
 import AllItemRequestsPage from './pages/AllItemRequestsPage';
+import ItemsPage from './pages/ItemsPage';
+import POIsPage from './pages/POIsPage';
 
 function App() {
   return (
@@ -21,6 +23,8 @@ function App() {
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/item-requests" element={<ItemRequestPage />} />
               <Route path="/item-requests/all" element={<AllItemRequestsPage />} />
+              <Route path="/items" element={<ItemsPage />} />
+              <Route path="/pois" element={<POIsPage />} />
             </Routes>
           </div>
         </Router>
