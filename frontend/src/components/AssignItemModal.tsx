@@ -3,6 +3,7 @@ import { Item } from '../types/poi';
 import POIService from '../services/poiService';
 import { useToast } from '../contexts/ToastContext';
 import { formatPrice } from '../utils/format';
+import { DEFAULT_BEER_LOGO_PATH } from '../utils/constants';
 import './AssignItemModal.css';
 
 interface AssignItemModalProps {
@@ -132,7 +133,7 @@ const AssignItemModal: React.FC<AssignItemModalProps> = ({
     if (thumbnail) {
       return `data:image/png;base64,${thumbnail}`;
     }
-    return '/placeholder-item.png';
+    return DEFAULT_BEER_LOGO_PATH;
   };
 
   if (!isOpen) return null;
@@ -269,8 +270,7 @@ const AssignItemModal: React.FC<AssignItemModalProps> = ({
                         src={getThumbnailUrl(item.thumbnail)}
                         alt={item.name}
                         onError={(e) => {
-                          (e.target as HTMLImageElement).src =
-                            'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="120" height="120"%3E%3Crect width="120" height="120" fill="%23e0e0e0"/%3E%3Ctext x="50%25" y="50%25" text-anchor="middle" dy=".3em" fill="%23999"%3E%3F%3C/text%3E%3C/svg%3E';
+                          (e.target as HTMLImageElement).src = DEFAULT_BEER_LOGO_PATH;
                         }}
                       />
                     </div>
