@@ -18,7 +18,7 @@ success() { echo -e "${GREEN}[OK]${NC} $1"; }
 # ========================================
 # CONFIGURACIÓN - Ajustar según tu servidor
 # ========================================
-PROJECT_DIR="/var/www/beerfinder"
+PROJECT_DIR="/var/www/html/BeerFinder"
 VENV_DIR="${PROJECT_DIR}/venv"
 BRANCH="${1:-master}"
 
