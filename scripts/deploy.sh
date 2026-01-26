@@ -49,6 +49,49 @@ if ! git ls-remote --exit-code origin "${BRANCH}" >/dev/null 2>&1; then
 fi
 
 # ========================================
+# Verificar/instalar dependencias del sistema
+# ========================================
+log "Verificando dependencias del sistema para GeoDjango/PostGIS..."
+
+# Función para verificar si un paquete está instalado
+check_package() {
+    dpkg -l "$1" 2>/dev/null | grep -q "^ii"
+}
+
+# Lista de paquetes necesarios para GeoDjango y Python
+REQUIRED_PACKAGES="gdal-bin libgdal-dev python3-gdal postgresql-client python3-venv"
+MISSING_PACKAGES=""
+
+for pkg in $REQUIRED_PACKAGES; do
+    if ! check_package "$pkg"; then
+        MISSING_PACKAGES="$MISSING_PACKAGES $pkg"
+    fi
+done
+
+if [ -n "$MISSING_PACKAGES" ]; then
+    warn "Faltan paquetes del sistema:$MISSING_PACKAGES"
+    log "Instalando dependencias del sistema..."
+    
+    # Verificar si podemos usar sudo
+    if command -v sudo &> /dev/null; then
+        sudo apt-get update -qq
+        sudo apt-get install -y $MISSING_PACKAGES
+    else
+        apt-get update -qq
+        apt-get install -y $MISSING_PACKAGES
+    fi
+    
+    if [ $? -ne 0 ]; then
+        error "Falló la instalación de dependencias del sistema"
+        error "Instala manualmente: apt-get install$MISSING_PACKAGES"
+        exit 1
+    fi
+    success "Dependencias del sistema instaladas"
+else
+    success "Todas las dependencias del sistema están instaladas"
+fi
+
+# ========================================
 # Actualizar código desde repositorio
 # ========================================
 log "Restaurando estado limpio del repositorio..."
