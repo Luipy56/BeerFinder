@@ -60,6 +60,17 @@ check_package() {
 
 # Lista de paquetes necesarios para GeoDjango y Python
 REQUIRED_PACKAGES="gdal-bin libgdal-dev python3-gdal postgresql-client python3-venv"
+
+# Detectar versión de PostgreSQL instalada y añadir PostGIS
+PG_VERSION=$(pg_config --version 2>/dev/null | grep -oP '\d+' | head -1)
+if [ -n "$PG_VERSION" ]; then
+    POSTGIS_PKG="postgresql-${PG_VERSION}-postgis-3"
+    log "Detectada PostgreSQL versión ${PG_VERSION}, verificando ${POSTGIS_PKG}..."
+    REQUIRED_PACKAGES="$REQUIRED_PACKAGES $POSTGIS_PKG"
+else
+    warn "No se pudo detectar la versión de PostgreSQL"
+    warn "Si usas PostgreSQL local, instala manualmente: postgresql-XX-postgis-3"
+fi
 MISSING_PACKAGES=""
 
 for pkg in $REQUIRED_PACKAGES; do
