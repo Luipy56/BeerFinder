@@ -93,14 +93,20 @@ log "=========================================="
 
 cd "${PROJECT_DIR}/backend" || { error "No se pudo acceder a backend/"; exit 1; }
 
-# Activar entorno virtual
-if [ -d "${VENV_DIR}" ]; then
-    log "Activando entorno virtual..."
-    source "${VENV_DIR}/bin/activate"
-else
-    warn "No se encontró entorno virtual en ${VENV_DIR}"
-    warn "Asegúrate de tener las dependencias instaladas globalmente o crea el venv"
+# Crear y activar entorno virtual
+if [ ! -d "${VENV_DIR}" ]; then
+    log "Creando entorno virtual en ${VENV_DIR}..."
+    python3 -m venv "${VENV_DIR}"
+    if [ $? -ne 0 ]; then
+        error "Falló la creación del entorno virtual"
+        error "Asegúrate de tener python3-venv instalado: apt install python3-venv"
+        exit 1
+    fi
+    success "Entorno virtual creado"
 fi
+
+log "Activando entorno virtual..."
+source "${VENV_DIR}/bin/activate"
 
 log "Instalando dependencias de Python..."
 pip install -r requirements.txt --quiet
