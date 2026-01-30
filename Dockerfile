@@ -4,9 +4,11 @@ FROM python:3.11-slim as backend
 
 WORKDIR /app/backend
 
-# Install system dependencies including build tools for development
+# Install system dependencies: MySQL/MariaDB client for mysqlclient, GDAL for GIS, curl for healthcheck
 RUN apt-get update && apt-get install -y \
-    postgresql-client \
+    default-libmysqlclient-dev \
+    build-essential \
+    pkg-config \
     gdal-bin \
     libgdal-dev \
     python3-gdal \
@@ -61,9 +63,9 @@ FROM python:3.11-slim
 
 WORKDIR /app
 
-# Install system dependencies
+# Install system dependencies: MySQL/MariaDB client for mysqlclient, GDAL for GIS
 RUN apt-get update && apt-get install -y \
-    postgresql-client \
+    default-libmysqlclient-dev \
     gdal-bin \
     libgdal-dev \
     python3-gdal \

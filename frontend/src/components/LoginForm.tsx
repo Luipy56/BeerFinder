@@ -24,18 +24,14 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
         onSuccess();
       }
     } catch (err: any) {
-      if (err.response?.data) {
-        const errorData = err.response.data;
-        if (errorData.detail) {
-          setError(errorData.detail);
-        } else if (errorData.non_field_errors) {
-          setError(errorData.non_field_errors[0]);
-        } else {
-          setError('Invalid credentials. Please try again.');
-        }
-      } else {
-        setError('An error occurred. Please try again.');
-      }
+      const data = err.response?.data;
+      const detail = typeof data?.detail === 'string' ? data.detail : data?.detail?.[0];
+      const message =
+        detail ||
+        data?.non_field_errors?.[0] ||
+        (err.response?.status === 401 ? 'Usuario o contraseña incorrectos. Comprueba los datos e inténtalo de nuevo.' : null) ||
+        (err.response ? 'Error al iniciar sesión. Inténtalo de nuevo.' : 'Error de conexión. Comprueba la red e inténtalo de nuevo.');
+      setError(message);
     } finally {
       setIsLoading(false);
     }

@@ -210,9 +210,12 @@ const ViewPOIModal: React.FC<ViewPOIModalProps> = ({
                         </div>
                         <div className="poi-item-info">
                           <span className="poi-item-name">{poiItem.item.name}</span>
-                          {poiItem.item.flavor_type && (
+                          {(poiItem.item.flavor_type || poiItem.item.volumen) && (
                             <span className="poi-item-flavor">
-                              {poiItem.item.flavor_type.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join('-')}
+                              {[
+                                poiItem.item.flavor_type && poiItem.item.flavor_type.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join('-'),
+                                poiItem.item.volumen,
+                              ].filter(Boolean).join(' · ')}
                             </span>
                           )}
                           {poiItem.relationship_created_by_username && (

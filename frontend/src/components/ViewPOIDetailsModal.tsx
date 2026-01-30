@@ -179,9 +179,12 @@ const ViewPOIDetailsModal: React.FC<ViewPOIDetailsModalProps> = ({
                         </div>
                         <div className="poi-item-info">
                           <div className="poi-item-name">{poiItem.item.name}</div>
-                          {poiItem.item.flavor_type && (
+                          {(poiItem.item.flavor_type || poiItem.item.volumen) && (
                             <div className="poi-item-flavor">
-                              {poiItem.item.flavor_type.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join('-')}
+                              {[
+                                poiItem.item.flavor_type && poiItem.item.flavor_type.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join('-'),
+                                poiItem.item.volumen,
+                              ].filter(Boolean).join(' · ')}
                             </div>
                           )}
                           {poiItem.item.description && (

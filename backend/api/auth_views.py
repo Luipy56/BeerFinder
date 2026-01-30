@@ -1,11 +1,36 @@
 from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from django.contrib.auth.models import User
+from django.contrib.auth import authenticate
 from .serializers import UserRegistrationSerializer, UserSerializer
+
+
+class LoginView(APIView):
+    """Login returning always 200 so invalid credentials don't show as failed request in browser console."""
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        username = request.data.get('username', '').strip()
+        password = request.data.get('password', '')
+        if not username or not password:
+            return Response({
+                'ok': False,
+                'detail': 'Usuario o contraseña incorrectos. Comprueba los datos e inténtalo de nuevo.',
+            }, status=status.HTTP_200_OK)
+        user = authenticate(request, username=username, password=password)
+        if user is not None and user.is_active:
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                'ok': True,
+                'access': str(refresh.access_token),
+                'refresh': str(refresh),
+            }, status=status.HTTP_200_OK)
+        return Response({
+            'ok': False,
+            'detail': 'Usuario o contraseña incorrectos. Comprueba los datos e inténtalo de nuevo.',
+        }, status=status.HTTP_200_OK)
 
 
 class RegisterView(APIView):

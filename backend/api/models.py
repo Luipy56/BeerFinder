@@ -47,6 +47,7 @@ class Item(models.Model):
     thumbnail = models.BinaryField(null=True, blank=True)
     flavor_type = models.CharField(max_length=20, choices=FLAVOR_CHOICES, default='other')
     percentage = models.FloatField(null=True, blank=True)
+    volumen = models.CharField(max_length=50, blank=True, help_text='Free text e.g. 33cl, 1 L, 500ml')
     created_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='created_items')
     updated_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='updated_items')
     created_at = models.DateTimeField(auto_now_add=True)
@@ -110,6 +111,7 @@ class ItemRequest(models.Model):
     percentage = models.FloatField(null=True, blank=True)
     thumbnail = models.BinaryField(null=True, blank=True)
     flavor_type = models.CharField(max_length=20, choices=FLAVOR_CHOICES, default='other')
+    volumen = models.CharField(max_length=50, blank=True, help_text='Free text e.g. 33cl, 1 L, 500ml')
     requested_by = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     status = models.CharField(
         max_length=20,

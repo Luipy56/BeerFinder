@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -12,6 +12,39 @@ import DeletePOIModal from './DeletePOIModal';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 
+const SESSION_KEY_LAST_MAP = 'beerfinder_map_last_center';
+const SPAIN_CENTER: [number, number] = [40.0, -3.7];
+const DEFAULT_ZOOM = 6;
+const POI_ZOOM = 13;
+
+function parseStoredCenter(stored: string | null): { center: [number, number]; zoom: number } | null {
+  if (!stored) return null;
+  try {
+    const data = JSON.parse(stored);
+    const lat = typeof data.lat === 'number' ? data.lat : Number(data.lat);
+    const lng = typeof data.lng === 'number' ? data.lng : Number(data.lng);
+    const zoom = typeof data.zoom === 'number' ? data.zoom : POI_ZOOM;
+    if (!Number.isNaN(lat) && !Number.isNaN(lng) && lat >= -90 && lat <= 90 && lng >= -180 && lng <= 180) {
+      return { center: [lat, lng], zoom };
+    }
+  } catch (_) {
+    // ignore
+  }
+  return null;
+}
+
+function saveLastViewedPOI(poi: POI): void {
+  if (poi.latitude == null || poi.longitude == null) return;
+  try {
+    sessionStorage.setItem(
+      SESSION_KEY_LAST_MAP,
+      JSON.stringify({ lat: poi.latitude, lng: poi.longitude, zoom: POI_ZOOM })
+    );
+  } catch (_) {
+    // ignore
+  }
+}
+
 const MapComponent: React.FC = () => {
   const { isAuthenticated, user } = useAuth();
   const { showSuccess, showError } = useToast();
@@ -24,19 +57,30 @@ const MapComponent: React.FC = () => {
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
   const [clickedLocation, setClickedLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [selectedPOI, setSelectedPOI] = useState<POI | null>(null);
-  const [userLocation, setUserLocation] = useState<[number, number]>([51.505, -0.09]); // Default to London
+  const [mapState, setMapState] = useState<{ center: [number, number]; zoom: number }>(() => ({
+    center: SPAIN_CENTER,
+    zoom: DEFAULT_ZOOM,
+  }));
+  const [syncViewToState, setSyncViewToState] = useState(true);
 
   useEffect(() => {
     loadPOIs();
-    // Get user's location
+    const stored = parseStoredCenter(sessionStorage.getItem(SESSION_KEY_LAST_MAP));
+    if (stored) {
+      setMapState(stored);
+      setSyncViewToState(true);
+    }
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          setUserLocation([position.coords.latitude, position.coords.longitude]);
+          setMapState((prev) => ({
+            center: [position.coords.latitude, position.coords.longitude],
+            zoom: prev.zoom < POI_ZOOM ? POI_ZOOM : prev.zoom,
+          }));
+          setSyncViewToState(true);
         },
-        (error) => {
-          console.warn('Error getting user location:', error);
-          // Keep default location
+        () => {
+          // User denied or error: keep session/default (Spain)
         }
       );
     }
@@ -62,34 +106,48 @@ const MapComponent: React.FC = () => {
     return null;
   };
 
-  // Component to update map center when userLocation changes
-  const MapCenterUpdater: React.FC<{ center: [number, number] }> = ({ center }) => {
+  const clearSyncViewToState = useCallback(() => setSyncViewToState(false), []);
+
+  const MapCenterUpdater: React.FC<{
+    center: [number, number];
+    zoom: number;
+    syncViewToState: boolean;
+    onApplied: () => void;
+  }> = ({ center, zoom, syncViewToState, onApplied }) => {
     const map = useMap();
     useEffect(() => {
-      map.setView(center, map.getZoom());
-    }, [center, map]);
+      if (syncViewToState) {
+        map.setView(center, zoom);
+        onApplied();
+      }
+    }, [center, zoom, syncViewToState, map, onApplied]);
     return null;
   };
 
   const handleMapClick = (lat: number, lng: number) => {
-    // Close ViewPOIModal if open when clicking on map
     if (isViewModalOpen) {
       setIsViewModalOpen(false);
       setSelectedPOI(null);
       return;
     }
-    
     if (!isAuthenticated) {
       if (window.confirm('You need to be logged in to create a POI. Would you like to login?')) {
         navigate('/auth');
       }
       return;
     }
+    setMapState((prev) => ({ ...prev, center: [lat, lng] }));
+    setSyncViewToState(true);
     setClickedLocation({ lat, lng });
     setIsCreateModalOpen(true);
   };
 
   const handleViewDetails = (poi: POI) => {
+    if (poi.latitude != null && poi.longitude != null) {
+      saveLastViewedPOI(poi);
+      setMapState({ center: [poi.latitude, poi.longitude], zoom: POI_ZOOM });
+      setSyncViewToState(true);
+    }
     setSelectedPOI(poi);
     setIsViewModalOpen(true);
   };
@@ -194,8 +252,8 @@ const MapComponent: React.FC = () => {
   return (
     <div className="map-container">
       <MapContainer
-        center={userLocation}
-        zoom={13}
+        center={mapState.center}
+        zoom={mapState.zoom}
         style={{ height: '100%', width: '100%' }}
         maxBounds={[[-85, -180], [85, 180]]}
         maxBoundsViscosity={1.0}
@@ -204,7 +262,12 @@ const MapComponent: React.FC = () => {
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
         />
-        <MapCenterUpdater center={userLocation} />
+        <MapCenterUpdater
+          center={mapState.center}
+          zoom={mapState.zoom}
+          syncViewToState={syncViewToState}
+          onApplied={clearSyncViewToState}
+        />
         <MapClickHandler onMapClick={handleMapClick} />
         {pois.map((poi) => {
           // Only render marker if coordinates are valid

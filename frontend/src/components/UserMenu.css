@@ -141,6 +141,16 @@
   color: var(--color-primary);
 }
 
+.menu-item-version {
+  cursor: default;
+  color: var(--color-text-muted, #6b7280);
+  font-size: var(--font-size-xs);
+}
+
+.menu-item-version:hover {
+  background-color: transparent;
+}
+
 @media (max-width: 767px) {
   .user-menu {
     z-index: 1; /* Relative to parent */

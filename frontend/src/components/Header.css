@@ -372,6 +372,14 @@
     border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
   }
 
+  .header-nav-version {
+    margin-top: auto;
+    padding: var(--spacing-md) var(--spacing-lg);
+    font-size: var(--font-size-sm);
+    color: var(--color-text-muted, #6b7280);
+    border-top: 1px solid var(--color-border);
+  }
+
   .header-nav-link:hover {
     background-color: var(--color-block-above);
     border-color: var(--color-primary);

@@ -58,6 +58,9 @@ const ItemsPage: React.FC = () => {
       
       // Search by flavor
       if (item.flavor_type?.toLowerCase().includes(query)) return true;
+
+      // Search by volumen
+      if (item.volumen?.toLowerCase().includes(query)) return true;
       
       // Search by price
       if (item.typical_price !== null && item.typical_price !== undefined) {
@@ -205,10 +208,12 @@ const ItemsPage: React.FC = () => {
                       <span className="item-card-brand-value">{item.brand}</span>
                     </div>
                   )}
-                  {item.flavor_type && (
+                  {(item.flavor_type || item.volumen) && (
                     <div className="item-card-flavor">
-                      <span className="item-card-flavor-label">Flavor:</span>
-                      <span className="item-card-flavor-value">{formatFlavor(item.flavor_type)}</span>
+                      <span className="item-card-flavor-label">Flavor{item.volumen ? ' · Volumen' : ''}:</span>
+                      <span className="item-card-flavor-value">
+                        {[item.flavor_type && formatFlavor(item.flavor_type), item.volumen].filter(Boolean).join(' · ')}
+                      </span>
                     </div>
                   )}
                   {item.description && (

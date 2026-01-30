@@ -77,20 +77,19 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'beerfinder.wsgi.application'
 
-# Database
-# When connecting to 'db' service (Docker), always use port 5432 (internal port)
-# POSTGRES_PORT from .env is for host access, not container-to-container
-db_host = env('POSTGRES_HOST', default='db')
-db_port = '5432' if db_host == 'db' else env('POSTGRES_PORT', default='5432')
-
+# Database: MariaDB (remote) with GIS support for PointField
 DATABASES = {
     'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': env('POSTGRES_DB', default='beerfinder'),
-        'USER': env('POSTGRES_USER', default='postgres'),
-        'PASSWORD': env('POSTGRES_PASSWORD', default='postgres'),
-        'HOST': db_host,
-        'PORT': db_port,
+        'ENGINE': 'django.contrib.gis.db.backends.mysql',
+        'NAME': env('MARIADB_DB', default='BeerFinder'),
+        'USER': env('MARIADB_USER', default='beeruser'),
+        'PASSWORD': env('MARIADB_PASSWORD', default=''),
+        'HOST': env('MARIADB_HOST', default='ldeluipy.es'),
+        'PORT': env('MARIADB_PORT', default='3306'),
+        'OPTIONS': {
+            'charset': 'utf8mb4',
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+        },
     }
 }
 

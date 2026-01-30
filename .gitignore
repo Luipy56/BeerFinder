@@ -75,3 +75,4 @@ htmlcov/
 *.tmp
 .cache/
 ssh-tunnel.sh
+'vercel-labs agent-skills main skills-react-best-practices'

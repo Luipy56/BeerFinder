@@ -144,6 +144,12 @@ const ViewItemDetailsModal: React.FC<ViewItemDetailsModalProps> = ({
                 <p className="poi-detail-value">{formatFlavor(item.flavor_type)}</p>
               </div>
             )}
+            {item.volumen && (
+              <div className="poi-detail-item">
+                <h3 className="poi-detail-label">Volumen</h3>
+                <p className="poi-detail-value">{item.volumen}</p>
+              </div>
+            )}
             {item.typical_price !== null && item.typical_price !== undefined && (
               <div className="poi-detail-item">
                 <h3 className="poi-detail-label">Typical Price</h3>

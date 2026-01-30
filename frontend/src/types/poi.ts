@@ -54,6 +54,7 @@ export interface Item {
   thumbnail?: string | null;
   flavor_type?: FlavorType;
   percentage?: number;
+  volumen?: string;
   created_by?: number;
   updated_by?: number;
 }

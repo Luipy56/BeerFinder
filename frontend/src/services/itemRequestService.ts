@@ -10,6 +10,7 @@ export interface ItemRequest {
   percentage?: number | null;
   thumbnail?: string | null;
   flavor_type?: FlavorType;
+  volumen?: string;
   requested_by?: number;
   requested_by_username?: string;
   status: 'pending' | 'approved' | 'rejected';
@@ -25,6 +26,7 @@ export interface CreateItemRequestDto {
   percentage?: number | null;
   thumbnail?: string;
   flavor_type?: FlavorType;
+  volumen?: string;
 }
 
 const ItemRequestService = {
@@ -51,6 +53,7 @@ const ItemRequestService = {
       brand: itemRequestData.brand,
       price: itemRequestData.price,
       flavor_type: itemRequestData.flavor_type,
+      volumen: itemRequestData.volumen || '',
     };
     
     // Add percentage if provided, otherwise set to null

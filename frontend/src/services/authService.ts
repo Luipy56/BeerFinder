@@ -28,21 +28,35 @@ export interface AuthResponse {
   user?: User;
 }
 
+/** Backend returns 200 with ok + tokens or ok false + detail (avoids 401 in console). */
+interface LoginResponse {
+  ok: boolean;
+  access?: string;
+  refresh?: string;
+  detail?: string;
+}
+
 const authService = {
   login: async (credentials: LoginCredentials): Promise<AuthResponse> => {
-    const response = await api.post<AuthResponse>('/auth/login/', credentials);
-    const { access, refresh } = response.data;
-    
-    // Store tokens with versioning and error handling
+    const { data } = await api.post<LoginResponse>('/auth/login/', credentials);
+    if (!data.ok) {
+      const err = new Error(data.detail || 'Login failed') as Error & { response: { status: number; data: { detail?: string } } };
+      err.response = { status: 401, data: { detail: data.detail } };
+      throw err;
+    }
+    const { access, refresh } = data;
+    if (!access || !refresh) {
+      const err = new Error('Invalid login response') as Error & { response: { status: number; data: { detail?: string } } };
+      err.response = { status: 401, data: { detail: 'Error al iniciar sesión. Inténtalo de nuevo.' } };
+      throw err;
+    }
     try {
       localStorage.setItem(`access_token:${VERSION}`, access);
       localStorage.setItem(`refresh_token:${VERSION}`, refresh);
-    } catch (error) {
-      // Handle localStorage errors (incognito, quota exceeded, disabled)
-      console.warn('Failed to store tokens in localStorage:', error);
+    } catch (e) {
+      console.warn('Failed to store tokens in localStorage:', e);
     }
-    
-    return response.data;
+    return { access, refresh };
   },
 
   register: async (userData: RegisterData): Promise<AuthResponse> => {

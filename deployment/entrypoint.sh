@@ -3,16 +3,7 @@ set -e
 
 echo "Starting BeerFinder application..."
 
-# Wait for database to be ready
-echo "Waiting for database..."
-until pg_isready -h "${POSTGRES_HOST:-db}" -U "${POSTGRES_USER:-postgres}"; do
-  echo "Database is unavailable - sleeping"
-  sleep 2
-done
-
-echo "Database is ready!"
-
-# Run database migrations
+# Run database migrations (SQLite/SpatiaLite - no wait needed)
 echo "Running database migrations..."
 cd /app/backend
 python manage.py migrate --noinput

@@ -19,8 +19,9 @@ class POIViewSet(viewsets.ModelViewSet):
     def get_permissions(self):
         """
         Instantiates and returns the list of permissions that this view requires.
+        list, retrieve, poi_items: public (view map and POI details).
         """
-        if self.action in ['list', 'retrieve', 'list_all']:
+        if self.action in ['list', 'retrieve', 'poi_items', 'list_all']:
             if self.action == 'list_all':
                 permission_classes = [IsAdminUser]
             else:
@@ -266,13 +267,14 @@ class ItemRequestViewSet(viewsets.ModelViewSet):
         new_item = Item.objects.create(
             name=item_request.name,
             description=item_request.description,
-            brand=item_request.brand,  # Copy brand
-            typical_price=item_request.price,  # Map price to typical_price
-            percentage=item_request.percentage,  # Copy percentage
+            brand=item_request.brand,
+            typical_price=item_request.price,
+            percentage=item_request.percentage,
             thumbnail=item_request.thumbnail,
-            flavor_type=item_request.flavor_type,  # Copy flavor_type
-            created_by=item_request.requested_by,  # The user who requested it
-            updated_by=request.user  # The admin who approved it
+            flavor_type=item_request.flavor_type,
+            volumen=item_request.volumen or '',
+            created_by=item_request.requested_by,
+            updated_by=request.user
         )
         
         # Update the request status

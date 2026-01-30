@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import UserMenu from './UserMenu';
+import { APP_VERSION } from '../utils/constants';
 import './Header.css';
 
 const Header: React.FC = () => {
@@ -126,6 +127,9 @@ const Header: React.FC = () => {
                 </button>
               </>
             )}
+            <div className="header-nav-version" aria-label="App version">
+              Version {APP_VERSION}
+            </div>
           </div>
         </nav>
         <div className="header-actions">

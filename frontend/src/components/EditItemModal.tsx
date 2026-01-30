@@ -32,6 +32,7 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
   const [brand, setBrand] = useState('');
   const [typicalPrice, setTypicalPrice] = useState<string>('');
   const [percentage, setPercentage] = useState<string>('');
+  const [volumen, setVolumen] = useState<string>('');
   const [flavorType, setFlavorType] = useState<FlavorType>('other');
   const [thumbnail, setThumbnail] = useState<string | undefined>(undefined);
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
@@ -46,6 +47,7 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
       setBrand(item.brand || '');
       setTypicalPrice(item.typical_price?.toString() || '');
       setPercentage(item.percentage?.toString() || '');
+      setVolumen(item.volumen || '');
       setFlavorType(item.flavor_type || 'other');
       setThumbnail(undefined);
       setThumbnailFile(null);
@@ -124,6 +126,7 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
         description: description.trim(),
         brand: brand.trim() || '',
         flavor_type: flavorType,
+        volumen: volumen.trim() || '',
       };
 
       if (typicalPrice.trim()) {
@@ -304,6 +307,20 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
                 />
                 <span className="item-request-price-currency">%</span>
               </div>
+            </div>
+            <div className="form-group">
+              <label htmlFor="edit-item-volumen" className="form-label">
+                Volumen
+              </label>
+              <input
+                type="text"
+                id="edit-item-volumen"
+                className="form-input"
+                value={volumen}
+                onChange={(e) => setVolumen(e.target.value)}
+                placeholder="e.g. 33cl, 1 L, 500ml"
+                disabled={isSubmitting}
+              />
             </div>
             <div className="form-group">
               <label htmlFor="edit-item-thumbnail" className="form-label">

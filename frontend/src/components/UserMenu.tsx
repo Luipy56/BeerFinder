@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { APP_VERSION } from '../utils/constants';
 import './UserMenu.css';
 
 const UserMenu: React.FC = () => {
@@ -127,6 +128,9 @@ const UserMenu: React.FC = () => {
             POIs
           </button>
           <div className="menu-divider"></div>
+          <div className="menu-item menu-item-version" role="none">
+            Version {APP_VERSION}
+          </div>
           <button
             className="menu-item"
             onClick={handleLogout}

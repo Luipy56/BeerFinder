@@ -27,6 +27,7 @@ const ItemRequestPage: React.FC = () => {
     percentage: null,
     thumbnail: undefined,
     flavor_type: 'other',
+    volumen: '',
   });
   const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -100,7 +101,7 @@ const ItemRequestPage: React.FC = () => {
     try {
       const newRequest = await ItemRequestService.createItemRequest(formData);
       setItemRequests([newRequest, ...itemRequests]);
-      setFormData({ name: '', description: '', price: undefined, percentage: null, thumbnail: undefined, flavor_type: 'other' });
+      setFormData({ name: '', description: '', price: undefined, percentage: null, thumbnail: undefined, flavor_type: 'other', volumen: '' });
       setThumbnailFile(null);
       setErrors({});
       setShowCreateForm(false);
@@ -341,6 +342,22 @@ const ItemRequestPage: React.FC = () => {
                 </div>
 
                 <div className="form-group">
+                  <label htmlFor="request-volumen" className="form-label">
+                    Volumen
+                  </label>
+                  <input
+                    type="text"
+                    id="request-volumen"
+                    name="volumen"
+                    className="form-input"
+                    value={formData.volumen || ''}
+                    onChange={handleChange}
+                    disabled={isCreating}
+                    placeholder="e.g. 33cl, 1 L, 500ml"
+                  />
+                </div>
+
+                <div className="form-group">
                   <label htmlFor="request-flavor-type" className="form-label">
                     Flavor Type
                   </label>
@@ -512,6 +529,12 @@ const ItemRequestPage: React.FC = () => {
                         <span className="detail-value">
                           {selectedRequest.flavor_type.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join('-')}
                         </span>
+                      </div>
+                    )}
+                    {selectedRequest.volumen && (
+                      <div className="detail-item">
+                        <span className="detail-label">Volumen</span>
+                        <span className="detail-value">{selectedRequest.volumen}</span>
                       </div>
                     )}
                     {selectedRequest.price !== undefined && selectedRequest.price !== null && (

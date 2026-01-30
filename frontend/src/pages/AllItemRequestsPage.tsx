@@ -255,6 +255,12 @@ const AllItemRequestsPage: React.FC = () => {
                           </span>
                         </div>
                       )}
+                      {selectedRequest.volumen && (
+                        <div className="detail-item">
+                          <span className="detail-label">Volumen</span>
+                          <span className="detail-value">{selectedRequest.volumen}</span>
+                        </div>
+                      )}
                       {selectedRequest.price !== undefined && selectedRequest.price !== null && (
                         <div className="detail-item">
                           <span className="detail-label">Price</span>

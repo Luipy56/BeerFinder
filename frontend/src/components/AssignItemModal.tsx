@@ -100,7 +100,7 @@ const AssignItemModal: React.FC<AssignItemModalProps> = ({
     }
   };
 
-  // Filter items by search query (case-insensitive) - searches name, brand, and flavor_type
+  // Filter items by search query (case-insensitive) - searches name, brand, flavor_type, volumen
   const filteredItems = useMemo(() => {
     if (!searchQuery.trim()) {
       return availableItems;
@@ -109,11 +109,12 @@ const AssignItemModal: React.FC<AssignItemModalProps> = ({
     return availableItems.filter((item) => {
       const nameMatch = item.name.toLowerCase().includes(query);
       const brandMatch = item.brand ? item.brand.toLowerCase().includes(query) : false;
-      const flavorMatch = item.flavor_type 
-        ? item.flavor_type.toLowerCase().includes(query) || 
+      const flavorMatch = item.flavor_type
+        ? item.flavor_type.toLowerCase().includes(query) ||
           item.flavor_type.replace('-', ' ').toLowerCase().includes(query)
         : false;
-      return nameMatch || brandMatch || flavorMatch;
+      const volumenMatch = item.volumen ? item.volumen.toLowerCase().includes(query) : false;
+      return nameMatch || brandMatch || flavorMatch || volumenMatch;
     });
   }, [availableItems, searchQuery]);
 
@@ -204,7 +205,7 @@ const AssignItemModal: React.FC<AssignItemModalProps> = ({
               ref={searchInputRef}
               type="text"
               className="assign-item-search-input"
-              placeholder="Search items by name, brand, or flavor type..."
+              placeholder="Search items by name, brand, flavor, or volumen..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -320,11 +321,14 @@ const AssignItemModal: React.FC<AssignItemModalProps> = ({
                           <span className="assign-item-card-brand-value">{item.brand}</span>
                         </div>
                       )}
-                      {item.flavor_type && (
+                      {(item.flavor_type || item.volumen) && (
                         <div className="assign-item-card-flavor">
-                          <span className="assign-item-card-flavor-label">Flavor:</span>
+                          <span className="assign-item-card-flavor-label">Flavor{item.volumen ? ' · Volumen' : ''}:</span>
                           <span className="assign-item-card-flavor-value">
-                            {item.flavor_type.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join('-')}
+                            {[
+                              item.flavor_type && item.flavor_type.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join('-'),
+                              item.volumen,
+                            ].filter(Boolean).join(' · ')}
                           </span>
                         </div>
                       )}
