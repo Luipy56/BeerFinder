@@ -1,20 +1,8 @@
+# Producción (servidor real): backend (gunicorn), frontend (build estático), nginx.
+# Base de datos: EXTERNA. Configurar .env con MARIADB_* (host, user, password, etc.).
+# Puertos: NGINX_PORT (ej. 8080), opcional NGINX_HTTPS_PORT (ej. 8443).
+# Levantar: docker compose -f docker-compose.prod.yml up -d --build
 services:
-  db:
-    image: postgis/postgis:15-3.3
-    container_name: beerfinder_db_prod
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB:-beerfinder}
-      POSTGRES_USER: ${POSTGRES_USER:-postgres}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
-    volumes:
-      - postgres_data_prod:/var/lib/postgresql/data
-    restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-
   backend:
     build:
       context: .
@@ -23,12 +11,6 @@ services:
     container_name: beerfinder_backend_prod
     command: >
       sh -c "
-      echo 'Waiting for database...' &&
-      until pg_isready -h db -U ${POSTGRES_USER:-postgres}; do
-        echo 'Database is unavailable - sleeping'
-        sleep 2
-      done &&
-      echo 'Database is ready!' &&
       cd /app/backend &&
       python manage.py migrate --noinput &&
       python manage.py collectstatic --noinput &&
@@ -40,11 +22,7 @@ services:
     env_file:
       - .env
     environment:
-      - DATABASE_URL=postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-beerfinder}
       - DJANGO_DEBUG=False
-    depends_on:
-      db:
-        condition: service_healthy
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health/"]
@@ -87,8 +65,11 @@ services:
       - frontend
     restart: unless-stopped
 
+networks:
+  default:
+    name: beerfinder_prod
+
 volumes:
-  postgres_data_prod:
   static_volume:
   media_volume:
   frontend_build:

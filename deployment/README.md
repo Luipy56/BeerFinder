@@ -10,29 +10,29 @@ Deployment is the process of making your application available to users on the i
 
 ### 1. Docker Compose (Development)
 
-This is the easiest way to run the application locally for development and testing.
+Run the application locally for development. Uses `docker-compose.dev.yml` (backend + frontend; database is external, configure `MARIADB_*` in `.env`).
 
 **Start the application:**
 ```bash
-docker-compose up
+docker compose -f docker-compose.dev.yml up
 ```
 
 **Stop the application:**
 ```bash
-docker-compose down
+docker compose -f docker-compose.dev.yml down
 ```
 
 **View logs:**
 ```bash
-docker-compose logs -f
+docker compose -f docker-compose.dev.yml logs -f
 ```
 
 ### 2. Docker Compose (Production)
 
-For production deployment, use the production configuration:
+For production deployment, use the production configuration (from project root):
 
 ```bash
-docker-compose -f deployment/docker-compose.prod.yml up -d
+docker compose -f docker-compose.prod.yml up -d --build
 ```
 
 ### 3. Manual Deployment
@@ -106,7 +106,7 @@ This script runs when the Docker container starts:
 4. Starts Nginx
 5. Starts Django server
 
-### docker-compose.prod.yml
+### docker-compose.prod.yml (project root)
 
 Production configuration with:
 - Better security settings
@@ -137,17 +137,17 @@ cp .env.example .env
 
 4. **Start services:**
 ```bash
-docker-compose up -d
+docker compose -f docker-compose.dev.yml up -d
 ```
 
 5. **Check if services are running:**
 ```bash
-docker-compose ps
+docker compose -f docker-compose.dev.yml ps
 ```
 
 6. **View logs:**
 ```bash
-docker-compose logs -f
+docker compose -f docker-compose.dev.yml logs -f
 ```
 
 7. **Access the application:**
@@ -167,12 +167,12 @@ POSTGRES_PASSWORD=strong-password-here
 
 2. **Build and start:**
 ```bash
-docker-compose -f deployment/docker-compose.prod.yml up -d --build
+docker compose -f docker-compose.prod.yml up -d --build
 ```
 
 3. **Create superuser:**
 ```bash
-docker-compose -f deployment/docker-compose.prod.yml exec backend python manage.py createsuperuser
+docker compose -f docker-compose.prod.yml exec backend python manage.py createsuperuser
 ```
 
 4. **Access the application:**
@@ -181,39 +181,37 @@ docker-compose -f deployment/docker-compose.prod.yml exec backend python manage.
 
 ## Common Deployment Tasks
 
+Use `-f docker-compose.dev.yml` for development or `-f docker-compose.prod.yml` for production.
+
 ### Viewing Logs
 
 ```bash
-# All services
-docker-compose logs -f
+# All services (dev)
+docker compose -f docker-compose.dev.yml logs -f
 
 # Specific service
-docker-compose logs -f backend
-docker-compose logs -f frontend
-docker-compose logs -f db
+docker compose -f docker-compose.dev.yml logs -f backend
+docker compose -f docker-compose.dev.yml logs -f frontend
 ```
 
 ### Restarting Services
 
 ```bash
-# Restart all
-docker-compose restart
+# Restart all (dev)
+docker compose -f docker-compose.dev.yml restart
 
 # Restart specific service
-docker-compose restart backend
+docker compose -f docker-compose.dev.yml restart backend
 ```
 
 ### Stopping Services
 
 ```bash
-# Stop but keep containers
-docker-compose stop
+# Stop and remove containers (dev)
+docker compose -f docker-compose.dev.yml down
 
-# Stop and remove containers
-docker-compose down
-
-# Stop and remove containers + volumes (deletes data!)
-docker-compose down -v
+# Prod: stop and remove containers + volumes (deletes data!)
+docker compose -f docker-compose.prod.yml down -v
 ```
 
 ### Updating the Application
@@ -223,25 +221,19 @@ docker-compose down -v
 git pull
 ```
 
-2. **Rebuild and restart:**
+2. **Rebuild and restart (dev):**
 ```bash
-docker-compose up -d --build
+docker compose -f docker-compose.dev.yml up -d --build
 ```
 
 3. **Run migrations:**
 ```bash
-docker-compose exec backend python manage.py migrate
+docker compose -f docker-compose.dev.yml exec backend python manage.py migrate
 ```
 
 ### Database Backup
 
-```bash
-# Create backup
-docker-compose exec db pg_dump -U postgres beerfinder > backup.sql
-
-# Restore backup
-docker-compose exec -T db psql -U postgres beerfinder < backup.sql
-```
+The dev compose has no DB container; the backend uses external MariaDB. Back up your MariaDB/MySQL server with your usual tools. For prod, the DB is also external (MARIADB_* in .env).
 
 ## Troubleshooting
 
@@ -249,69 +241,54 @@ docker-compose exec -T db psql -U postgres beerfinder < backup.sql
 
 1. **Check if ports are available:**
 ```bash
-# Check if port 80, 3000, 8000, 5432 are in use
-netstat -tulpn | grep -E ':(80|3000|8000|5432)'
+# Check if ports 80, 3000, 8000 are in use
+netstat -tulpn | grep -E ':(80|3000|8000)'
 ```
 
 2. **Check Docker logs:**
 ```bash
-docker-compose logs
+docker compose -f docker-compose.dev.yml logs
 ```
 
-3. **Check if database is ready:**
-```bash
-docker-compose exec db pg_isready -U postgres
-```
+3. **Dev has no DB container;** backend uses external MariaDB (MARIADB_* in .env).
 
 ### Database Connection Errors
 
-1. **Check database is running:**
-```bash
-docker-compose ps db
-```
-
-2. **Check database logs:**
-```bash
-docker-compose logs db
-```
-
-3. **Verify connection settings in .env:**
-```bash
-cat .env | grep POSTGRES
-```
+1. **Dev/prod use external DB;** verify `.env` has correct `MARIADB_HOST`, `MARIADB_USER`, `MARIADB_PASSWORD`, `MARIADB_DB`.
+2. **Ensure the database server is reachable** from the host (and from containers if needed).
 
 ### Frontend Not Loading
 
 1. **Check if frontend container is running:**
 ```bash
-docker-compose ps frontend
+docker compose -f docker-compose.dev.yml ps frontend
 ```
 
 2. **Check frontend logs:**
 ```bash
-docker-compose logs frontend
+docker compose -f docker-compose.dev.yml logs frontend
 ```
 
 3. **Rebuild frontend:**
 ```bash
-docker-compose up -d --build frontend
+docker compose -f docker-compose.dev.yml up -d --build frontend
 ```
 
 ### Backend API Not Responding
 
 1. **Check backend logs:**
 ```bash
-docker-compose logs backend
+docker compose -f docker-compose.dev.yml logs backend
 ```
 
 2. **Check if migrations ran:**
 ```bash
-docker-compose exec backend python manage.py showmigrations
+docker compose -f docker-compose.dev.yml exec backend python manage.py showmigrations
 ```
 
 3. **Run migrations manually:**
 ```bash
-docker-compose exec backend python manage.py migrate
+docker compose -f docker-compose.dev.yml exec backend python manage.py migrate
 ```
 
 ## Security Considerations
@@ -332,11 +309,11 @@ docker-compose exec backend python manage.py migrate
 ### Check Service Health
 
 ```bash
-# Check all services
-docker-compose ps
+# Check all services (dev)
+docker compose -f docker-compose.dev.yml ps
 
 # Check specific service
-docker-compose exec backend curl http://localhost:8000/health/
+docker compose -f docker-compose.dev.yml exec backend curl http://localhost:8000/health/
 ```
 
 ### Resource Usage

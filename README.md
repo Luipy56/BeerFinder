@@ -58,16 +58,11 @@ cd BeerFinder
 
 3. **Start the services** (start all parts of the application):
 ```bash
-docker-compose up -d
+docker compose -f docker-compose.dev.yml up -d
 ```
 The `-d` flag runs services in the background (detached mode).
 
-**Note:** The backend automatically:
-- Waits for the database to be ready
-- Runs database migrations
-- Creates a superuser (admin/admin123) if it doesn't exist
-
-You don't need to run migrations or create a superuser manually!
+**Note:** The dev compose includes only backend and frontend. The database is external: set `MARIADB_*` in `.env`. The backend runs migrations and creates a superuser (admin/admin123) on startup when the DB is reachable.
 
 ### Accessing the Application
 
@@ -109,7 +104,8 @@ BeerFinder/
 │   ├── backend/      # Backend tests
 │   ├── frontend/     # Frontend tests
 │   └── integration/  # Integration tests
-├── docker-compose.yml  # Docker configuration for development
+├── docker-compose.dev.yml   # Desarrollo (backend + frontend)
+├── docker-compose.prod.yml  # Producción (servidor real)
 ├── Dockerfile        # Instructions for building Docker images
 └── README.md        # This file
 ```
@@ -120,30 +116,30 @@ BeerFinder/
 
 Start all services and see logs in real-time:
 ```bash
-docker-compose up
+docker compose -f docker-compose.dev.yml up
 ```
 
 Stop services:
 ```bash
-docker-compose down
+docker compose -f docker-compose.dev.yml down
 ```
 
 ### Running Tests
 
 **Backend tests:**
 ```bash
-docker-compose exec backend python manage.py test
+docker compose -f docker-compose.dev.yml exec backend python manage.py test
 ```
 
 **Frontend tests:**
 ```bash
-docker-compose exec frontend npm test
+docker compose -f docker-compose.dev.yml exec frontend npm test
 ```
 
 **All tests:**
 ```bash
-docker-compose exec backend python manage.py test
-docker-compose exec frontend npm test
+docker compose -f docker-compose.dev.yml exec backend python manage.py test
+docker compose -f docker-compose.dev.yml exec frontend npm test
 ```
 
 ### Making Changes
@@ -152,8 +148,8 @@ docker-compose exec frontend npm test
 2. **Changes are automatically reflected** (hot reloading)
 3. **For database changes**, create and run migrations:
 ```bash
-docker-compose exec backend python manage.py makemigrations
-docker-compose exec backend python manage.py migrate
+docker compose -f docker-compose.dev.yml exec backend python manage.py makemigrations
+docker compose -f docker-compose.dev.yml exec backend python manage.py migrate
 ```
 
 ## API Documentation
@@ -195,50 +191,36 @@ curl -X POST http://localhost:8000/api/v1/pois/ \
 ### View Logs
 ```bash
 # All services
-docker-compose logs -f
+docker compose -f docker-compose.dev.yml logs -f
 
 # Specific service
-docker-compose logs -f backend
+docker compose -f docker-compose.dev.yml logs -f backend
 ```
 
-### Access Database
-```bash
-docker-compose exec db psql -U postgres -d beerfinder
-```
-
-### Create Database Backup
-```bash
-docker-compose exec db pg_dump -U postgres beerfinder > backup.sql
-```
-
-### Restore Database Backup
-```bash
-docker-compose exec -T db psql -U postgres beerfinder < backup.sql
-```
+### Database (external)
+The dev compose does not include a database container. The backend uses MariaDB/MySQL from `.env` (`MARIADB_HOST`, `MARIADB_USER`, etc.). Backups and access depend on your DB setup.
 
 ## Troubleshooting
 
 ### Services Won't Start
-- Check if ports 3000, 8000, 5433 are available
+- Check if ports 3000 and 8000 are available
 - Check Docker is running: `docker ps`
-- View logs: `docker-compose logs`
-- If port 5432 is in use, the database uses port 5433 (configured in docker-compose.yml)
+- View logs: `docker compose -f docker-compose.dev.yml logs`
 
 ### Database Connection Errors
-- Ensure database container is running: `docker-compose ps db`
-- Check database logs: `docker-compose logs db`
-- Verify `.env` file has correct database credentials
-- Note: Database uses port 5433 on host (5432 inside container)
+- The dev compose has no DB container; the backend uses MariaDB/MySQL from `.env`
+- Verify `MARIADB_HOST`, `MARIADB_USER`, `MARIADB_PASSWORD`, `MARIADB_DB` in `.env`
+- Ensure the database server is reachable from the host/container
 
 ### Frontend Not Loading
-- Check frontend container: `docker-compose ps frontend`
-- Rebuild frontend: `docker-compose up -d --build frontend`
+- Check frontend container: `docker compose -f docker-compose.dev.yml ps frontend`
+- Rebuild frontend: `docker compose -f docker-compose.dev.yml up -d --build frontend`
 - Check browser console (F12) for errors
 
 ### Backend API Errors
-- Check backend logs: `docker-compose logs backend`
+- Check backend logs: `docker compose -f docker-compose.dev.yml logs backend`
 - Migrations run automatically on startup (see entrypoint-dev.sh)
-- Check if database is ready: `docker-compose exec db pg_isready`
+- Ensure the external database is reachable and credentials in `.env` are correct
 
 ### Cannot Access from Network
 - Ensure backend is listening on 0.0.0.0 (configured in entrypoint-dev.sh)
