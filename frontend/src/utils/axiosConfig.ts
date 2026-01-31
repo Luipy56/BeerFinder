@@ -1,7 +1,11 @@
 import axios from 'axios';
 
-// Get API URL - same logic as poiService.ts
+// Get API URL: use REACT_APP_API_URL if set (prod: /api/v1 same-origin), else dev (front :3000, backend :8000)
 const getApiBaseUrl = () => {
+  const envUrl = process.env.REACT_APP_API_URL;
+  if (envUrl != null && envUrl !== '') {
+    return envUrl;
+  }
   const hostname = window.location.hostname;
   const protocol = window.location.protocol;
   return `${protocol}//${hostname}:8000/api/v1`;
