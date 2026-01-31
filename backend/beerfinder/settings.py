@@ -30,6 +30,10 @@ if DEBUG:
 else:
     ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
 
+# Behind HTTPS reverse proxy (Apache/nginx): trust X-Forwarded-Proto
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 # Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
