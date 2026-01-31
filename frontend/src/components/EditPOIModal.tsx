@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
 import { POI } from '../types/poi';
 import './EditPOIModal.css';
@@ -19,6 +20,7 @@ const EditPOIModal: React.FC<EditPOIModalProps> = ({
   onSubmit,
   onRequestDelete,
 }) => {
+  const { t } = useTranslation();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [thumbnail, setThumbnail] = useState<string | undefined>(undefined);
@@ -125,7 +127,7 @@ const EditPOIModal: React.FC<EditPOIModalProps> = ({
       await onSubmit(name, description, thumbnail);
       onClose();
     } catch (err: any) {
-      setError(err.message || 'Failed to update POI. Please try again.');
+      setError(err.message || t('components.editPOIModal.failedToUpdate'));
       setIsSubmitting(false);
     }
   };
@@ -148,11 +150,11 @@ const EditPOIModal: React.FC<EditPOIModalProps> = ({
     >
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2 id="edit-poi-title" className="modal-title">Edit Point of Interest</h2>
+          <h2 id="edit-poi-title" className="modal-title">{t('components.editPOIModal.title')}</h2>
           <button
             className="modal-close"
             onClick={onClose}
-            aria-label="Close modal"
+            aria-label={t('common.closeModal')}
             type="button"
           >
             ×
@@ -167,7 +169,7 @@ const EditPOIModal: React.FC<EditPOIModalProps> = ({
             )}
             <div className="form-group">
               <label htmlFor="edit-name" className="form-label required">
-                Name
+                {t('components.editPOIModal.name')}
               </label>
               <input
                 ref={nameInputRef}
@@ -177,7 +179,7 @@ const EditPOIModal: React.FC<EditPOIModalProps> = ({
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
-                placeholder="Enter POI name"
+                placeholder={t('components.editPOIModal.placeholderName')}
                 disabled={isSubmitting}
                 aria-required="true"
                 aria-invalid={error ? 'true' : 'false'}
@@ -185,21 +187,21 @@ const EditPOIModal: React.FC<EditPOIModalProps> = ({
             </div>
             <div className="form-group">
               <label htmlFor="edit-description" className="form-label">
-                Description
+                {t('components.editPOIModal.description')}
               </label>
               <textarea
                 id="edit-description"
                 className="form-textarea"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Enter description"
+                placeholder={t('components.editPOIModal.placeholderDescription')}
                 rows={3}
                 disabled={isSubmitting}
               />
             </div>
             <div className="form-group">
               <label htmlFor="edit-poi-thumbnail" className="form-label">
-                Thumbnail
+                {t('components.editPOIModal.thumbnail')}
               </label>
               <input
                 type="file"
@@ -213,16 +215,16 @@ const EditPOIModal: React.FC<EditPOIModalProps> = ({
                 <div style={{ marginTop: '8px' }}>
                   <img
                     src={URL.createObjectURL(thumbnailFile)}
-                    alt="Thumbnail preview"
+                    alt={t('common.thumbnailPreview')}
                     style={{ maxWidth: '200px', maxHeight: '200px', objectFit: 'contain' }}
                   />
                 </div>
               ) : poi?.thumbnail ? (
                 <div style={{ marginTop: '8px' }}>
-                  <span className="form-help">Current thumbnail:</span>
+                  <span className="form-help">{t('components.editItemModal.currentThumbnail')}</span>
                   <img
                     src={`data:image/png;base64,${poi.thumbnail}`}
-                    alt="Current thumbnail"
+                    alt={t('common.currentThumbnail')}
                     style={{ maxWidth: '200px', maxHeight: '200px', objectFit: 'contain', marginTop: '4px', display: 'block' }}
                   />
                 </div>
@@ -241,9 +243,9 @@ const EditPOIModal: React.FC<EditPOIModalProps> = ({
                 onClick={handleRequestDelete}
                 className="btn btn-danger"
                 disabled={isSubmitting}
-                aria-label="Delete POI"
+                aria-label={t('components.editPOIModal.deletePOI')}
               >
-                Delete
+                {t('common.delete')}
               </button>
             )}
             <div className="modal-footer-actions">
@@ -253,14 +255,14 @@ const EditPOIModal: React.FC<EditPOIModalProps> = ({
                 className="btn btn-secondary"
                 disabled={isSubmitting}
               >
-                Cancel
+                {t('common.cancel')}
               </button>
               <button
                 type="submit"
                 className={`btn btn-primary ${isSubmitting ? 'btn-loading' : ''}`}
                 disabled={isSubmitting || !name.trim()}
               >
-                {isSubmitting ? 'Saving...' : 'Save Changes'}
+                {isSubmitting ? t('common.saving') : t('common.saveChanges')}
               </button>
             </div>
           </div>

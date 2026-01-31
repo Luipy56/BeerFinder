@@ -45,7 +45,9 @@
   padding: 2px;
   background-color: var(--color-border);
   border-radius: var(--radius-full);
-  transition: background-color var(--transition-fast);
+  border: 1px solid transparent;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast);
+  flex-shrink: 0;
 }
 
 .theme-toggle-button[aria-pressed="true"] .theme-toggle-track {
@@ -56,8 +58,8 @@
   width: 1rem;
   height: 1rem;
   border-radius: 50%;
-  background-color: var(--color-block-white);
-  box-shadow: var(--shadow-sm);
+  background-color: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
   transition: transform var(--transition-fast);
 }
 
@@ -71,4 +73,20 @@
 
 .theme-toggle-button[aria-pressed="false"] .theme-toggle-thumb {
   transform: translateX(0);
+}
+
+/* Dark mode: more contrast for track and thumb inside menus/dropdowns */
+html[data-theme="dark"] .theme-toggle-track {
+  background-color: #3d3d3d;
+  border-color: #5a5a5a;
+}
+
+html[data-theme="dark"] .theme-toggle-button[aria-pressed="true"] .theme-toggle-track {
+  background-color: var(--color-primary);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+html[data-theme="dark"] .theme-toggle-thumb {
+  background-color: #f0f0f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }

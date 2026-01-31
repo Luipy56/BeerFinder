@@ -231,6 +231,12 @@
   color: var(--color-text);
 }
 
+/* Dark theme: dark text on warning yellow for readable contrast */
+html[data-theme="dark"] .status-pending,
+html[data-theme="dark"] .status-badge-inline.status-pending {
+  color: #1a1a1a;
+}
+
 .status-approved {
   background-color: var(--color-success);
   color: var(--color-background);

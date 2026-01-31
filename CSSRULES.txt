@@ -1,6 +1,14 @@
+Reglas de bloques de color (3 niveles, de más oscuro a más claro).
+Usar las variables CSS: --color-block-background, --color-block-above, --color-block-white.
 
-Si es blanco:
-* Color del fondo: #eeeeee
-* Color del siguiente bloque por encima: #f7f7f7
-* Siguiente color: #ffffff
-Si sólo hay 2 bloques, se utilizarán los 2 últimos
+Tema claro (blanco):
+* Color del fondo: #eeeeee  →  --color-block-background
+* Color del siguiente bloque por encima: #f7f7f7  →  --color-block-above
+* Siguiente color: #ffffff  →  --color-block-white
+Si sólo hay 2 bloques, se utilizarán los 2 últimos (above + white).
+
+Tema oscuro:
+* Color del fondo: #1a1a1a  →  --color-block-background
+* Color del siguiente bloque por encima: #2d2d2d  →  --color-block-above
+* Siguiente color: #3d3d3d  →  --color-block-white
+Si sólo hay 2 bloques, se utilizarán los 2 últimos (above + white).

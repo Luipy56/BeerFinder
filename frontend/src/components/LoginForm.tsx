@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import './LoginForm.css';
 
@@ -7,6 +8,7 @@ interface LoginFormProps {
 }
 
 const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
+  const { t } = useTranslation();
   const { login } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -29,8 +31,8 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
       const message =
         detail ||
         data?.non_field_errors?.[0] ||
-        (err.response?.status === 401 ? 'Usuario o contraseña incorrectos. Comprueba los datos e inténtalo de nuevo.' : null) ||
-        (err.response ? 'Error al iniciar sesión. Inténtalo de nuevo.' : 'Error de conexión. Comprueba la red e inténtalo de nuevo.');
+        (err.response?.status === 401 ? t('components.loginForm.invalidCredentials') : null) ||
+        (err.response ? t('components.loginForm.loginError') : t('components.loginForm.connectionError'));
       setError(message);
     } finally {
       setIsLoading(false);
@@ -47,7 +49,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
       )}
       <div className="form-group">
         <label htmlFor="username" className="form-label required">
-          Username
+          {t('components.loginForm.username')}
         </label>
         <input
           type="text"
@@ -83,9 +85,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSuccess }) => {
         type="submit"
         disabled={isLoading}
         className={`btn btn-primary ${isLoading ? 'btn-loading' : ''}`}
-        aria-label={isLoading ? 'Logging in...' : 'Login'}
+        aria-label={isLoading ? t('common.saving') : t('components.loginForm.submit')}
       >
-        {isLoading ? 'Logging in...' : 'Login'}
+        {isLoading ? t('common.saving') : t('components.loginForm.submit')}
       </button>
     </form>
   );

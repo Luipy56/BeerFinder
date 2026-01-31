@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -47,6 +48,7 @@ function saveLastViewedPOI(poi: POI): void {
 }
 
 const MapComponent: React.FC = () => {
+  const { t } = useTranslation();
   const { isAuthenticated, user } = useAuth();
   const { showSuccess, showError } = useToast();
   const navigate = useNavigate();
@@ -172,7 +174,7 @@ const MapComponent: React.FC = () => {
         return;
       }
       setPois([...pois, createdPOI]);
-      showSuccess('POI created successfully!');
+      showSuccess(t('components.createPOIModal.poiCreated'));
     } catch (error: any) {
       console.error('Error creating POI:', error);
       showError(error.response?.data?.detail || error.message || 'Failed to create POI. Please try again.');
@@ -210,10 +212,10 @@ const MapComponent: React.FC = () => {
       setIsEditModalOpen(false);
       setIsViewModalOpen(true);
       setSelectedPOI(updatedPOI);
-      showSuccess('POI updated successfully!');
+      showSuccess(t('components.editPOIModal.failedToUpdate').replace('Failed to update POI. Please try again.', '') || t('pages.pois.poiDeleted'));
     } catch (error: any) {
       console.error('Error updating POI:', error);
-      showError(error.response?.data?.detail || error.message || 'Failed to update POI. Please try again.');
+      showError(error.response?.data?.detail || error.message || t('pages.pois.failedToUpdate'));
       throw error;
     }
   };
@@ -246,7 +248,7 @@ const MapComponent: React.FC = () => {
   };
 
   if (loading) {
-    return <div className="map-loading">Loading map...</div>;
+    return <div className="map-loading">{t('pages.map.loading')}</div>;
   }
 
   return (
@@ -297,7 +299,7 @@ const MapComponent: React.FC = () => {
                   }}
                   style={{ marginTop: '0.5rem', width: '100%' }}
                 >
-                  View Details
+                  {t('pages.map.viewDetails')}
                 </button>
               </div>
             </Popup>
@@ -307,8 +309,8 @@ const MapComponent: React.FC = () => {
       </MapContainer>
       {pois.length === 0 && !loading && (
         <div className="map-empty-state">
-          <h3>No Points of Interest</h3>
-          <p>Click on the map to create your first POI</p>
+          <h3>{t('pages.map.noPOIs')}</h3>
+          <p>{t('pages.map.clickToCreate')}</p>
         </div>
       )}
       {clickedLocation && (

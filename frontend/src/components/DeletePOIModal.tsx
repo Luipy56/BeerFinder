@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
 import { POI } from '../types/poi';
 import './DeletePOIModal.css';
@@ -16,6 +17,7 @@ const DeletePOIModal: React.FC<DeletePOIModalProps> = ({
   poi,
   onConfirm,
 }) => {
+  const { t } = useTranslation();
   const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const cancelButtonRef = useRef<HTMLButtonElement>(null);
@@ -103,11 +105,11 @@ const DeletePOIModal: React.FC<DeletePOIModalProps> = ({
     >
       <div className="modal modal-small" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2 id="delete-poi-title" className="modal-title">Delete Point of Interest</h2>
+          <h2 id="delete-poi-title" className="modal-title">{t('components.deletePOIModal.title')}</h2>
           <button
             className="modal-close"
             onClick={onClose}
-            aria-label="Close modal"
+            aria-label={t('common.closeModal')}
             type="button"
             disabled={isDeleting}
           >
@@ -121,7 +123,7 @@ const DeletePOIModal: React.FC<DeletePOIModalProps> = ({
             </div>
           )}
           <p className="delete-confirmation-text">
-            Are you sure you want to delete <strong>"{poi.name}"</strong>? This action cannot be undone.
+            {t('components.deletePOIModal.confirmText', { name: poi.name })}
           </p>
         </div>
         <div className="modal-footer">
@@ -132,16 +134,16 @@ const DeletePOIModal: React.FC<DeletePOIModalProps> = ({
             className="btn btn-secondary"
             disabled={isDeleting}
           >
-            Cancel
+            {t('common.cancel')}
           </button>
           <button
             type="button"
             onClick={handleConfirm}
             className={`btn btn-danger ${isDeleting ? 'btn-loading' : ''}`}
             disabled={isDeleting}
-            aria-label="Confirm delete POI"
+            aria-label={t('common.confirmDeletePOI')}
           >
-            {isDeleting ? 'Deleting...' : 'Delete'}
+            {isDeleting ? t('common.deleting') : t('common.delete')}
           </button>
         </div>
       </div>

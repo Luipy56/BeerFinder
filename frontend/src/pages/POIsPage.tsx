@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import Header from '../components/Header';
@@ -13,6 +14,7 @@ import { DEFAULT_BEER_LOGO_PATH } from '../utils/constants';
 import './POIsPage.css';
 
 const POIsPage: React.FC = () => {
+  const { t } = useTranslation();
   const { isAuthenticated, user } = useAuth();
   const { showError, showSuccess } = useToast();
   const navigate = useNavigate();
@@ -93,7 +95,7 @@ const POIsPage: React.FC = () => {
       setIsDeleteModalOpen(false);
       setSelectedPOI(null);
       loadPOIs();
-      showSuccess('POI deleted successfully.');
+      showSuccess(t('pages.pois.poiDeleted'));
     } catch (error: any) {
       console.error('Error deleting POI:', error);
       showError(error.response?.data?.detail || error.message || 'Failed to delete POI. Please try again.');
@@ -103,7 +105,7 @@ const POIsPage: React.FC = () => {
 
   const handlePOIUpdated = async (name: string, description: string, thumbnail?: string) => {
     if (!selectedPOI || !selectedPOI.id) {
-      showError('Invalid POI: missing ID');
+      showError(t('pages.pois.invalidPOI'));
       return;
     }
 
@@ -128,10 +130,10 @@ const POIsPage: React.FC = () => {
       setIsEditModalOpen(false);
       setSelectedPOI(refreshedPOI);
       setIsViewModalOpen(true);
-      showSuccess('POI updated successfully!');
+      showSuccess(t('pages.pois.poiUpdated'));
     } catch (error: any) {
       console.error('Error updating POI:', error);
-      showError(error.response?.data?.detail || error.message || 'Failed to update POI. Please try again.');
+      showError(error.response?.data?.detail || error.message || t('pages.pois.failedToUpdate'));
     }
   };
 
@@ -148,7 +150,7 @@ const POIsPage: React.FC = () => {
         <Header />
         <div className="pois-loading">
           <div className="loading-spinner" aria-hidden="true"></div>
-          <p className="pois-loading-text">Loading POIs...</p>
+          <p className="pois-loading-text">{t('pages.pois.loading')}</p>
         </div>
         <Footer />
       </div>
@@ -160,13 +162,13 @@ const POIsPage: React.FC = () => {
       <Header />
       <div className="pois-container">
         <div className="pois-header">
-          <h1 className="pois-title">All Points of Interest</h1>
-          <p className="pois-subtitle">Browse all POIs in the application</p>
+          <h1 className="pois-title">{t('pages.pois.title')}</h1>
+          <p className="pois-subtitle">{t('pages.pois.subtitle')}</p>
           <div className="pois-search-container">
             <input
               type="text"
               className="pois-search-input"
-              placeholder="Search by name..."
+              placeholder={t('pages.pois.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -188,8 +190,8 @@ const POIsPage: React.FC = () => {
             <button
               className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
               onClick={() => setViewMode('list')}
-              aria-label="List view"
-              title="List view"
+              aria-label={t('common.listView')}
+              title={t('common.listView')}
             >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="8" y1="6" x2="21" y2="6"></line>
@@ -205,7 +207,7 @@ const POIsPage: React.FC = () => {
         <div className={viewMode === 'grid' ? 'pois-grid' : 'pois-list'}>
           {pois.length === 0 ? (
             <div className="pois-empty">
-              <p>No POIs available</p>
+              <p>{t('pages.pois.noPois')}</p>
             </div>
           ) : (
             pois.map((poi) => (
@@ -235,7 +237,7 @@ const POIsPage: React.FC = () => {
                     </p>
                   )}
                   <div className="poi-card-location">
-                    <span className="poi-card-location-label">Location:</span>
+                    <span className="poi-card-location-label">{t('components.viewPOIDetailsModal.location')}:</span>
                     <span className="poi-card-location-value">
                       {poi.latitude?.toFixed(4)}, {poi.longitude?.toFixed(4)}
                     </span>

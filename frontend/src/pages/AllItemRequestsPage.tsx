@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import ItemRequestService, { ItemRequest } from '../services/itemRequestService';
@@ -8,9 +9,11 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import './ItemRequestPage.css';
 import { formatPrice } from '../utils/format';
+import { getFlavorLabel } from '../utils/formatFlavor';
 import api from '../utils/axiosConfig';
 
 const AllItemRequestsPage: React.FC = () => {
+  const { t } = useTranslation();
   const { user, isLoading: authLoading } = useAuth();
   const { showSuccess, showError } = useToast();
   const navigate = useNavigate();
@@ -117,7 +120,7 @@ const AllItemRequestsPage: React.FC = () => {
               <div className="item-request-card-header">
                 <h3>{request.name}</h3>
                 <span className={getStatusBadgeClass(request.status)}>
-                  {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                  {t(`enums.status.${request.status}`)}
                 </span>
               </div>
               {request.requested_by_username && (
@@ -151,7 +154,7 @@ const AllItemRequestsPage: React.FC = () => {
           <div className="item-request-page">
             <div className="item-request-loading">
               <div className="loading-spinner"></div>
-              <p>Loading item requests...</p>
+              <p>{t('pages.allItemRequests.loading')}</p>
             </div>
           </div>
           <Footer />
@@ -167,21 +170,21 @@ const AllItemRequestsPage: React.FC = () => {
         <div className="item-request-page">
           <div className="item-request-container">
             <div className="item-request-header">
-              <div className="item-request-header-left">
-                <h1>All Item Requests</h1>
-              </div>
+            <div className="item-request-header-left">
+              <h1>{t('pages.allItemRequests.title')}</h1>
+            </div>
             </div>
 
             {itemRequests.length === 0 ? (
               <div className="item-request-empty">
-                <h3>No Item Requests</h3>
-                <p>There are no item requests in the system.</p>
+                <h3>{t('pages.allItemRequests.noRequests')}</h3>
+                <p>{t('pages.allItemRequests.emptyMessage')}</p>
               </div>
             ) : (
               <div className="item-request-sections">
-                {renderRequestSection('Pending', groupedRequests.pending, 'pending')}
-                {renderRequestSection('Approved', groupedRequests.approved, 'approved')}
-                {renderRequestSection('Rejected', groupedRequests.rejected, 'rejected')}
+                {renderRequestSection(t('enums.status.pending'), groupedRequests.pending, 'pending')}
+                {renderRequestSection(t('enums.status.approved'), groupedRequests.approved, 'approved')}
+                {renderRequestSection(t('enums.status.rejected'), groupedRequests.rejected, 'rejected')}
               </div>
             )}
 
@@ -200,7 +203,7 @@ const AllItemRequestsPage: React.FC = () => {
                     <button
                       className="modal-close"
                       onClick={() => setSelectedRequest(null)}
-                      aria-label="Close modal"
+                      aria-label={t('common.closeModal')}
                       type="button"
                     >
                       ×
@@ -209,20 +212,20 @@ const AllItemRequestsPage: React.FC = () => {
                   <div className="modal-body">
                     <div className="item-request-detail">
                       <div className="detail-item">
-                        <span className="detail-label">Status</span>
+                        <span className="detail-label">{t('pages.allItemRequests.status')}</span>
                         <span className={`${getStatusBadgeClass(selectedRequest.status)} status-badge-inline`}>
-                          {selectedRequest.status.charAt(0).toUpperCase() + selectedRequest.status.slice(1)}
+                          {t(`enums.status.${selectedRequest.status}`)}
                         </span>
                       </div>
                       {selectedRequest.requested_by_username && (
                         <div className="detail-item">
-                          <span className="detail-label">Requested by</span>
+                          <span className="detail-label">{t('pages.allItemRequests.requestedBy')}</span>
                           <span className="detail-value">{selectedRequest.requested_by_username}</span>
                         </div>
                       )}
                       {selectedRequest.thumbnail && (
                         <div className="detail-item">
-                          <span className="detail-label">Image</span>
+                          <span className="detail-label">{t('pages.allItemRequests.image')}</span>
                           <div className="item-request-thumbnail-container">
                             <img
                               src={`data:image/png;base64,${selectedRequest.thumbnail}`}
@@ -237,38 +240,38 @@ const AllItemRequestsPage: React.FC = () => {
                       )}
                       {selectedRequest.description && (
                         <div className="detail-item">
-                          <span className="detail-label">Description</span>
+                          <span className="detail-label">{t('pages.allItemRequests.description')}</span>
                           <p className="detail-value">{selectedRequest.description}</p>
                         </div>
                       )}
                       {selectedRequest.brand && (
                         <div className="detail-item">
-                          <span className="detail-label">Brand</span>
+                          <span className="detail-label">{t('pages.allItemRequests.brand')}</span>
                           <span className="detail-value">{selectedRequest.brand}</span>
                         </div>
                       )}
                       {selectedRequest.flavor_type && (
                         <div className="detail-item">
-                          <span className="detail-label">Flavor Type</span>
+                          <span className="detail-label">{t('pages.allItemRequests.flavorType')}</span>
                           <span className="detail-value">
-                            {selectedRequest.flavor_type.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join('-')}
+                            {getFlavorLabel(selectedRequest.flavor_type, t)}
                           </span>
                         </div>
                       )}
                       {selectedRequest.volumen && (
                         <div className="detail-item">
-                          <span className="detail-label">Volumen</span>
+                          <span className="detail-label">{t('pages.allItemRequests.volumen')}</span>
                           <span className="detail-value">{selectedRequest.volumen}</span>
                         </div>
                       )}
                       {selectedRequest.price !== undefined && selectedRequest.price !== null && (
                         <div className="detail-item">
-                          <span className="detail-label">Price</span>
+                          <span className="detail-label">{t('pages.allItemRequests.price')}</span>
                           <span className="detail-value">${formatPrice(selectedRequest.price)}</span>
                         </div>
                       )}
                       <div className="detail-item">
-                        <span className="detail-label">Created</span>
+                        <span className="detail-label">{t('pages.allItemRequests.created')}</span>
                         <span className="detail-value">{formatDate(selectedRequest.created_at)}</span>
                       </div>
                     </div>
@@ -281,14 +284,14 @@ const AllItemRequestsPage: React.FC = () => {
                           onClick={() => handleApprove(selectedRequest.id)}
                           className="btn btn-success"
                         >
-                          Approve
+                          {t('pages.allItemRequests.approve')}
                         </button>
                         <button
                           type="button"
                           onClick={() => handleReject(selectedRequest.id)}
                           className="btn btn-danger"
                         >
-                          Reject
+                          {t('pages.allItemRequests.reject')}
                         </button>
                       </>
                     )}
@@ -297,7 +300,7 @@ const AllItemRequestsPage: React.FC = () => {
                       onClick={() => setSelectedRequest(null)}
                       className="btn btn-primary"
                     >
-                      Close
+                      {t('common.close')}
                     </button>
                   </div>
                 </div>

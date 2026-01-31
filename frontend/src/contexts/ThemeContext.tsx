@@ -13,12 +13,12 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 function getInitialTheme(): Theme {
-  if (typeof document === 'undefined') return 'light';
+  if (typeof document === 'undefined') return 'dark';
   const stored = document.documentElement.getAttribute('data-theme') as Theme | null;
   if (stored === 'light' || stored === 'dark') return stored;
   const fromStorage = localStorage.getItem(THEME_STORAGE_KEY) as Theme | null;
   if (fromStorage === 'light' || fromStorage === 'dark') return fromStorage;
-  return 'light';
+  return 'dark';
 }
 
 export const useTheme = () => {

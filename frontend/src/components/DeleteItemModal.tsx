@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
 import { Item } from '../types/poi';
 import './DeleteItemModal.css';
@@ -16,6 +17,7 @@ const DeleteItemModal: React.FC<DeleteItemModalProps> = ({
   item,
   onConfirm,
 }) => {
+  const { t } = useTranslation();
   const [isDeleting, setIsDeleting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const cancelButtonRef = useRef<HTMLButtonElement>(null);
@@ -68,7 +70,7 @@ const DeleteItemModal: React.FC<DeleteItemModalProps> = ({
       await onConfirm();
       onClose();
     } catch (err: any) {
-      setError(err.response?.data?.detail || err.response?.data?.error || err.message || 'Failed to delete item. Please try again.');
+      setError(err.response?.data?.detail || err.response?.data?.error || err.message || t('components.deleteItemModal.failedToDelete'));
       setIsDeleting(false);
     }
   };
@@ -91,11 +93,11 @@ const DeleteItemModal: React.FC<DeleteItemModalProps> = ({
     >
       <div className="modal modal-small" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2 id="delete-item-title" className="modal-title">Delete Item</h2>
+          <h2 id="delete-item-title" className="modal-title">{t('components.deleteItemModal.title')}</h2>
           <button
             className="modal-close"
             onClick={onClose}
-            aria-label="Close modal"
+            aria-label={t('common.closeModal')}
             type="button"
             disabled={isDeleting}
           >
@@ -109,7 +111,7 @@ const DeleteItemModal: React.FC<DeleteItemModalProps> = ({
             </div>
           )}
           <p className="delete-confirmation-text">
-            Are you sure you want to delete <strong>"{item.name}"</strong>? This action cannot be undone.
+            {t('components.deleteItemModal.confirmText', { name: item.name })}
           </p>
         </div>
         <div className="modal-footer">
@@ -120,16 +122,16 @@ const DeleteItemModal: React.FC<DeleteItemModalProps> = ({
             className="btn btn-secondary"
             disabled={isDeleting}
           >
-            Cancel
+            {t('common.cancel')}
           </button>
           <button
             type="button"
             onClick={handleConfirm}
             className={`btn btn-danger ${isDeleting ? 'btn-loading' : ''}`}
             disabled={isDeleting}
-            aria-label="Confirm delete item"
+            aria-label={t('common.confirmDeleteItem')}
           >
-            {isDeleting ? 'Deleting...' : 'Delete'}
+            {isDeleting ? t('common.deleting') : t('common.delete')}
           </button>
         </div>
       </div>

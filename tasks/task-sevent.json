@@ -1,0 +1,75 @@
+{
+    "name": "BeerFinder",
+    "description": [
+        "The project will be an app or a web application where users can:",
+        "View a real-time map of their area.",
+        "The maps must be of any part of the world.",
+        "Create points of interest (POIs) by clicking directly on the map.",
+        "View their own POIs as well as those created by other users.",
+        "Edit any existing POI, regardless of who created it.",
+        "Access detailed information about each POI.",
+        "Each POI will include data such as name, description, price, and other attributes.",
+        "The application will require an API to fetch POI data.",
+        "A database will be needed to store information about POIs, items, and users.",
+        "POI information may include items pre-created in the database, referenced via foreign keys to avoid redundancy.",
+        "Users with permission will be able to add new items.",
+        "Users without permission may submit item insertion requests.",
+        "The database should be accessible for other future applications."
+    ],
+    "technologies": {
+      "backend": "Django REST Framework + djangorestframework-simplejwt",
+      "frontend": "React + TypeScript + Axios",
+      "authentication": "JWT (Access Token + Refresh Token)",
+      "storage": "localStorage (frontend)",
+      "database": "PostgreSQL",
+      "design-like": "Tailwind",
+      "containerization": "Docker"
+    },
+    "Prompt": "@task.json Execute tasks SEQUENTIALLY. For each step: * Capture ALL output/error * Update output_format JSON only * Move to next step ONLY if status=completed Respond ONLY with output_format JSON. Never free text.",
+    "tasks": [
+      {"name": "Migrar el gestor de base de datos a sql", 
+      "description": "Modificar todo el código necesario para que use la base de datos sql en lugar de postgres",
+      "subtasks": [
+        "Decidir qué gestor es mejor, si mariadb o sqlite",
+        "Modificar el archivo de configuración de la base de datos para que use el gestor seleccionado",
+        "Modificar todos los archivos de código necesario para que use el gestor seleccionado",
+        "Seeders, controladores, vistas, modelos, etc."
+      ]},
+      {"name": "Modificar el docker de la base de datos para que use el gestor seleccionado", 
+      "subtasks": [
+        "Modificar docker par utilziar el gestor seleccionado",
+        "Modificar los demás contenedores para que usen la nueva base de datos",
+        "Hacer una prueba de conexión con la nueva base de datos"
+      ]}
+    ],
+    "musts": [
+      ""
+    ],
+    "output_format": {
+      "status": "completed",
+      "current_task": 2,
+      "current_subtask": 3,
+      "log": [
+        "Task 1.1: Decided SQLite with SpatiaLite (preserves GIS PointField, no separate DB container)",
+        "Task 1.2: Modified backend/beerfinder/settings.py DATABASES to spatialite, NAME to db_path",
+        "Task 1.3: Removed psycopg2-binary from requirements.txt; models/views/seeders use ORM only, no changes",
+        "Task 2.1: Removed db service from docker-compose.yml and docker-compose.prod.yml; Dockerfile: postgresql-client -> libsqlite3-mod-spatialite",
+        "Task 2.2: Backend entrypoint-dev.sh and deployment/entrypoint.sh: removed pg_isready wait; prod: DATABASE_PATH, backend_data volume, mkdir -p /app/backend/data",
+        "Task 2.3: docker-compose build backend (exit 0); docker-compose run backend python manage.py migrate --noinput (exit 0), all migrations applied"
+      ],
+      "command_output": "Operations to perform:\n  Apply all migrations: admin, api, auth, contenttypes, sessions\nRunning migrations:\n  Applying contenttypes.0001_initial... OK\n  Applying auth.0001_initial... OK\n  Applying admin.0001_initial... OK\n  Applying admin.0002_logentry_remove_auto_add... OK\n  Applying admin.0003_logentry_add_action_flag_choices... OK\n  Applying api.0001_initial... OK\n  Applying api.0002_itemrequest_thumbnail... OK\n  Applying api.0003_add_flavor_type_to_items... OK\n  Applying api.0004_item_percentage_poi_thumbnail... OK\n  Applying api.0005_alter_item_percentage... OK\n  Applying api.0006_add_percentage_to_item_request... OK\n  Applying api.0007_add_brand_to_item_and_item_request... OK\n  Applying contenttypes.0002_remove_content_type_name... OK\n  Applying auth.0002_alter_permission_name_max_length... OK\n  Applying auth.0003_alter_user_email_max_length... OK\n  Applying auth.0004_alter_user_username_opts... OK\n  Applying auth.0005_alter_user_last_login_null... OK\n  Applying auth.0006_require_contenttypes_0002... OK\n  Applying auth.0007_alter_validators_add_error_messages... OK\n  Applying auth.0008_alter_user_username_max_length... OK\n  Applying auth.0009_alter_user_last_name_max_length... OK\n  Applying auth.0010_alter_group_name_max_length... OK\n  Applying auth.0011_update_proxy_permissions... OK\n  Applying auth.0012_alter_user_first_name_max_length... OK\n  Applying sessions.0001_initial... OK",
+      "failed_command": "",
+      "next_action": "",
+      "files_created": [
+        "backend/beerfinder/settings.py",
+        "backend/requirements.txt",
+        "backend/entrypoint-dev.sh",
+        "Dockerfile",
+        "docker-compose.yml",
+        "docker-compose.prod.yml",
+        "deployment/entrypoint.sh"
+      ],
+      "dirs_created": [],
+      "errors": []
+    }
+  } 

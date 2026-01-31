@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import './RegisterForm.css';
 
@@ -7,6 +8,7 @@ interface RegisterFormProps {
 }
 
 const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
+  const { t } = useTranslation();
   const { register } = useAuth();
   const [formData, setFormData] = useState({
     username: '',
@@ -26,17 +28,17 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
 
   const validateForm = (): boolean => {
     if (formData.password !== formData.password_confirm) {
-      setError('Passwords do not match');
+      setError(t('components.registerForm.passwordsDoNotMatch'));
       return false;
     }
     if (formData.password.length < 8) {
-      setError('Password must be at least 8 characters long');
+      setError(t('components.registerForm.passwordMinLength'));
       return false;
     }
     if (formData.email && formData.email.trim()) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(formData.email)) {
-        setError('Please enter a valid email address');
+        setError(t('components.registerForm.validEmail'));
         return false;
       }
     }
@@ -75,10 +77,10 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
               return `${field}: ${messages}`;
             })
             .join('\n');
-          setError(errorMessages || 'Registration failed. Please check your input.');
+          setError(errorMessages || t('components.registerForm.registrationFailed'));
         }
       } else {
-        setError('An error occurred. Please try again.');
+        setError(t('components.registerForm.genericError'));
       }
     } finally {
       setIsLoading(false);
@@ -86,8 +88,8 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="register-form" aria-label="Registration form">
-      <h2 className="form-title">Register</h2>
+    <form onSubmit={handleSubmit} className="register-form" aria-label={t('components.registerForm.title')}>
+      <h2 className="form-title">{t('components.registerForm.title')}</h2>
       {error && (
         <div className="form-error-message" role="alert" aria-live="polite">
           {error}
@@ -95,7 +97,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
       )}
       <div className="form-group">
         <label htmlFor="username" className="form-label required">
-          Username
+          {t('components.registerForm.username')}
         </label>
         <input
           type="text"
@@ -112,7 +114,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
       </div>
       <div className="form-group">
         <label htmlFor="email" className="form-label">
-          Email
+          {t('components.registerForm.email')}
         </label>
         <input
           type="email"
@@ -127,7 +129,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
       </div>
       <div className="form-group">
         <label htmlFor="password" className="form-label required">
-          Password
+          {t('components.registerForm.password')}
         </label>
         <input
           type="password"
@@ -142,11 +144,11 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
           aria-required="true"
           aria-invalid={error ? 'true' : 'false'}
         />
-        <span className="form-help">Must be at least 8 characters long</span>
+        <span className="form-help">{t('components.registerForm.passwordMinLength')}</span>
       </div>
       <div className="form-group">
         <label htmlFor="password_confirm" className="form-label required">
-          Confirm Password
+          {t('components.registerForm.confirmPassword')}
         </label>
         <input
           type="password"
@@ -166,9 +168,9 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSuccess }) => {
         type="submit"
         disabled={isLoading}
         className={`btn btn-primary ${isLoading ? 'btn-loading' : ''}`}
-        aria-label={isLoading ? 'Registering...' : 'Register'}
+        aria-label={isLoading ? t('common.creating') : t('components.registerForm.submit')}
       >
-        {isLoading ? 'Registering...' : 'Register'}
+        {isLoading ? t('common.creating') : t('components.registerForm.submit')}
       </button>
     </form>
   );

@@ -1,7 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { POI, Item } from '../types/poi';
 import './ViewPOIModal.css';
 import { formatPrice } from '../utils/format';
+import { getFlavorLabel } from '../utils/formatFlavor';
 import POIService from '../services/poiService';
 import { useToast } from '../contexts/ToastContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -28,6 +30,7 @@ const ViewPOIDetailsModal: React.FC<ViewPOIDetailsModalProps> = ({
   poi,
   onEdit,
 }) => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { showError } = useToast();
   const closeButtonRef = useRef<HTMLButtonElement>(null);
@@ -81,7 +84,7 @@ const ViewPOIDetailsModal: React.FC<ViewPOIDetailsModalProps> = ({
       setPoiItems(items);
     } catch (error: any) {
       console.error('Error loading POI items:', error);
-      showError('Failed to load POI items');
+      showError(t('pages.items.failedToLoad'));
     } finally {
       setLoadingItems(false);
     }
@@ -132,7 +135,7 @@ const ViewPOIDetailsModal: React.FC<ViewPOIDetailsModalProps> = ({
               ref={closeButtonRef}
               className="modal-close"
               onClick={onClose}
-              aria-label="Close modal"
+              aria-label={t('common.closeModal')}
               type="button"
             >
               ×
@@ -200,12 +203,12 @@ const ViewPOIDetailsModal: React.FC<ViewPOIDetailsModalProps> = ({
                     ))}
                   </ul>
                 ) : (
-                  <div className="poi-item-empty">No items assigned to this POI</div>
+                  <div className="poi-item-empty">{t('components.viewPOIDetailsModal.noItemsAssigned')}</div>
                 )}
               </div>
             </div>
             <div className="poi-detail-item">
-              <h3 className="poi-detail-label">Location</h3>
+              <h3 className="poi-detail-label">{t('components.viewPOIDetailsModal.location')}</h3>
               <p className="poi-detail-value">
                 {poi.latitude?.toFixed(6)}, {poi.longitude?.toFixed(6)}
               </p>

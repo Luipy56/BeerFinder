@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Item } from '../types/poi';
 import POIService from '../services/poiService';
 import { useToast } from '../contexts/ToastContext';
 import { formatPrice } from '../utils/format';
+import { getFlavorLabel } from '../utils/formatFlavor';
 import { DEFAULT_BEER_LOGO_PATH } from '../utils/constants';
 import './AssignItemModal.css';
 
@@ -19,6 +21,7 @@ const AssignItemModal: React.FC<AssignItemModalProps> = ({
   poiId,
   onItemAssigned,
 }) => {
+  const { t } = useTranslation();
   const { showSuccess, showError } = useToast();
   const [availableItems, setAvailableItems] = useState<Item[]>([]);
   const [loading, setLoading] = useState(false);
@@ -150,7 +153,7 @@ const AssignItemModal: React.FC<AssignItemModalProps> = ({
 
     try {
       await POIService.assignItem(poiId, selectedItem.id, price);
-      showSuccess('Item assigned successfully!');
+      showSuccess(t('components.assignItemModal.itemAssigned'));
       await loadAvailableItems();
       setSelectedItem(null);
       setLocalPrice('');
@@ -187,11 +190,11 @@ const AssignItemModal: React.FC<AssignItemModalProps> = ({
     >
       <div className="modal modal-large assign-item-modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2 id="assign-item-title" className="modal-title">Assign Item to POI</h2>
+          <h2 id="assign-item-title" className="modal-title">{t('components.assignItemModal.title')}</h2>
           <button
             className="modal-close"
             onClick={onClose}
-            aria-label="Close modal"
+            aria-label={t('common.closeModal')}
             type="button"
           >
             ×
@@ -205,7 +208,7 @@ const AssignItemModal: React.FC<AssignItemModalProps> = ({
               ref={searchInputRef}
               type="text"
               className="assign-item-search-input"
-              placeholder="Search items by name, brand, flavor, or volumen..."
+              placeholder={t('components.assignItemModal.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -225,7 +228,7 @@ const AssignItemModal: React.FC<AssignItemModalProps> = ({
           {selectedItem && (
             <div className="assign-item-price-form">
               <div className="assign-item-price-form-header">
-                <h3>Set Local Price for {selectedItem.name}</h3>
+                <h3>{t('components.assignItemModal.setLocalPrice', { name: selectedItem.name })}</h3>
                 <button
                   type="button"
                   className="assign-item-price-form-close"
@@ -234,7 +237,7 @@ const AssignItemModal: React.FC<AssignItemModalProps> = ({
                     setLocalPrice('');
                     setPriceError(null);
                   }}
-                  aria-label="Cancel"
+                  aria-label={t('common.cancel')}
                 >
                   ×
                 </button>
@@ -242,7 +245,7 @@ const AssignItemModal: React.FC<AssignItemModalProps> = ({
               <div className="assign-item-price-form-body">
                 <div className="form-group">
                   <label htmlFor="local-price" className="form-label required">
-                    Local Price
+                    {t('components.assignItemModal.localPrice')}
                   </label>
                   <div className="assign-item-price-input-wrapper">
                     <span className="assign-item-price-currency">$</span>
@@ -265,7 +268,7 @@ const AssignItemModal: React.FC<AssignItemModalProps> = ({
                   )}
                   {selectedItem.typical_price && (
                     <span className="assign-item-typical-price">
-                      Typical price: ${formatPrice(selectedItem.typical_price)}
+                      {t('pages.items.typicalPrice')} ${formatPrice(selectedItem.typical_price)}
                     </span>
                   )}
                 </div>
@@ -275,7 +278,7 @@ const AssignItemModal: React.FC<AssignItemModalProps> = ({
                   onClick={handleAssign}
                   disabled={isSubmitting || !localPrice.trim()}
                 >
-                  {isSubmitting ? 'Assigning...' : 'Confirm Assignment'}
+                  {isSubmitting ? t('common.creating') : t('components.assignItemModal.confirmAssignment')}
                 </button>
               </div>
             </div>
@@ -286,14 +289,14 @@ const AssignItemModal: React.FC<AssignItemModalProps> = ({
             {loading ? (
               <div className="assign-item-loading">
                 <div className="loading-spinner"></div>
-                <p>Loading items...</p>
+                <p>{t('components.assignItemModal.loading')}</p>
               </div>
             ) : filteredItems.length === 0 ? (
               <div className="assign-item-empty">
                 <p>
                   {searchQuery
-                    ? `No items found matching "${searchQuery}"`
-                    : 'No items available to assign'}
+                    ? t('components.assignItemModal.noItemsMatch', { query: searchQuery })
+                    : t('components.assignItemModal.noItemsAvailable')}
                 </p>
               </div>
             ) : (
@@ -317,16 +320,16 @@ const AssignItemModal: React.FC<AssignItemModalProps> = ({
                       <h3 className="assign-item-card-name">{item.name}</h3>
                       {item.brand && (
                         <div className="assign-item-card-brand">
-                          <span className="assign-item-card-brand-label">Brand:</span>
+                          <span className="assign-item-card-brand-label">{t('pages.items.brand')}</span>
                           <span className="assign-item-card-brand-value">{item.brand}</span>
                         </div>
                       )}
                       {(item.flavor_type || item.volumen) && (
                         <div className="assign-item-card-flavor">
-                          <span className="assign-item-card-flavor-label">Flavor{item.volumen ? ' · Volumen' : ''}:</span>
+                          <span className="assign-item-card-flavor-label">{t(item.volumen ? 'pages.items.flavorVolumen' : 'pages.items.flavor')}</span>
                           <span className="assign-item-card-flavor-value">
                             {[
-                              item.flavor_type && item.flavor_type.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join('-'),
+                              item.flavor_type && getFlavorLabel(item.flavor_type, t),
                               item.volumen,
                             ].filter(Boolean).join(' · ')}
                           </span>

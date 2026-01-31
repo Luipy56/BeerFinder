@@ -1,8 +1,10 @@
 import React, { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Item } from '../types/poi';
 import './ViewPOIModal.css';
 import { useAuth } from '../contexts/AuthContext';
 import { formatPrice } from '../utils/format';
+import { getFlavorLabel } from '../utils/formatFlavor';
 import { DEFAULT_BEER_LOGO_PATH } from '../utils/constants';
 
 interface ViewItemDetailsModalProps {
@@ -18,6 +20,7 @@ const ViewItemDetailsModal: React.FC<ViewItemDetailsModalProps> = ({
   item,
   onEdit,
 }) => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const closeButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -68,11 +71,6 @@ const ViewItemDetailsModal: React.FC<ViewItemDetailsModalProps> = ({
     return DEFAULT_BEER_LOGO_PATH;
   };
 
-  const formatFlavor = (flavor?: string): string => {
-    if (!flavor) return '';
-    return flavor.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join('-');
-  };
-
   const isAdmin = user?.is_admin;
 
   return (
@@ -91,9 +89,9 @@ const ViewItemDetailsModal: React.FC<ViewItemDetailsModalProps> = ({
               <button
                 className="modal-edit-button"
                 onClick={onEdit}
-                aria-label="Edit item"
+                aria-label={t('components.viewPOIModal.edit')}
                 type="button"
-                title="Edit item"
+                title={t('components.viewPOIModal.edit')}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M17 3a2.85 2.85 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path>
@@ -105,7 +103,7 @@ const ViewItemDetailsModal: React.FC<ViewItemDetailsModalProps> = ({
               ref={closeButtonRef}
               className="modal-close"
               onClick={onClose}
-              aria-label="Close modal"
+              aria-label={t('common.closeModal')}
               type="button"
             >
               ×
@@ -128,37 +126,37 @@ const ViewItemDetailsModal: React.FC<ViewItemDetailsModalProps> = ({
           <div className="poi-details">
             {item.description && (
               <div className="poi-detail-item">
-                <h3 className="poi-detail-label">Description</h3>
+                <h3 className="poi-detail-label">{t('components.viewItemDetailsModal.description')}</h3>
                 <p className="poi-detail-value">{item.description}</p>
               </div>
             )}
             {item.brand && (
               <div className="poi-detail-item">
-                <h3 className="poi-detail-label">Brand</h3>
+                <h3 className="poi-detail-label">{t('components.viewItemDetailsModal.brand')}</h3>
                 <p className="poi-detail-value">{item.brand}</p>
               </div>
             )}
             {item.flavor_type && (
               <div className="poi-detail-item">
-                <h3 className="poi-detail-label">Flavor Type</h3>
-                <p className="poi-detail-value">{formatFlavor(item.flavor_type)}</p>
+                <h3 className="poi-detail-label">{t('components.viewItemDetailsModal.flavor')}</h3>
+                <p className="poi-detail-value">{getFlavorLabel(item.flavor_type, t)}</p>
               </div>
             )}
             {item.volumen && (
               <div className="poi-detail-item">
-                <h3 className="poi-detail-label">Volumen</h3>
+                <h3 className="poi-detail-label">{t('components.viewItemDetailsModal.volumen')}</h3>
                 <p className="poi-detail-value">{item.volumen}</p>
               </div>
             )}
             {item.typical_price !== null && item.typical_price !== undefined && (
               <div className="poi-detail-item">
-                <h3 className="poi-detail-label">Typical Price</h3>
+                <h3 className="poi-detail-label">{t('components.viewItemDetailsModal.typicalPrice')}</h3>
                 <p className="poi-detail-value">{formatPrice(item.typical_price)}</p>
               </div>
             )}
             {item.percentage !== null && item.percentage !== undefined && (
               <div className="poi-detail-item">
-                <h3 className="poi-detail-label">Percentage</h3>
+                <h3 className="poi-detail-label">{t('components.viewItemDetailsModal.percentage')}</h3>
                 <p className="poi-detail-value">{item.percentage}%</p>
               </div>
             )}

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import ItemRequestService, { ItemRequest, CreateItemRequestDto } from '../services/itemRequestService';
@@ -8,9 +9,19 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import './ItemRequestPage.css';
 import { formatPrice } from '../utils/format';
+import { getFlavorLabel } from '../utils/formatFlavor';
 import { FlavorType } from '../types/poi';
 
+const FLAVOR_OPTIONS: FlavorType[] = [
+  'bitter', 'caramel', 'chocolatey', 'coffee-like', 'creamy', 'crisp', 'dry',
+  'earthy', 'floral', 'fruity', 'full-bodied', 'funky', 'herbal', 'honeyed',
+  'hoppy', 'light-bodied', 'malty', 'nutty', 'refreshing', 'roasty', 'session',
+  'smoky', 'smooth', 'sour', 'spicy', 'strong', 'sweet', 'tart', 'toasted',
+  'woody', 'other'
+];
+
 const ItemRequestPage: React.FC = () => {
+  const { t } = useTranslation();
   const { isAuthenticated } = useAuth();
   const { showSuccess, showError } = useToast();
   const navigate = useNavigate();
@@ -182,7 +193,7 @@ const ItemRequestPage: React.FC = () => {
               <div className="item-request-card-header">
                 <h3>{request.name}</h3>
                 <span className={getStatusBadgeClass(request.status)}>
-                  {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
+                  {t(`enums.status.${request.status}`)}
                 </span>
               </div>
               {request.description && (
@@ -211,7 +222,7 @@ const ItemRequestPage: React.FC = () => {
           <div className="item-request-page">
             <div className="item-request-loading">
               <div className="loading-spinner"></div>
-              <p>Loading item requests...</p>
+              <p>{t('pages.itemRequests.loading')}</p>
             </div>
           </div>
           <Footer />
@@ -228,24 +239,24 @@ const ItemRequestPage: React.FC = () => {
           <div className="item-request-container">
           <div className="item-request-header">
             <div className="item-request-header-left">
-              <h1>Item Requests</h1>
+              <h1>{t('pages.itemRequests.pageTitle')}</h1>
             </div>
             <button
               className="btn btn-primary"
               onClick={() => setShowCreateForm(!showCreateForm)}
-              aria-label={showCreateForm ? 'Cancel create request' : 'Create new item request'}
+              aria-label={showCreateForm ? t('pages.itemRequests.cancelCreateAria') : t('pages.itemRequests.createNewAria')}
             >
-              {showCreateForm ? 'Cancel' : 'New Request'}
+              {showCreateForm ? t('common.cancel') : t('pages.itemRequests.newRequest')}
             </button>
           </div>
 
           {showCreateForm && (
             <div className="item-request-create-form card">
-              <h2>Create Item Request</h2>
-              <form onSubmit={handleSubmit} aria-label="Create item request form">
+              <h2>{t('pages.itemRequests.createTitle')}</h2>
+              <form onSubmit={handleSubmit} aria-label={t('pages.itemRequests.createFormAriaLabel')}>
                 <div className="form-group">
                   <label htmlFor="request-name" className="form-label required">
-                    Name
+                    {t('components.editItemModal.name')}
                   </label>
                   <input
                     type="text"
@@ -269,7 +280,7 @@ const ItemRequestPage: React.FC = () => {
 
                 <div className="form-group">
                   <label htmlFor="request-description" className="form-label">
-                    Description
+                    {t('components.editItemModal.description')}
                   </label>
                   <textarea
                     id="request-description"
@@ -284,7 +295,7 @@ const ItemRequestPage: React.FC = () => {
 
                 <div className="form-group">
                   <label htmlFor="request-brand" className="form-label">
-                    Brand
+                    {t('components.editItemModal.brand')}
                   </label>
                   <input
                     type="text"
@@ -294,13 +305,13 @@ const ItemRequestPage: React.FC = () => {
                     value={formData.brand || ''}
                     onChange={handleChange}
                     disabled={isCreating}
-                    placeholder="Enter brand"
+                    placeholder={t('components.editItemModal.placeholderBrand')}
                   />
                 </div>
 
                 <div className="form-group">
                   <label htmlFor="request-price" className="form-label">
-                    Price
+                    {t('components.editItemModal.typicalPrice')}
                   </label>
                   <div className="item-request-price-input-wrapper">
                     <span className="item-request-price-currency">$</span>
@@ -321,7 +332,7 @@ const ItemRequestPage: React.FC = () => {
 
                 <div className="form-group">
                   <label htmlFor="request-percentage" className="form-label">
-                    Percentage
+                    {t('components.editItemModal.percentage')}
                   </label>
                   <div className="item-request-price-input-wrapper">
                     <input
@@ -343,7 +354,7 @@ const ItemRequestPage: React.FC = () => {
 
                 <div className="form-group">
                   <label htmlFor="request-volumen" className="form-label">
-                    Volumen
+                    {t('components.editItemModal.volumen')}
                   </label>
                   <input
                     type="text"
@@ -353,13 +364,13 @@ const ItemRequestPage: React.FC = () => {
                     value={formData.volumen || ''}
                     onChange={handleChange}
                     disabled={isCreating}
-                    placeholder="e.g. 33cl, 1 L, 500ml"
+                    placeholder={t('components.editItemModal.placeholderVolumen')}
                   />
                 </div>
 
                 <div className="form-group">
                   <label htmlFor="request-flavor-type" className="form-label">
-                    Flavor Type
+                    {t('pages.itemRequests.flavorType')}
                   </label>
                   <select
                     id="request-flavor-type"
@@ -369,43 +380,17 @@ const ItemRequestPage: React.FC = () => {
                     onChange={(e) => setFormData({ ...formData, flavor_type: e.target.value as FlavorType })}
                     disabled={isCreating}
                   >
-                    <option value="bitter">Bitter</option>
-                    <option value="caramel">Caramel</option>
-                    <option value="chocolatey">Chocolatey</option>
-                    <option value="coffee-like">Coffee-like</option>
-                    <option value="creamy">Creamy</option>
-                    <option value="crisp">Crisp</option>
-                    <option value="dry">Dry</option>
-                    <option value="earthy">Earthy</option>
-                    <option value="floral">Floral</option>
-                    <option value="fruity">Fruity</option>
-                    <option value="full-bodied">Full-bodied</option>
-                    <option value="funky">Funky</option>
-                    <option value="herbal">Herbal</option>
-                    <option value="honeyed">Honeyed</option>
-                    <option value="hoppy">Hoppy</option>
-                    <option value="light-bodied">Light-bodied</option>
-                    <option value="malty">Malty</option>
-                    <option value="nutty">Nutty</option>
-                    <option value="refreshing">Refreshing</option>
-                    <option value="roasty">Roasty</option>
-                    <option value="session">Session</option>
-                    <option value="smoky">Smoky</option>
-                    <option value="smooth">Smooth</option>
-                    <option value="sour">Sour</option>
-                    <option value="spicy">Spicy</option>
-                    <option value="strong">Strong</option>
-                    <option value="sweet">Sweet</option>
-                    <option value="tart">Tart</option>
-                    <option value="toasted">Toasted</option>
-                    <option value="woody">Woody</option>
-                    <option value="other">Other</option>
+                    {FLAVOR_OPTIONS.map((flavor) => (
+                      <option key={flavor} value={flavor}>
+                        {getFlavorLabel(flavor, t)}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
                 <div className="form-group">
                   <label htmlFor="request-thumbnail" className="form-label">
-                    Thumbnail
+                    {t('components.editItemModal.thumbnail')}
                   </label>
                   <input
                     type="file"
@@ -419,7 +404,7 @@ const ItemRequestPage: React.FC = () => {
                     <div className="thumbnail-preview">
                       <img
                         src={URL.createObjectURL(thumbnailFile)}
-                        alt="Thumbnail preview"
+                        alt={t('common.thumbnailPreview')}
                         style={{ maxWidth: '200px', maxHeight: '200px', marginTop: 'var(--spacing-sm)' }}
                       />
                     </div>
@@ -433,14 +418,14 @@ const ItemRequestPage: React.FC = () => {
                     className="btn btn-secondary"
                     disabled={isCreating}
                   >
-                    Cancel
+                    {t('common.cancel')}
                   </button>
                   <button
                     type="submit"
                     className={`btn btn-primary ${isCreating ? 'btn-loading' : ''}`}
                     disabled={isCreating || !formData.name.trim()}
                   >
-                    {isCreating ? 'Submitting...' : 'Submit Request'}
+                    {isCreating ? t('pages.itemRequests.submitting') : t('pages.itemRequests.submitRequest')}
                   </button>
                 </div>
               </form>
@@ -449,20 +434,20 @@ const ItemRequestPage: React.FC = () => {
 
           {itemRequests.length === 0 && !showCreateForm ? (
             <div className="item-request-empty">
-              <h3>No Item Requests</h3>
-              <p>You haven't submitted any item requests yet.</p>
+              <h3>{t('pages.itemRequests.noRequests')}</h3>
+              <p>{t('pages.itemRequests.emptyMessage')}</p>
               <button
                 className="btn btn-primary"
                 onClick={() => setShowCreateForm(true)}
               >
-                Create Your First Request
+                {t('pages.itemRequests.createFirstRequest')}
               </button>
             </div>
           ) : (
             <div className="item-request-sections">
-              {renderRequestSection('Pending', groupedRequests.pending, 'pending')}
-              {renderRequestSection('Approved', groupedRequests.approved, 'approved')}
-              {renderRequestSection('Rejected', groupedRequests.rejected, 'rejected')}
+              {renderRequestSection(t('enums.status.pending'), groupedRequests.pending, 'pending')}
+              {renderRequestSection(t('enums.status.approved'), groupedRequests.approved, 'approved')}
+              {renderRequestSection(t('enums.status.rejected'), groupedRequests.rejected, 'rejected')}
             </div>
           )}
 
@@ -482,7 +467,7 @@ const ItemRequestPage: React.FC = () => {
                   <button
                     className="modal-close"
                     onClick={() => setSelectedRequest(null)}
-                    aria-label="Close modal"
+                    aria-label={t('common.closeModal')}
                     type="button"
                   >
                     ×
@@ -491,14 +476,14 @@ const ItemRequestPage: React.FC = () => {
                 <div className="modal-body">
                   <div className="item-request-detail">
                       <div className="detail-item">
-                        <span className="detail-label">Status</span>
+                        <span className="detail-label">{t('pages.itemRequests.status')}</span>
                         <span className={`${getStatusBadgeClass(selectedRequest.status)} status-badge-inline`}>
-                          {selectedRequest.status.charAt(0).toUpperCase() + selectedRequest.status.slice(1)}
+                          {t(`enums.status.${selectedRequest.status}`)}
                         </span>
                       </div>
                     {selectedRequest.thumbnail && (
                       <div className="detail-item">
-                        <span className="detail-label">Image</span>
+                        <span className="detail-label">{t('pages.itemRequests.image')}</span>
                         <div className="item-request-thumbnail-container">
                           <img
                             src={`data:image/png;base64,${selectedRequest.thumbnail}`}
@@ -513,33 +498,33 @@ const ItemRequestPage: React.FC = () => {
                     )}
                     {selectedRequest.description && (
                       <div className="detail-item">
-                        <span className="detail-label">Description</span>
+                        <span className="detail-label">{t('components.editItemModal.description')}</span>
                         <p className="detail-value">{selectedRequest.description}</p>
                       </div>
                     )}
                     {selectedRequest.brand && (
                       <div className="detail-item">
-                        <span className="detail-label">Brand</span>
+                        <span className="detail-label">{t('components.editItemModal.brand')}</span>
                         <span className="detail-value">{selectedRequest.brand}</span>
                       </div>
                     )}
                     {selectedRequest.flavor_type && (
                       <div className="detail-item">
-                        <span className="detail-label">Flavor Type</span>
+                        <span className="detail-label">{t('pages.itemRequests.flavorType')}</span>
                         <span className="detail-value">
-                          {selectedRequest.flavor_type.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join('-')}
+                          {getFlavorLabel(selectedRequest.flavor_type, t)}
                         </span>
                       </div>
                     )}
                     {selectedRequest.volumen && (
                       <div className="detail-item">
-                        <span className="detail-label">Volumen</span>
+                        <span className="detail-label">{t('components.editItemModal.volumen')}</span>
                         <span className="detail-value">{selectedRequest.volumen}</span>
                       </div>
                     )}
                     {selectedRequest.price !== undefined && selectedRequest.price !== null && (
                       <div className="detail-item">
-                        <span className="detail-label">Price</span>
+                        <span className="detail-label">{t('components.editItemModal.typicalPrice')}</span>
                         <span className="detail-value">${formatPrice(selectedRequest.price)}</span>
                       </div>
                     )}
@@ -561,7 +546,7 @@ const ItemRequestPage: React.FC = () => {
                     onClick={() => setSelectedRequest(null)}
                     className="btn btn-primary"
                   >
-                    Close
+                    {t('common.close')}
                   </button>
                 </div>
               </div>

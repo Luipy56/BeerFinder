@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
 import './LoginPromptModal.css';
 
@@ -9,6 +10,7 @@ interface LoginPromptModalProps {
 }
 
 const LoginPromptModal: React.FC<LoginPromptModalProps> = ({ isOpen, onClose }) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -57,11 +59,11 @@ const LoginPromptModal: React.FC<LoginPromptModalProps> = ({ isOpen, onClose }) 
     >
       <div className="modal modal-small" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2 id="login-prompt-title" className="modal-title">Sign in to contribute</h2>
+          <h2 id="login-prompt-title" className="modal-title">{t('components.loginPrompt.title')}</h2>
           <button
             className="modal-close"
             onClick={onClose}
-            aria-label="Close modal"
+            aria-label={t('common.closeModal')}
             type="button"
           >
             ×
@@ -69,7 +71,7 @@ const LoginPromptModal: React.FC<LoginPromptModalProps> = ({ isOpen, onClose }) 
         </div>
         <div className="modal-body">
           <p className="login-prompt-description">
-            If you sign in, you can create points of interest on the map, add items, and assign them.
+            {t('components.loginPrompt.description')}
           </p>
         </div>
         <div className="modal-footer">
@@ -77,9 +79,9 @@ const LoginPromptModal: React.FC<LoginPromptModalProps> = ({ isOpen, onClose }) 
             type="button"
             onClick={handleGoToLogin}
             className="btn btn-primary"
-            aria-label="Go to login page"
+            aria-label={t('common.goToLogin')}
           >
-            Go to Login
+            {t('components.loginPrompt.goToLogin')}
           </button>
         </div>
       </div>

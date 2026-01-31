@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import Header from '../components/Header';
@@ -8,12 +9,14 @@ import ViewItemDetailsModal from '../components/ViewItemDetailsModal';
 import EditItemModal from '../components/EditItemModal';
 import DeleteItemModal from '../components/DeleteItemModal';
 import ItemService from '../services/itemService';
-import { Item, FlavorType } from '../types/poi';
+import { Item } from '../types/poi';
 import { DEFAULT_BEER_LOGO_PATH } from '../utils/constants';
 import { formatPrice } from '../utils/format';
+import { getFlavorLabel } from '../utils/formatFlavor';
 import './ItemsPage.css';
 
 const ItemsPage: React.FC = () => {
+  const { t } = useTranslation();
   const { isAuthenticated, user } = useAuth();
   const { showSuccess, showError } = useToast();
   const navigate = useNavigate();
@@ -38,7 +41,7 @@ const ItemsPage: React.FC = () => {
       setItems(data);
     } catch (error: any) {
       console.error('Error loading items:', error);
-      showError(error.response?.data?.detail || 'Failed to load items');
+      showError(error.response?.data?.detail || t('pages.items.failedToLoad'));
     } finally {
       setLoading(false);
     }
@@ -121,7 +124,7 @@ const ItemsPage: React.FC = () => {
     setIsDeleteItemModalOpen(false);
     setSelectedItem(null);
     loadItems();
-    showSuccess('Item deleted successfully.');
+    showSuccess(t('pages.items.itemDeleted'));
   };
 
   const getThumbnailUrl = (thumbnail: string | null | undefined): string => {
@@ -131,18 +134,13 @@ const ItemsPage: React.FC = () => {
     return DEFAULT_BEER_LOGO_PATH;
   };
 
-  const formatFlavor = (flavor?: FlavorType): string => {
-    if (!flavor) return '';
-    return flavor.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join('-');
-  };
-
   if (loading) {
     return (
       <div className="items-page">
         <Header />
         <div className="items-loading">
           <div className="loading-spinner" aria-hidden="true"></div>
-          <p className="items-loading-text">Loading items...</p>
+          <p className="items-loading-text">{t('pages.items.loading')}</p>
         </div>
         <Footer />
       </div>
@@ -154,13 +152,13 @@ const ItemsPage: React.FC = () => {
       <Header />
       <div className="items-container">
         <div className="items-header">
-          <h1 className="items-title">All Items</h1>
-          <p className="items-subtitle">Browse all available items in the application</p>
+          <h1 className="items-title">{t('pages.items.title')}</h1>
+          <p className="items-subtitle">{t('pages.items.subtitle')}</p>
           <div className="items-search-container">
             <input
               type="text"
               className="items-search-input"
-              placeholder="Search by name, brand, flavor, price, or percentage..."
+              placeholder={t('pages.items.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -169,8 +167,8 @@ const ItemsPage: React.FC = () => {
             <button
               className={`view-toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
               onClick={() => setViewMode('grid')}
-              aria-label="Grid view"
-              title="Grid view"
+              aria-label={t('common.gridView')}
+              title={t('common.gridView')}
             >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <rect x="3" y="3" width="7" height="7"></rect>
@@ -182,8 +180,8 @@ const ItemsPage: React.FC = () => {
             <button
               className={`view-toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
               onClick={() => setViewMode('list')}
-              aria-label="List view"
-              title="List view"
+              aria-label={t('common.listView')}
+              title={t('common.listView')}
             >
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="8" y1="6" x2="21" y2="6"></line>
@@ -199,7 +197,7 @@ const ItemsPage: React.FC = () => {
         <div className={viewMode === 'grid' ? 'items-grid' : 'items-list'}>
           {items.length === 0 ? (
             <div className="items-empty">
-              <p>No items available</p>
+              <p>{t('pages.items.noItems')}</p>
             </div>
           ) : (
             items.map((item) => (
@@ -221,15 +219,15 @@ const ItemsPage: React.FC = () => {
                   <h3 className="item-card-name">{item.name}</h3>
                   {item.brand && (
                     <div className="item-card-brand">
-                      <span className="item-card-brand-label">Brand:</span>
+                      <span className="item-card-brand-label">{t('pages.items.brand')}</span>
                       <span className="item-card-brand-value">{item.brand}</span>
                     </div>
                   )}
                   {(item.flavor_type || item.volumen) && (
                     <div className="item-card-flavor">
-                      <span className="item-card-flavor-label">Flavor{item.volumen ? ' · Volumen' : ''}:</span>
+                      <span className="item-card-flavor-label">{t(item.volumen ? 'pages.items.flavorVolumen' : 'pages.items.flavor')}</span>
                       <span className="item-card-flavor-value">
-                        {[item.flavor_type && formatFlavor(item.flavor_type), item.volumen].filter(Boolean).join(' · ')}
+                        {[item.flavor_type && getFlavorLabel(item.flavor_type, t), item.volumen].filter(Boolean).join(' · ')}
                       </span>
                     </div>
                   )}
@@ -239,13 +237,13 @@ const ItemsPage: React.FC = () => {
                   <div className="item-card-details">
                     {item.typical_price && (
                       <div className="item-card-price">
-                        <span className="item-card-price-label">Typical Price:</span>
+                        <span className="item-card-price-label">{t('pages.items.typicalPrice')}</span>
                         <span className="item-card-price-value">{formatPrice(item.typical_price)}</span>
                       </div>
                     )}
                     {item.percentage !== null && item.percentage !== undefined && (
                       <div className="item-card-percentage">
-                        <span className="item-card-percentage-label">Percentage:</span>
+                        <span className="item-card-percentage-label">{t('pages.items.percentage')}</span>
                         <span className="item-card-percentage-value">{item.percentage}%</span>
                       </div>
                     )}

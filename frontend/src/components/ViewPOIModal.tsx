@@ -1,8 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
 import { POI, Item } from '../types/poi';
 import './ViewPOIModal.css';
 import { formatPrice } from '../utils/format';
+import { getFlavorLabel } from '../utils/formatFlavor';
 import POIService from '../services/poiService';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
@@ -36,6 +38,7 @@ const ViewPOIModal: React.FC<ViewPOIModalProps> = ({
   canEdit = true,
   canDelete = true,
 }) => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { showSuccess, showError } = useToast();
   const closeButtonRef = useRef<HTMLButtonElement>(null);
@@ -155,7 +158,7 @@ const ViewPOIModal: React.FC<ViewPOIModalProps> = ({
             ref={closeButtonRef}
             className="modal-close"
             onClick={onClose}
-            aria-label="Close modal"
+            aria-label={t('common.closeModal')}
             type="button"
           >
             ×
@@ -177,20 +180,20 @@ const ViewPOIModal: React.FC<ViewPOIModalProps> = ({
           <div className="poi-details">
             {poi.description && (
               <div className="poi-detail-item">
-                <h3 className="poi-detail-label">Description</h3>
+                <h3 className="poi-detail-label">{t('components.viewItemDetailsModal.description')}</h3>
                 <p className="poi-detail-value">{poi.description}</p>
               </div>
             )}
             <div className="poi-detail-item">
               <div className="poi-items-header">
-                <h3 className="poi-detail-label">Items</h3>
+                <h3 className="poi-detail-label">{t('components.viewPOIModal.items')}</h3>
                 {user && (
                   <button
                     type="button"
                     onClick={() => setIsAssignModalOpen(true)}
                     className="btn btn-sm btn-primary"
                   >
-                    Assign Item
+                    {t('components.assignItemModal.assignItem')}
                   </button>
                 )}
               </div>
@@ -213,7 +216,7 @@ const ViewPOIModal: React.FC<ViewPOIModalProps> = ({
                           {(poiItem.item.flavor_type || poiItem.item.volumen) && (
                             <span className="poi-item-flavor">
                               {[
-                                poiItem.item.flavor_type && poiItem.item.flavor_type.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join('-'),
+                                poiItem.item.flavor_type && getFlavorLabel(poiItem.item.flavor_type, t),
                                 poiItem.item.volumen,
                               ].filter(Boolean).join(' · ')}
                             </span>
@@ -230,7 +233,7 @@ const ViewPOIModal: React.FC<ViewPOIModalProps> = ({
                       </li>
                     ))
                   ) : (
-                    <li className="poi-item-empty">No items assigned</li>
+                    <li className="poi-item-empty">{t('components.viewPOIModal.noItemsAssigned')}</li>
                   )}
                 </ul>
               </div>
@@ -243,9 +246,9 @@ const ViewPOIModal: React.FC<ViewPOIModalProps> = ({
               type="button"
               onClick={onEdit}
               className="btn btn-secondary"
-              aria-label="Edit POI"
+              aria-label={t('components.viewPOIModal.edit')}
             >
-              Edit
+              {t('components.viewPOIModal.edit')}
             </button>
           )}
           {canDeletePOI && onDelete && (
@@ -253,9 +256,9 @@ const ViewPOIModal: React.FC<ViewPOIModalProps> = ({
               type="button"
               onClick={onDelete}
               className="btn btn-danger"
-              aria-label="Delete POI"
+              aria-label={t('components.viewPOIModal.delete')}
             >
-              Delete
+              {t('components.viewPOIModal.delete')}
             </button>
           )}
         </div>

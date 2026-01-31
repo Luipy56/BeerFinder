@@ -1,11 +1,13 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import ThemeToggle from './ThemeToggle';
 import { APP_VERSION } from '../utils/constants';
 import './UserMenu.css';
 
 const UserMenu: React.FC = () => {
+  const { t } = useTranslation();
   const { user, logout, isAuthenticated } = useAuth();
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -46,9 +48,9 @@ const UserMenu: React.FC = () => {
       <button
         className="btn btn-primary"
         onClick={() => navigate('/auth')}
-        aria-label="Go to login page"
+        aria-label={t('common.goToLogin')}
       >
-        Login
+        {t('pages.auth.login')}
       </button>
     );
   }
@@ -60,7 +62,7 @@ const UserMenu: React.FC = () => {
       <button
         className="user-menu-button"
         onClick={() => setIsOpen(!isOpen)}
-        aria-label="User menu"
+        aria-label={t('common.userMenu')}
         aria-expanded={isOpen}
         aria-haspopup="true"
       >
@@ -74,7 +76,7 @@ const UserMenu: React.FC = () => {
         <div className="user-menu-dropdown" role="menu">
           <div className="user-info">
             <div className="user-info-item">
-              <strong>Username:</strong> {user.username}
+              <strong>{t('components.userMenu.username')}</strong> {user.username}
             </div>
           </div>
           <div className="menu-divider"></div>
@@ -82,51 +84,51 @@ const UserMenu: React.FC = () => {
             className={`menu-item ${isActive('/') ? 'active' : ''}`}
             onClick={() => handleNavClick('/')}
             role="menuitem"
-            aria-label="View map"
+            aria-label={t('common.viewMap')}
           >
-            Map
+            {t('common.navMap')}
           </button>
           <button
             className={`menu-item ${isActive('/profile') ? 'active' : ''}`}
             onClick={() => handleNavClick('/profile')}
             role="menuitem"
-            aria-label="View profile"
+            aria-label={t('common.viewProfile')}
           >
-            Profile
+            {t('common.navProfile')}
           </button>
           <button
             className={`menu-item ${isActive('/item-requests') ? 'active' : ''}`}
             onClick={() => handleNavClick('/item-requests')}
             role="menuitem"
-            aria-label="View my item requests"
+            aria-label={t('common.viewMyItemRequests')}
           >
-            My Item Requests
+            {t('common.navMyItemRequests')}
           </button>
           {user.is_admin && (
             <button
               className={`menu-item ${isActive('/item-requests/all') ? 'active' : ''}`}
               onClick={() => handleNavClick('/item-requests/all')}
               role="menuitem"
-              aria-label="View all item requests"
+              aria-label={t('common.viewAllItemRequests')}
             >
-              All Item Requests
+              {t('common.navAllItemRequests')}
             </button>
           )}
           <button
             className={`menu-item ${isActive('/items') ? 'active' : ''}`}
             onClick={() => handleNavClick('/items')}
             role="menuitem"
-            aria-label="View items"
+            aria-label={t('common.viewItems')}
           >
-            Items
+            {t('common.navItems')}
           </button>
           <button
             className={`menu-item ${isActive('/pois') ? 'active' : ''}`}
             onClick={() => handleNavClick('/pois')}
             role="menuitem"
-            aria-label="View POIs"
+            aria-label={t('common.viewPOIs')}
           >
-            POIs
+            {t('common.navPOIs')}
           </button>
           <div className="menu-divider"></div>
           <div className="menu-item menu-item-theme" role="none">
@@ -134,15 +136,15 @@ const UserMenu: React.FC = () => {
           </div>
           <div className="menu-divider"></div>
           <div className="menu-item menu-item-version" role="none">
-            Version {APP_VERSION}
+            {t('common.version')} {APP_VERSION}
           </div>
           <button
             className="menu-item"
             onClick={handleLogout}
             role="menuitem"
-            aria-label="Logout"
+            aria-label={t('common.logout')}
           >
-            Logout
+            {t('common.logout')}
           </button>
         </div>
       )}

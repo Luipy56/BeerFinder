@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { createPortal } from 'react-dom';
 import './CreatePOIModal.css';
 
@@ -17,6 +18,7 @@ const CreatePOIModal: React.FC<CreatePOIModalProps> = ({
   latitude,
   longitude,
 }) => {
+  const { t } = useTranslation();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [thumbnail, setThumbnail] = useState<string | undefined>(undefined);
@@ -127,11 +129,11 @@ const CreatePOIModal: React.FC<CreatePOIModalProps> = ({
     >
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2 id="create-poi-title" className="modal-title">Create New Point of Interest</h2>
+            <h2 id="create-poi-title" className="modal-title">{t('components.createPOIModal.title')}</h2>
           <button
             className="modal-close"
             onClick={onClose}
-            aria-label="Close modal"
+            aria-label={t('common.closeModal')}
             type="button"
           >
             ×
@@ -141,7 +143,7 @@ const CreatePOIModal: React.FC<CreatePOIModalProps> = ({
           <div className="modal-body">
             <div className="form-group">
               <label htmlFor="name" className="form-label required">
-                Name
+                {t('components.createPOIModal.name')}
               </label>
               <input
                 ref={nameInputRef}
@@ -151,28 +153,28 @@ const CreatePOIModal: React.FC<CreatePOIModalProps> = ({
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
-                placeholder="Enter POI name"
+                placeholder={t('components.createPOIModal.placeholderName')}
                 disabled={isSubmitting}
                 aria-required="true"
               />
             </div>
             <div className="form-group">
               <label htmlFor="description" className="form-label">
-                Description
+                {t('components.createPOIModal.description')}
               </label>
               <textarea
                 id="description"
                 className="form-textarea"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Enter description"
+                placeholder={t('components.createPOIModal.placeholderDescription')}
                 rows={3}
                 disabled={isSubmitting}
               />
             </div>
             <div className="form-group">
               <label htmlFor="poi-thumbnail" className="form-label">
-                Thumbnail
+                {t('components.createPOIModal.thumbnail')}
               </label>
               <input
                 type="file"
@@ -186,7 +188,7 @@ const CreatePOIModal: React.FC<CreatePOIModalProps> = ({
                 <div style={{ marginTop: '8px' }}>
                   <img
                     src={URL.createObjectURL(thumbnailFile)}
-                    alt="Thumbnail preview"
+                    alt={t('common.thumbnailPreview')}
                     style={{ maxWidth: '200px', maxHeight: '200px', objectFit: 'contain' }}
                   />
                 </div>
@@ -204,7 +206,7 @@ const CreatePOIModal: React.FC<CreatePOIModalProps> = ({
               className={`btn btn-primary ${isSubmitting ? 'btn-loading' : ''}`}
               disabled={isSubmitting || !name.trim()}
             >
-              {isSubmitting ? 'Creating...' : 'Create POI'}
+              {isSubmitting ? t('common.creating') : t('components.createPOIModal.submit')}
             </button>
           </div>
         </form>

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import authService from '../services/authService';
@@ -8,7 +9,13 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import './ProfilePage.css';
 
+const SUPPORTED_LANGS = [
+  { code: 'en', labelKey: 'common.english' as const },
+  { code: 'es', labelKey: 'common.spanish' as const },
+] as const;
+
 const ProfilePage: React.FC = () => {
+  const { t, i18n } = useTranslation();
   const { user: contextUser, logout } = useAuth();
   const { showSuccess, showError } = useToast();
   const navigate = useNavigate();
@@ -41,7 +48,7 @@ const ProfilePage: React.FC = () => {
       });
     } catch (error: any) {
       console.error('Error loading profile:', error);
-      showError('Failed to load profile. Please try again.');
+      showError(t('pages.profile.failedToLoad'));
     } finally {
       setIsLoading(false);
     }
@@ -61,7 +68,7 @@ const ProfilePage: React.FC = () => {
     if (formData.email && formData.email.trim()) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(formData.email)) {
-        newErrors.email = 'Please enter a valid email address';
+        newErrors.email = t('pages.profile.validEmail');
       }
     }
 
@@ -72,15 +79,15 @@ const ProfilePage: React.FC = () => {
     );
     if (hasAnyPassword) {
       if (!formData.current_password?.trim()) {
-        newErrors.current_password = 'Current password is required to change password';
+        newErrors.current_password = t('pages.profile.currentPasswordRequired');
       }
       if (!formData.new_password?.trim()) {
-        newErrors.new_password = 'New password is required';
+        newErrors.new_password = t('pages.profile.newPasswordRequired');
       } else if (formData.new_password.length < 8) {
-        newErrors.new_password = 'New password must be at least 8 characters';
+        newErrors.new_password = t('pages.profile.newPasswordMinLength');
       }
       if (formData.new_password !== formData.new_password_confirm) {
-        newErrors.new_password_confirm = "New passwords don't match";
+        newErrors.new_password_confirm = t('pages.profile.passwordsDontMatch');
       }
     }
 
@@ -114,7 +121,7 @@ const ProfilePage: React.FC = () => {
         new_password_confirm: '',
       }));
       setIsEditing(false);
-      showSuccess(hasPasswordChange ? 'Profile and password updated successfully!' : 'Profile updated successfully!');
+      showSuccess(hasPasswordChange ? t('pages.profile.profileAndPasswordUpdated') : t('pages.profile.profileUpdated'));
     } catch (error: any) {
       console.error('Error updating profile:', error);
       if (error.response?.data) {
@@ -130,10 +137,10 @@ const ProfilePage: React.FC = () => {
           });
           setErrors(fieldErrors);
         } else {
-          showError(String(errorData) || 'Failed to update profile. Please try again.');
+          showError(String(errorData) || t('pages.profile.failedToUpdate'));
         }
       } else {
-        showError('Failed to update profile. Please try again.');
+        showError(t('pages.profile.failedToUpdate'));
       }
     } finally {
       setIsSaving(false);
@@ -159,7 +166,7 @@ const ProfilePage: React.FC = () => {
         <div className="profile-page">
           <div className="profile-loading">
             <div className="loading-spinner"></div>
-            <p>Loading profile...</p>
+            <p>{t('pages.profile.loading')}</p>
           </div>
         </div>
       </ProtectedRoute>
@@ -171,9 +178,9 @@ const ProfilePage: React.FC = () => {
       <ProtectedRoute>
         <div className="profile-page">
           <div className="profile-error">
-            <p>Failed to load profile. Please try again.</p>
+            <p>{t('pages.profile.failedToLoad')}</p>
             <button className="btn btn-primary" onClick={loadProfile}>
-              Retry
+              {t('common.cancel')}
             </button>
           </div>
         </div>
@@ -189,15 +196,15 @@ const ProfilePage: React.FC = () => {
           <div className="profile-container">
           <div className="profile-header">
             <div className="profile-header-left">
-              <h1>Profile</h1>
+              <h1>{t('pages.profile.title')}</h1>
             </div>
             {!isEditing && (
               <button
                 className="btn btn-primary"
                 onClick={() => setIsEditing(true)}
-                aria-label="Edit profile"
+                aria-label={t('pages.profile.editProfile')}
               >
-                Edit Profile
+                {t('pages.profile.editProfile')}
               </button>
             )}
           </div>
@@ -207,7 +214,7 @@ const ProfilePage: React.FC = () => {
               <div className="profile-form-content">
                 <div className="form-group">
                   <label htmlFor="username" className="form-label">
-                    Username
+                    {t('components.loginForm.username')}
                   </label>
                   <input
                     type="text"
@@ -217,12 +224,12 @@ const ProfilePage: React.FC = () => {
                     disabled
                     aria-label="Username (read-only)"
                   />
-                  <span className="form-help">Username cannot be changed</span>
+                  <span className="form-help">{t('pages.profile.usernameReadOnly')}</span>
                 </div>
 
                 <div className="form-group">
                   <label htmlFor="email" className="form-label">
-                    Email
+                    {t('pages.profile.email')}
                   </label>
                   <input
                     type="email"
@@ -243,10 +250,10 @@ const ProfilePage: React.FC = () => {
                 </div>
 
                 <div className="profile-form-password-section">
-                  <h3 className="profile-form-password-heading">Change password</h3>
+                  <h3 className="profile-form-password-heading">{t('pages.profile.changePassword')}</h3>
                   <div className="form-group">
                     <label htmlFor="current_password" className="form-label">
-                      Current password
+                      {t('pages.profile.currentPassword')}
                     </label>
                     <input
                       type="password"
@@ -257,7 +264,7 @@ const ProfilePage: React.FC = () => {
                       onChange={handleChange}
                       disabled={isSaving}
                       autoComplete="current-password"
-                      placeholder="Leave blank to keep current password"
+                      placeholder={t('pages.profile.passwordOptional')}
                       aria-invalid={errors.current_password ? 'true' : 'false'}
                     />
                     {errors.current_password && (
@@ -268,7 +275,7 @@ const ProfilePage: React.FC = () => {
                   </div>
                   <div className="form-group">
                     <label htmlFor="new_password" className="form-label">
-                      New password
+                      {t('pages.profile.newPassword')}
                     </label>
                     <input
                       type="password"
@@ -279,7 +286,7 @@ const ProfilePage: React.FC = () => {
                       onChange={handleChange}
                       disabled={isSaving}
                       autoComplete="new-password"
-                      placeholder="At least 8 characters"
+                      placeholder={t('pages.profile.newPasswordPlaceholder')}
                       aria-invalid={errors.new_password ? 'true' : 'false'}
                     />
                     {errors.new_password && (
@@ -290,7 +297,7 @@ const ProfilePage: React.FC = () => {
                   </div>
                   <div className="form-group">
                     <label htmlFor="new_password_confirm" className="form-label">
-                      Confirm new password
+                      {t('pages.profile.confirmNewPassword')}
                     </label>
                     <input
                       type="password"
@@ -319,14 +326,14 @@ const ProfilePage: React.FC = () => {
                   className="btn btn-secondary"
                   disabled={isSaving}
                 >
-                  Cancel
+                  {t('pages.profile.cancelEdit')}
                 </button>
                 <button
                   type="submit"
                   className={`btn btn-primary ${isSaving ? 'btn-loading' : ''}`}
                   disabled={isSaving}
                 >
-                  {isSaving ? 'Saving...' : 'Save Changes'}
+                  {isSaving ? t('common.saving') : t('pages.profile.saveChanges')}
                 </button>
               </div>
             </form>
@@ -334,12 +341,35 @@ const ProfilePage: React.FC = () => {
             <div className="profile-view">
               <div className="profile-info">
                 <div className="profile-info-item">
-                  <span className="profile-info-label">Username</span>
+                  <span className="profile-info-label">{t('components.userMenu.username')}</span>
                   <span className="profile-info-value">{user.username}</span>
                 </div>
                 <div className="profile-info-item">
-                  <span className="profile-info-label">Email</span>
-                  <span className="profile-info-value">{user.email || 'Not provided'}</span>
+                  <span className="profile-info-label">{t('pages.profile.email')}</span>
+                  <span className="profile-info-value">{user.email || t('pages.profile.emailNotProvided')}</span>
+                </div>
+                <div className="profile-info-item profile-info-language">
+                  <span className="profile-info-label">{t('common.language')}</span>
+                  <select
+                    className="profile-language-select"
+                    value={i18n.language?.split('-')[0] ?? 'en'}
+                    onChange={(e) => {
+                      const code = e.target.value as 'en' | 'es';
+                      i18n.changeLanguage(code);
+                      try {
+                        localStorage.setItem('i18nextLng', code);
+                      } catch {
+                        // ignore
+                      }
+                    }}
+                    aria-label={t('common.language')}
+                  >
+                    {SUPPORTED_LANGS.map(({ code, labelKey }) => (
+                      <option key={code} value={code}>
+                        {t(labelKey)}
+                      </option>
+                    ))}
+                  </select>
                 </div>
               </div>
             </div>

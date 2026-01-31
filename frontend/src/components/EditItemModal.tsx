@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Item, FlavorType } from '../types/poi';
 import ItemService from '../services/itemService';
 import { useToast } from '../contexts/ToastContext';
 import { DEFAULT_BEER_LOGO_PATH } from '../utils/constants';
+import { getFlavorLabel } from '../utils/formatFlavor';
 import './EditItemModal.css';
 
 interface EditItemModalProps {
@@ -29,6 +31,7 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
   onItemUpdated,
   onRequestDelete,
 }) => {
+  const { t } = useTranslation();
   const { showSuccess, showError } = useToast();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -135,7 +138,7 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
       if (typicalPrice.trim()) {
         const price = parseFloat(typicalPrice);
         if (isNaN(price) || price < 0) {
-          setError('Typical price must be a valid number >= 0');
+          setError(t('components.editItemModal.priceInvalid'));
           setIsSubmitting(false);
           return;
         }
@@ -147,7 +150,7 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
       if (percentage.trim()) {
         const perc = parseFloat(percentage);
         if (isNaN(perc) || perc < 0 || perc > 100) {
-          setError('Percentage must be a valid number between 0 and 100');
+          setError(t('components.editItemModal.percentageInvalid'));
           setIsSubmitting(false);
           return;
         }
@@ -161,13 +164,13 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
       }
 
       await ItemService.updateItem(item.id, updateData);
-      showSuccess('Item updated successfully!');
+      showSuccess(t('components.editItemModal.itemUpdated'));
       onItemUpdated();
     } catch (err: any) {
       const errorMessage = err.response?.data?.detail || 
                           err.response?.data?.error || 
                           err.message || 
-                          'Failed to update item. Please try again.';
+                          t('components.editItemModal.failedToUpdate');
       setError(errorMessage);
       setIsSubmitting(false);
     }
@@ -196,11 +199,11 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
     >
       <div className="modal" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2 id="edit-item-title" className="modal-title">Edit Item</h2>
+          <h2 id="edit-item-title" className="modal-title">{t('components.editItemModal.title')}</h2>
           <button
             className="modal-close"
             onClick={onClose}
-            aria-label="Close modal"
+            aria-label={t('common.closeModal')}
             type="button"
           >
             ×
@@ -215,7 +218,7 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
             )}
             <div className="form-group">
               <label htmlFor="edit-item-name" className="form-label required">
-                Name
+                {t('components.editItemModal.name')}
               </label>
               <input
                 ref={nameInputRef}
@@ -225,7 +228,7 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
-                placeholder="Enter item name"
+                placeholder={t('components.editItemModal.placeholderName')}
                 disabled={isSubmitting}
                 aria-required="true"
                 aria-invalid={error ? 'true' : 'false'}
@@ -233,21 +236,21 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
             </div>
             <div className="form-group">
               <label htmlFor="edit-item-description" className="form-label">
-                Description
+                {t('components.editItemModal.description')}
               </label>
               <textarea
                 id="edit-item-description"
                 className="form-textarea"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Enter description"
+                placeholder={t('components.editItemModal.placeholderDescription')}
                 rows={3}
                 disabled={isSubmitting}
               />
             </div>
             <div className="form-group">
               <label htmlFor="edit-item-brand" className="form-label">
-                Brand
+                {t('components.editItemModal.brand')}
               </label>
               <input
                 type="text"
@@ -255,13 +258,13 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
                 className="form-input"
                 value={brand}
                 onChange={(e) => setBrand(e.target.value)}
-                placeholder="Enter brand"
+                placeholder={t('components.editItemModal.placeholderBrand')}
                 disabled={isSubmitting}
               />
             </div>
             <div className="form-group">
               <label htmlFor="edit-item-flavor" className="form-label">
-                Flavor Type
+                {t('components.editItemModal.flavor')}
               </label>
               <select
                 id="edit-item-flavor"
@@ -272,14 +275,14 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
               >
                 {FLAVOR_OPTIONS.map((flavor) => (
                   <option key={flavor} value={flavor}>
-                    {flavor.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join('-')}
+                    {getFlavorLabel(flavor, t)}
                   </option>
                 ))}
               </select>
             </div>
             <div className="form-group">
               <label htmlFor="edit-item-price" className="form-label">
-                Typical Price
+                {t('components.editItemModal.typicalPrice')}
               </label>
               <div className="item-request-price-input-wrapper">
                 <span className="item-request-price-currency">$</span>
@@ -289,7 +292,7 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
                   className="form-input item-request-price-input"
                   value={typicalPrice}
                   onChange={(e) => setTypicalPrice(e.target.value)}
-                  placeholder="0.00"
+                  placeholder={t('components.editItemModal.placeholderPrice')}
                   step="0.01"
                   min="0"
                   disabled={isSubmitting}
@@ -298,7 +301,7 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
             </div>
             <div className="form-group">
               <label htmlFor="edit-item-percentage" className="form-label">
-                Percentage
+                {t('components.editItemModal.percentage')}
               </label>
               <div className="item-request-price-input-wrapper">
                 <input
@@ -307,7 +310,7 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
                   className="form-input item-request-price-input"
                   value={percentage}
                   onChange={(e) => setPercentage(e.target.value)}
-                  placeholder="0.0"
+                  placeholder={t('components.editItemModal.placeholderPercentage')}
                   step="0.1"
                   min="0"
                   max="100"
@@ -318,7 +321,7 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
             </div>
             <div className="form-group">
               <label htmlFor="edit-item-volumen" className="form-label">
-                Volumen
+                {t('components.editItemModal.volumen')}
               </label>
               <input
                 type="text"
@@ -326,13 +329,13 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
                 className="form-input"
                 value={volumen}
                 onChange={(e) => setVolumen(e.target.value)}
-                placeholder="e.g. 33cl, 1 L, 500ml"
+                placeholder={t('components.editItemModal.placeholderVolumen')}
                 disabled={isSubmitting}
               />
             </div>
             <div className="form-group">
               <label htmlFor="edit-item-thumbnail" className="form-label">
-                Thumbnail
+                {t('components.editItemModal.thumbnail')}
               </label>
               <input
                 type="file"
@@ -346,16 +349,16 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
                 <div style={{ marginTop: '8px' }}>
                   <img
                     src={URL.createObjectURL(thumbnailFile)}
-                    alt="Thumbnail preview"
+                    alt={t('common.thumbnailPreview')}
                     style={{ maxWidth: '200px', maxHeight: '200px', objectFit: 'contain' }}
                   />
                 </div>
               ) : item?.thumbnail ? (
                 <div style={{ marginTop: '8px' }}>
-                  <span className="form-help">Current thumbnail:</span>
+                  <span className="form-help">{t('components.editItemModal.currentThumbnail')}</span>
                   <img
                     src={`data:image/png;base64,${item.thumbnail}`}
-                    alt="Current thumbnail"
+                    alt={t('common.currentThumbnail')}
                     style={{ maxWidth: '200px', maxHeight: '200px', objectFit: 'contain', marginTop: '4px', display: 'block' }}
                   />
                 </div>
@@ -369,9 +372,9 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
                 onClick={handleRequestDelete}
                 className="btn btn-danger"
                 disabled={isSubmitting}
-                aria-label="Delete item"
+                aria-label={t('components.editItemModal.deleteItem')}
               >
-                Delete
+                {t('common.delete')}
               </button>
             )}
             <div className="modal-footer-actions">
@@ -381,14 +384,14 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
                 className="btn btn-secondary"
                 disabled={isSubmitting}
               >
-                Cancel
+                {t('common.cancel')}
               </button>
               <button
                 type="submit"
                 className={`btn btn-primary ${isSubmitting ? 'btn-loading' : ''}`}
                 disabled={isSubmitting || !name.trim()}
               >
-                {isSubmitting ? 'Saving...' : 'Save Changes'}
+                {isSubmitting ? t('common.saving') : t('common.saveChanges')}
               </button>
             </div>
           </div>

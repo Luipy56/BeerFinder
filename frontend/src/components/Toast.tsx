@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import './Toast.css';
 
 export interface ToastProps {
@@ -9,6 +10,7 @@ export interface ToastProps {
 }
 
 const Toast: React.FC<ToastProps> = ({ message, type, onClose, duration = 5000 }) => {
+  const { t } = useTranslation();
   useEffect(() => {
     const timer = setTimeout(() => {
       onClose();
@@ -29,7 +31,7 @@ const Toast: React.FC<ToastProps> = ({ message, type, onClose, duration = 5000 }
         <button
           className="toast-close"
           onClick={onClose}
-          aria-label="Close notification"
+          aria-label={t('common.closeNotification')}
         >
           ×
         </button>

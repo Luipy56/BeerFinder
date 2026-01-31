@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import LoginForm from '../components/LoginForm';
 import RegisterForm from '../components/RegisterForm';
 import './AuthPage.css';
 
 const AuthPage: React.FC = () => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<'login' | 'register'>('login');
   const navigate = useNavigate();
   const { isAuthenticated } = useAuth();
@@ -26,11 +28,15 @@ const AuthPage: React.FC = () => {
       <div className="auth-container">
         <div className="auth-header">
           <button
-            className="btn-back"
+            type="button"
+            className="auth-back-button"
             onClick={() => navigate('/')}
-            aria-label="Back to map"
+            aria-label={t('common.backToMap')}
+            title={t('pages.auth.backToMap')}
           >
-            ← Back to map
+            <svg className="auth-back-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <path d="M19 12H5M12 19l-7-7 7-7" />
+            </svg>
           </button>
         </div>
         <div className="auth-tabs">
@@ -38,13 +44,13 @@ const AuthPage: React.FC = () => {
             className={`tab-button ${activeTab === 'login' ? 'active' : ''}`}
             onClick={() => setActiveTab('login')}
           >
-            Login
+            {t('pages.auth.login')}
           </button>
           <button
             className={`tab-button ${activeTab === 'register' ? 'active' : ''}`}
             onClick={() => setActiveTab('register')}
           >
-            Register
+            {t('pages.auth.register')}
           </button>
         </div>
         <div className="auth-content">

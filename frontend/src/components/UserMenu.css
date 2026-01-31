@@ -146,6 +146,12 @@
   cursor: default;
 }
 
+.menu-item-theme:hover,
+.menu-item-theme:focus,
+.menu-item-theme:focus-within {
+  background-color: transparent;
+}
+
 .menu-item-theme .theme-toggle-button {
   border-radius: 0;
 }
@@ -158,6 +164,11 @@
 
 .menu-item-version:hover {
   background-color: transparent;
+}
+
+/* Dark theme: lighter blue for link text in dropdown (font only, not buttons) */
+html[data-theme="dark"] .user-menu-dropdown .menu-item.active {
+  color: #4da3ff;
 }
 
 @media (max-width: 767px) {
