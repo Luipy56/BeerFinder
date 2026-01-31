@@ -69,7 +69,6 @@ RUN apt-get update && apt-get install -y \
     gdal-bin \
     libgdal-dev \
     python3-gdal \
-    nginx \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy backend from stage 1
@@ -78,14 +77,5 @@ COPY --from=backend /app/backend /app/backend
 # Copy frontend build from stage 2
 COPY --from=frontend /app/frontend/build /app/frontend/build
 
-# Copy nginx configuration
-COPY deployment/nginx.conf /etc/nginx/sites-available/default
-
 # Expose port
 EXPOSE 80
-
-# Start services
-COPY deployment/entrypoint.sh /entrypoint.sh
-RUN chmod +x /entrypoint.sh
-
-ENTRYPOINT ["/entrypoint.sh"]

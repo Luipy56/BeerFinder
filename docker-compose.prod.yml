@@ -1,6 +1,5 @@
 # Producción (servidor real): backend (gunicorn), frontend (build estático), nginx.
 # Base de datos: EXTERNA. Configurar .env con MARIADB_* (host, user, password, etc.).
-# Puertos: NGINX_PORT (ej. 8080), opcional NGINX_HTTPS_PORT (ej. 8443).
 # Levantar: docker compose -f docker-compose.prod.yml up -d --build
 services:
   backend:
@@ -29,6 +28,8 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
 
   frontend:
     build:
@@ -36,35 +37,12 @@ services:
       dockerfile: Dockerfile
       target: frontend
       args:
-        REACT_APP_API_URL: ${REACT_APP_API_URL:-/api/v1}
-    container_name: beerfinder_frontend_prod
-    entrypoint: ["/bin/sh", "-c"]
-    command: |
-      cp -r /app/frontend/build/* /app/frontend/build_volume/ &&
-      echo "Frontend build copied to shared volume" &&
-      tail -f /dev/null
+        REACT_APP_API_URL: /api/v1
+    container_name: beerfinder_frontend_build
+    command: sh -c "cp -r /app/frontend/build/* /frontend_build/"
     volumes:
-      - frontend_build:/app/frontend/build_volume
-    env_file:
-      - .env
-    restart: unless-stopped
-
-  nginx:
-    image: nginx:alpine
-    container_name: beerfinder_nginx_prod
-    ports:
-      - "${NGINX_PORT:-8080}:80"
-      - "${NGINX_HTTPS_PORT:-8443}:443"
-    volumes:
-      - ./deployment/nginx.conf:/etc/nginx/conf.d/default.conf:ro
-      - static_volume:/app/backend/staticfiles:ro
-      - media_volume:/app/backend/media:ro
-      - frontend_build:/app/frontend/build:ro
-    depends_on:
-      - backend
-      - frontend
-    restart: unless-stopped
-
+      - frontend_build:/frontend_build
+  
 networks:
   default:
     name: beerfinder_prod
