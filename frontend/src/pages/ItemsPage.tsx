@@ -6,6 +6,7 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import ViewItemDetailsModal from '../components/ViewItemDetailsModal';
 import EditItemModal from '../components/EditItemModal';
+import DeleteItemModal from '../components/DeleteItemModal';
 import ItemService from '../services/itemService';
 import { Item, FlavorType } from '../types/poi';
 import { DEFAULT_BEER_LOGO_PATH } from '../utils/constants';
@@ -14,7 +15,7 @@ import './ItemsPage.css';
 
 const ItemsPage: React.FC = () => {
   const { isAuthenticated, user } = useAuth();
-  const { showError } = useToast();
+  const { showSuccess, showError } = useToast();
   const navigate = useNavigate();
   const [items, setItems] = useState<Item[]>([]);
   const [allItems, setAllItems] = useState<Item[]>([]);
@@ -22,6 +23,7 @@ const ItemsPage: React.FC = () => {
   const [selectedItem, setSelectedItem] = useState<Item | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteItemModalOpen, setIsDeleteItemModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>(() => {
     const saved = localStorage.getItem('itemsViewMode');
@@ -108,6 +110,20 @@ const ItemsPage: React.FC = () => {
     setSelectedItem(null);
   };
 
+  const handleOpenDeleteItemModal = () => {
+    setIsEditModalOpen(false);
+    setIsDeleteItemModalOpen(true);
+  };
+
+  const handleDeleteItem = async () => {
+    if (!selectedItem?.id) return;
+    await ItemService.deleteItem(selectedItem.id);
+    setIsDeleteItemModalOpen(false);
+    setSelectedItem(null);
+    loadItems();
+    showSuccess('Item deleted successfully.');
+  };
+
   const getThumbnailUrl = (thumbnail: string | null | undefined): string => {
     if (thumbnail) {
       return `data:image/png;base64,${thumbnail}`;
@@ -125,7 +141,8 @@ const ItemsPage: React.FC = () => {
       <div className="items-page">
         <Header />
         <div className="items-loading">
-          <div className="loading-spinner">Loading items...</div>
+          <div className="loading-spinner" aria-hidden="true"></div>
+          <p className="items-loading-text">Loading items...</p>
         </div>
         <Footer />
       </div>
@@ -258,6 +275,16 @@ const ItemsPage: React.FC = () => {
             }}
             item={selectedItem}
             onItemUpdated={handleItemUpdated}
+            onRequestDelete={user?.is_admin ? handleOpenDeleteItemModal : undefined}
+          />
+          <DeleteItemModal
+            isOpen={isDeleteItemModalOpen}
+            onClose={() => {
+              setIsDeleteItemModalOpen(false);
+              setSelectedItem(null);
+            }}
+            item={selectedItem}
+            onConfirm={handleDeleteItem}
           />
         </>
       )}

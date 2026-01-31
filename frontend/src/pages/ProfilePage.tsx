@@ -18,6 +18,9 @@ const ProfilePage: React.FC = () => {
   const [user, setUser] = useState(contextUser);
   const [formData, setFormData] = useState({
     email: '',
+    current_password: '',
+    new_password: '',
+    new_password_confirm: '',
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
@@ -32,6 +35,9 @@ const ProfilePage: React.FC = () => {
       setUser(userData);
       setFormData({
         email: userData.email || '',
+        current_password: '',
+        new_password: '',
+        new_password_confirm: '',
       });
     } catch (error: any) {
       console.error('Error loading profile:', error);
@@ -59,6 +65,25 @@ const ProfilePage: React.FC = () => {
       }
     }
 
+    const hasAnyPassword = !!(
+      formData.current_password?.trim() ||
+      formData.new_password?.trim() ||
+      formData.new_password_confirm?.trim()
+    );
+    if (hasAnyPassword) {
+      if (!formData.current_password?.trim()) {
+        newErrors.current_password = 'Current password is required to change password';
+      }
+      if (!formData.new_password?.trim()) {
+        newErrors.new_password = 'New password is required';
+      } else if (formData.new_password.length < 8) {
+        newErrors.new_password = 'New password must be at least 8 characters';
+      }
+      if (formData.new_password !== formData.new_password_confirm) {
+        newErrors.new_password_confirm = "New passwords don't match";
+      }
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -68,11 +93,28 @@ const ProfilePage: React.FC = () => {
     if (!validateForm() || isSaving) return;
 
     setIsSaving(true);
+    setErrors({});
     try {
-      const updatedUser = await authService.updateProfile(formData);
+      const updatedUser = await authService.updateProfile({ email: formData.email });
       setUser(updatedUser);
+
+      const hasPasswordChange = !!(
+        formData.current_password?.trim() &&
+        formData.new_password?.trim() &&
+        formData.new_password_confirm?.trim()
+      );
+      if (hasPasswordChange) {
+        await authService.changePassword(formData.current_password, formData.new_password);
+      }
+
+      setFormData((prev) => ({
+        ...prev,
+        current_password: '',
+        new_password: '',
+        new_password_confirm: '',
+      }));
       setIsEditing(false);
-      showSuccess('Profile updated successfully!');
+      showSuccess(hasPasswordChange ? 'Profile and password updated successfully!' : 'Profile updated successfully!');
     } catch (error: any) {
       console.error('Error updating profile:', error);
       if (error.response?.data) {
@@ -83,12 +125,12 @@ const ProfilePage: React.FC = () => {
             if (Array.isArray(messages)) {
               fieldErrors[field] = messages[0];
             } else {
-              fieldErrors[field] = messages;
+              fieldErrors[field] = String(messages);
             }
           });
           setErrors(fieldErrors);
         } else {
-          showError(errorData || 'Failed to update profile. Please try again.');
+          showError(String(errorData) || 'Failed to update profile. Please try again.');
         }
       } else {
         showError('Failed to update profile. Please try again.');
@@ -102,6 +144,9 @@ const ProfilePage: React.FC = () => {
     if (user) {
       setFormData({
         email: user.email || '',
+        current_password: '',
+        new_password: '',
+        new_password_confirm: '',
       });
     }
     setErrors({});
@@ -195,6 +240,75 @@ const ProfilePage: React.FC = () => {
                       {errors.email}
                     </span>
                   )}
+                </div>
+
+                <div className="profile-form-password-section">
+                  <h3 className="profile-form-password-heading">Change password</h3>
+                  <div className="form-group">
+                    <label htmlFor="current_password" className="form-label">
+                      Current password
+                    </label>
+                    <input
+                      type="password"
+                      id="current_password"
+                      name="current_password"
+                      className={`form-input ${errors.current_password ? 'error' : ''}`}
+                      value={formData.current_password}
+                      onChange={handleChange}
+                      disabled={isSaving}
+                      autoComplete="current-password"
+                      placeholder="Leave blank to keep current password"
+                      aria-invalid={errors.current_password ? 'true' : 'false'}
+                    />
+                    {errors.current_password && (
+                      <span className="form-error" role="alert">
+                        {errors.current_password}
+                      </span>
+                    )}
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="new_password" className="form-label">
+                      New password
+                    </label>
+                    <input
+                      type="password"
+                      id="new_password"
+                      name="new_password"
+                      className={`form-input ${errors.new_password ? 'error' : ''}`}
+                      value={formData.new_password}
+                      onChange={handleChange}
+                      disabled={isSaving}
+                      autoComplete="new-password"
+                      placeholder="At least 8 characters"
+                      aria-invalid={errors.new_password ? 'true' : 'false'}
+                    />
+                    {errors.new_password && (
+                      <span className="form-error" role="alert">
+                        {errors.new_password}
+                      </span>
+                    )}
+                  </div>
+                  <div className="form-group">
+                    <label htmlFor="new_password_confirm" className="form-label">
+                      Confirm new password
+                    </label>
+                    <input
+                      type="password"
+                      id="new_password_confirm"
+                      name="new_password_confirm"
+                      className={`form-input ${errors.new_password_confirm ? 'error' : ''}`}
+                      value={formData.new_password_confirm}
+                      onChange={handleChange}
+                      disabled={isSaving}
+                      autoComplete="new-password"
+                      aria-invalid={errors.new_password_confirm ? 'true' : 'false'}
+                    />
+                    {errors.new_password_confirm && (
+                      <span className="form-error" role="alert">
+                        {errors.new_password_confirm}
+                      </span>
+                    )}
+                  </div>
                 </div>
               </div>
 

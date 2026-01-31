@@ -123,6 +123,14 @@ const authService = {
     return response.data;
   },
 
+  changePassword: async (currentPassword: string, newPassword: string): Promise<void> => {
+    await api.post('/auth/profile/change-password/', {
+      current_password: currentPassword,
+      new_password: newPassword,
+      new_password_confirm: newPassword,
+    });
+  },
+
   getAccessToken: (): string | null => {
     try {
       return localStorage.getItem(`access_token:${VERSION}`);

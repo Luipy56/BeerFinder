@@ -41,8 +41,13 @@
   font-size: var(--font-size-base);
   border: 2px solid var(--color-border);
   border-radius: var(--radius-lg);
-  background-color: var(--color-background);
+  background-color: var(--color-block-white);
+  color: var(--color-text);
   transition: all var(--transition-base);
+}
+
+.assign-item-search-input::placeholder {
+  color: var(--color-text-secondary);
 }
 
 .assign-item-search-input:focus {
@@ -222,7 +227,7 @@
 
 /* Item Card */
 .assign-item-card {
-  background: var(--color-background);
+  background: var(--color-block-white);
   border: 2px solid var(--color-border);
   border-radius: var(--radius-lg);
   overflow: hidden;
@@ -242,7 +247,7 @@
 .assign-item-card.selected {
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
-  background: linear-gradient(135deg, rgba(0, 123, 255, 0.05) 0%, var(--color-background) 100%);
+  background: linear-gradient(135deg, rgba(0, 123, 255, 0.08) 0%, var(--color-block-white) 100%);
 }
 
 .assign-item-card-thumbnail {

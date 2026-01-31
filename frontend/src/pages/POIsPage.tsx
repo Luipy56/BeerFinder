@@ -6,6 +6,7 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import ViewPOIDetailsModal from '../components/ViewPOIDetailsModal';
 import EditPOIModal from '../components/EditPOIModal';
+import DeletePOIModal from '../components/DeletePOIModal';
 import POIService from '../services/poiService';
 import { POI } from '../types/poi';
 import { DEFAULT_BEER_LOGO_PATH } from '../utils/constants';
@@ -21,6 +22,7 @@ const POIsPage: React.FC = () => {
   const [selectedPOI, setSelectedPOI] = useState<POI | null>(null);
   const [isViewModalOpen, setIsViewModalOpen] = useState(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [viewMode, setViewMode] = useState<'grid' | 'list'>(() => {
     const saved = localStorage.getItem('poisViewMode');
@@ -79,6 +81,26 @@ const POIsPage: React.FC = () => {
     }
   };
 
+  const handleOpenDeleteModal = () => {
+    setIsEditModalOpen(false);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleDeletePOI = async () => {
+    if (!selectedPOI?.id) return;
+    try {
+      await POIService.deletePOI(selectedPOI.id);
+      setIsDeleteModalOpen(false);
+      setSelectedPOI(null);
+      loadPOIs();
+      showSuccess('POI deleted successfully.');
+    } catch (error: any) {
+      console.error('Error deleting POI:', error);
+      showError(error.response?.data?.detail || error.message || 'Failed to delete POI. Please try again.');
+      throw error;
+    }
+  };
+
   const handlePOIUpdated = async (name: string, description: string, thumbnail?: string) => {
     if (!selectedPOI || !selectedPOI.id) {
       showError('Invalid POI: missing ID');
@@ -125,7 +147,8 @@ const POIsPage: React.FC = () => {
       <div className="pois-page">
         <Header />
         <div className="pois-loading">
-          <div className="loading-spinner">Loading POIs...</div>
+          <div className="loading-spinner" aria-hidden="true"></div>
+          <p className="pois-loading-text">Loading POIs...</p>
         </div>
         <Footer />
       </div>
@@ -247,6 +270,16 @@ const POIsPage: React.FC = () => {
             }}
             poi={selectedPOI}
             onSubmit={handlePOIUpdated}
+            onRequestDelete={user?.is_admin ? handleOpenDeleteModal : undefined}
+          />
+          <DeletePOIModal
+            isOpen={isDeleteModalOpen}
+            onClose={() => {
+              setIsDeleteModalOpen(false);
+              setSelectedPOI(null);
+            }}
+            poi={selectedPOI}
+            onConfirm={handleDeletePOI}
           />
         </>
       )}

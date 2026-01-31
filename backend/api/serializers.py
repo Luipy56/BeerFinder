@@ -3,6 +3,7 @@ from rest_framework_gis.serializers import GeoFeatureModelSerializer
 from django.contrib.auth.models import User
 from django.contrib.auth.password_validation import validate_password
 from .models import POI, Item, ItemRequest, POIItem
+from .utils import compress_thumbnail
 import base64
 
 
@@ -26,35 +27,28 @@ class ItemSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         """Create Item and handle thumbnail conversion"""
-        # Extract thumbnail_write from validated_data
         thumbnail_data = validated_data.pop('thumbnail_write', None)
         
-        # Convert base64 to binary if provided
         if thumbnail_data:
             try:
-                # Decode base64 string to binary
-                validated_data['thumbnail'] = base64.b64decode(thumbnail_data)
-            except Exception as e:
-                # If decoding fails, set to None
+                raw = base64.b64decode(thumbnail_data)
+                validated_data['thumbnail'] = compress_thumbnail(raw)
+            except Exception:
                 validated_data['thumbnail'] = None
         else:
-            # If no thumbnail_write provided, ensure thumbnail is not set
             validated_data.pop('thumbnail', None)
         
         return super().create(validated_data)
     
     def update(self, instance, validated_data):
         """Update Item and handle thumbnail conversion"""
-        # Extract thumbnail_write from validated_data
         thumbnail_data = validated_data.pop('thumbnail_write', None)
         
-        # Convert base64 to binary if provided
         if thumbnail_data:
             try:
-                # Decode base64 string to binary
-                validated_data['thumbnail'] = base64.b64decode(thumbnail_data)
-            except Exception as e:
-                # If decoding fails, set to None
+                raw = base64.b64decode(thumbnail_data)
+                validated_data['thumbnail'] = compress_thumbnail(raw)
+            except Exception:
                 validated_data['thumbnail'] = None
         
         return super().update(instance, validated_data)
@@ -95,35 +89,28 @@ class POISerializer(GeoFeatureModelSerializer):
     
     def create(self, validated_data):
         """Create POI and handle thumbnail conversion"""
-        # Extract thumbnail_write from validated_data
         thumbnail_data = validated_data.pop('thumbnail_write', None)
         
-        # Convert base64 to binary if provided
         if thumbnail_data:
             try:
-                # Decode base64 string to binary
-                validated_data['thumbnail'] = base64.b64decode(thumbnail_data)
-            except Exception as e:
-                # If decoding fails, set to None
+                raw = base64.b64decode(thumbnail_data)
+                validated_data['thumbnail'] = compress_thumbnail(raw)
+            except Exception:
                 validated_data['thumbnail'] = None
         else:
-            # If no thumbnail_write provided, ensure thumbnail is not set
             validated_data.pop('thumbnail', None)
         
         return super().create(validated_data)
     
     def update(self, instance, validated_data):
         """Update POI and handle thumbnail conversion"""
-        # Extract thumbnail_write from validated_data
         thumbnail_data = validated_data.pop('thumbnail_write', None)
         
-        # Convert base64 to binary if provided
         if thumbnail_data:
             try:
-                # Decode base64 string to binary
-                validated_data['thumbnail'] = base64.b64decode(thumbnail_data)
-            except Exception as e:
-                # If decoding fails, set to None
+                raw = base64.b64decode(thumbnail_data)
+                validated_data['thumbnail'] = compress_thumbnail(raw)
+            except Exception:
                 validated_data['thumbnail'] = None
         
         return super().update(instance, validated_data)
@@ -208,33 +195,28 @@ class ItemRequestSerializer(serializers.ModelSerializer):
     
     def create(self, validated_data):
         """Create ItemRequest and handle thumbnail conversion"""
-        # Extract thumbnail_write from validated_data
         thumbnail_data = validated_data.pop('thumbnail_write', None)
         
-        # Convert base64 to binary if provided
         if thumbnail_data:
             try:
-                # Decode base64 string to binary
-                validated_data['thumbnail'] = base64.b64decode(thumbnail_data)
-            except Exception as e:
-                # If decoding fails, set to None
+                raw = base64.b64decode(thumbnail_data)
+                validated_data['thumbnail'] = compress_thumbnail(raw)
+            except Exception:
                 validated_data['thumbnail'] = None
         else:
-            # If no thumbnail_write provided, ensure thumbnail is not set
             validated_data.pop('thumbnail', None)
         
         return super().create(validated_data)
     
     def update(self, instance, validated_data):
         """Update ItemRequest and handle thumbnail conversion"""
-        # Extract thumbnail_write from validated_data
         thumbnail_data = validated_data.pop('thumbnail_write', None)
         
-        # Convert base64 to binary if provided
         if thumbnail_data:
             try:
-                validated_data['thumbnail'] = base64.b64decode(thumbnail_data)
-            except Exception as e:
+                raw = base64.b64decode(thumbnail_data)
+                validated_data['thumbnail'] = compress_thumbnail(raw)
+            except Exception:
                 validated_data['thumbnail'] = None
         
         return super().update(instance, validated_data)

@@ -2,7 +2,7 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenRefreshView
 from .views import POIViewSet, ItemViewSet, ItemRequestViewSet
-from .auth_views import LoginView, RegisterView, UserProfileView
+from .auth_views import LoginView, RegisterView, UserProfileView, ChangePasswordView
 
 router = DefaultRouter()
 router.register(r'pois', POIViewSet, basename='poi')
@@ -14,5 +14,6 @@ urlpatterns = [
     path('auth/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('auth/register/', RegisterView.as_view(), name='register'),
     path('auth/profile/', UserProfileView.as_view(), name='user_profile'),
+    path('auth/profile/change-password/', ChangePasswordView.as_view(), name='change_password'),
     path('', include(router.urls)),
 ]

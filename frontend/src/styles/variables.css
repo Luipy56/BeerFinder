@@ -8,6 +8,7 @@
   --color-info: #17a2b8;
   --color-background: #ffffff;
   --color-surface: #f8f9fa;
+  --color-surface-hover: #e9ecef;
   --color-text: #212529;
   --color-text-secondary: #6c757d;
   --color-border: #dee2e6;
@@ -58,4 +59,55 @@
   --radius-lg: 0.5rem;
   --radius-xl: 0.75rem;
   --radius-full: 9999px;
+}
+
+/* Dark theme (per CSSRULES.txt: 3 block levels, darkest to lightest) */
+html[data-theme="dark"] {
+  /* Keep primary/danger same as light so blue and red buttons stay same color */
+  --color-secondary: #868e96;
+  --color-success: #51cf66;
+  --color-warning: #ffd43b;
+  --color-info: #339af0;
+  /* Keep --color-background light so button text stays readable on primary/danger */
+  --color-surface: #2d2d2d;
+  --color-surface-hover: #3d3d3d;
+  --color-text: #e8e8e8;
+  --color-text-secondary: #a0a0a0;
+  --color-border: #4a4a4a;
+
+  --color-block-background: #1a1a1a;
+  --color-block-above: #2d2d2d;
+  --color-block-white: #3d3d3d;
+
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.2);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+
+  /* Scrollbar dark styling */
+  scrollbar-color: #4a4a4a #2d2d2d;
+}
+
+html[data-theme="dark"] ::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+html[data-theme="dark"] ::-webkit-scrollbar-track {
+  background: var(--color-block-above);
+}
+
+html[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 6px;
+}
+
+html[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: var(--color-text-secondary);
+}
+
+/* Body uses design system background so theme applies to full page */
+body {
+  background-color: var(--color-block-background);
+  color: var(--color-text);
 }

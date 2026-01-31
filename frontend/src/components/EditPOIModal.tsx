@@ -8,6 +8,8 @@ interface EditPOIModalProps {
   onClose: () => void;
   poi: POI | null;
   onSubmit: (name: string, description: string, thumbnail?: string) => Promise<void>;
+  /** When provided, the Delete button closes this modal and asks the parent to open the delete confirmation modal */
+  onRequestDelete?: () => void;
 }
 
 const EditPOIModal: React.FC<EditPOIModalProps> = ({
@@ -15,6 +17,7 @@ const EditPOIModal: React.FC<EditPOIModalProps> = ({
   onClose,
   poi,
   onSubmit,
+  onRequestDelete,
 }) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
@@ -48,6 +51,12 @@ const EditPOIModal: React.FC<EditPOIModalProps> = ({
       setThumbnailFile(null);
     }
   }, [isOpen]);
+
+  const handleRequestDelete = () => {
+    if (!poi || isSubmitting) return;
+    onRequestDelete?.();
+    /* Do not call onClose() here: parent will close this modal and open the delete confirmation modal; calling onClose() would clear selectedPOI and the confirmation modal would receive poi=null */
+  };
 
   // Disable body scroll and reduce header z-index when modal is open
   useEffect(() => {
@@ -226,21 +235,34 @@ const EditPOIModal: React.FC<EditPOIModalProps> = ({
             </div>
           </div>
           <div className="modal-footer">
-            <button
-              type="button"
-              onClick={onClose}
-              className="btn btn-secondary"
-              disabled={isSubmitting}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className={`btn btn-primary ${isSubmitting ? 'btn-loading' : ''}`}
-              disabled={isSubmitting || !name.trim()}
-            >
-              {isSubmitting ? 'Saving...' : 'Save Changes'}
-            </button>
+            {onRequestDelete && (
+              <button
+                type="button"
+                onClick={handleRequestDelete}
+                className="btn btn-danger"
+                disabled={isSubmitting}
+                aria-label="Delete POI"
+              >
+                Delete
+              </button>
+            )}
+            <div className="modal-footer-actions">
+              <button
+                type="button"
+                onClick={onClose}
+                className="btn btn-secondary"
+                disabled={isSubmitting}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className={`btn btn-primary ${isSubmitting ? 'btn-loading' : ''}`}
+                disabled={isSubmitting || !name.trim()}
+              >
+                {isSubmitting ? 'Saving...' : 'Save Changes'}
+              </button>
+            </div>
           </div>
         </form>
       </div>

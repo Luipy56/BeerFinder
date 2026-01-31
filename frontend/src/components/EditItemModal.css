@@ -1,2 +1,48 @@
 /* EditItemModal uses the design system modal styles from styles/modals.css */
-/* Additional specific styles if needed */
+
+.modal-footer .modal-footer-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-left: auto;
+}
+
+/* Price/percentage input wrapper (theme-aware; also used when modal opened from /items) */
+.item-request-price-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.item-request-price-input-wrapper .item-request-price-currency {
+  position: absolute;
+  left: var(--spacing-md);
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--color-text-secondary);
+  z-index: 1;
+}
+
+.item-request-price-input-wrapper .item-request-price-currency:last-child {
+  left: auto;
+  right: var(--spacing-md);
+}
+
+.item-request-price-input-wrapper .item-request-price-input,
+.item-request-price-input-wrapper .form-input.item-request-price-input {
+  font-size: var(--font-size-base);
+  background-color: var(--color-block-white);
+  color: var(--color-text);
+  border: 1px solid var(--color-border);
+}
+
+/* Price: currency $ on the left */
+.item-request-price-input-wrapper .item-request-price-currency:first-child + input,
+.item-request-price-input-wrapper input:first-child:not(:has(+ .item-request-price-currency)) {
+  padding-left: calc(var(--spacing-md) + 1.5rem);
+}
+
+/* Percentage: currency % on the right */
+.item-request-price-input-wrapper input:has(+ .item-request-price-currency) {
+  padding-left: var(--spacing-md);
+  padding-right: calc(var(--spacing-md) + 1.5rem);
+}

@@ -1,5 +1,10 @@
 /* EditPOIModal uses the design system modal styles from styles/modals.css */
-/* Additional specific styles if needed */
+
+.modal-footer .modal-footer-actions {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-left: auto;
+}
 
 .form-error-message {
   padding: var(--spacing-sm) var(--spacing-md);

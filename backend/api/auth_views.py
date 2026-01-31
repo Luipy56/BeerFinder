@@ -4,6 +4,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import authenticate
+from django.contrib.auth.password_validation import validate_password
+from django.core.exceptions import ValidationError as DjangoValidationError
 from .serializers import UserRegistrationSerializer, UserSerializer
 
 
@@ -62,3 +64,33 @@ class UserProfileView(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ChangePasswordView(APIView):
+    """Optional password change for authenticated user. POST with current_password, new_password, new_password_confirm."""
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        current = (request.data.get('current_password') or '').strip()
+        new = (request.data.get('new_password') or '').strip()
+        confirm = (request.data.get('new_password_confirm') or '').strip()
+
+        if not current:
+            return Response({'current_password': ['This field is required.']}, status=status.HTTP_400_BAD_REQUEST)
+        if not new:
+            return Response({'new_password': ['This field is required.']}, status=status.HTTP_400_BAD_REQUEST)
+        if new != confirm:
+            return Response({'new_password_confirm': ["The two password fields didn't match."]}, status=status.HTTP_400_BAD_REQUEST)
+
+        user = authenticate(request, username=request.user.username, password=current)
+        if user is None:
+            return Response({'current_password': ['Current password is incorrect.']}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            validate_password(new, user)
+        except DjangoValidationError as e:
+            return Response({'new_password': list(e.messages)}, status=status.HTTP_400_BAD_REQUEST)
+
+        user.set_password(new)
+        user.save()
+        return Response({'detail': 'Password updated successfully.'}, status=status.HTTP_200_OK)

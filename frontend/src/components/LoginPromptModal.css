@@ -1,0 +1,8 @@
+/* LoginPromptModal uses the design system modal styles from styles/modals.css */
+
+.login-prompt-description {
+  margin: 0;
+  font-size: var(--font-size-base);
+  line-height: 1.5;
+  color: var(--color-text);
+}

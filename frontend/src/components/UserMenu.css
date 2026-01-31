@@ -141,6 +141,15 @@
   color: var(--color-primary);
 }
 
+.menu-item-theme {
+  padding: 0;
+  cursor: default;
+}
+
+.menu-item-theme .theme-toggle-button {
+  border-radius: 0;
+}
+
 .menu-item-version {
   cursor: default;
   color: var(--color-text-muted, #6b7280);

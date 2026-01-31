@@ -2,17 +2,24 @@
   flex: 1;
   width: 100%;
   position: relative;
-  background-color: var(--color-surface);
+  background-color: var(--color-block-above);
   /* Removed z-index to prevent stacking context issues with modals */
 }
 
+/* Map pane background in dark mode so it's not white while tiles load */
+html[data-theme="dark"] .map-container .leaflet-container {
+  background: var(--color-block-above);
+}
+
 .map-loading {
+  flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100%;
+  min-height: 300px;
   gap: var(--spacing-md);
+  background-color: var(--color-block-background);
   color: var(--color-text-secondary);
   font-size: var(--font-size-lg);
 }
@@ -33,16 +40,20 @@
   }
 }
 
-/* Leaflet Popup Styling */
+/* Leaflet Popup Styling - use theme vars so dark mode applies */
 .leaflet-popup-content-wrapper {
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-lg);
   font-family: var(--font-family);
+  background: var(--color-block-white);
+  color: var(--color-text);
 }
 
 .leaflet-popup-content {
   margin: var(--spacing-md);
   min-width: 200px;
+  background: transparent;
+  color: inherit;
 }
 
 .leaflet-popup-content h3 {
@@ -64,7 +75,7 @@
 }
 
 .leaflet-popup-tip {
-  background: var(--color-background);
+  background: var(--color-block-white);
   box-shadow: var(--shadow-md);
 }
 

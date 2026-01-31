@@ -57,7 +57,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - ALLOWED_HOSTS set to '*' in development (should be restricted in production)
 - CORS_ALLOW_ALL_ORIGINS enabled in development (should be restricted in production)
 
-## [0.1.0] - 2026-Jan-18
+## [26-0.1.0] - 2026-Jan-18
 
 ### Added
 - Initial release

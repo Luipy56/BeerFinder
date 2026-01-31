@@ -10,6 +10,8 @@ interface EditItemModalProps {
   onClose: () => void;
   item: Item | null;
   onItemUpdated: () => void;
+  /** When provided, the Delete button closes this modal and asks the parent to open the delete confirmation modal */
+  onRequestDelete?: () => void;
 }
 
 const FLAVOR_OPTIONS: FlavorType[] = [
@@ -25,6 +27,7 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
   onClose,
   item,
   onItemUpdated,
+  onRequestDelete,
 }) => {
   const { showSuccess, showError } = useToast();
   const [name, setName] = useState('');
@@ -176,6 +179,11 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
     }
   };
 
+  const handleRequestDelete = () => {
+    if (!item || isSubmitting) return;
+    onRequestDelete?.();
+  };
+
   if (!isOpen || !item) return null;
 
   return (
@@ -278,7 +286,7 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
                 <input
                   type="number"
                   id="edit-item-price"
-                  className="item-request-price-input"
+                  className="form-input item-request-price-input"
                   value={typicalPrice}
                   onChange={(e) => setTypicalPrice(e.target.value)}
                   placeholder="0.00"
@@ -296,7 +304,7 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
                 <input
                   type="number"
                   id="edit-item-percentage"
-                  className="item-request-price-input"
+                  className="form-input item-request-price-input"
                   value={percentage}
                   onChange={(e) => setPercentage(e.target.value)}
                   placeholder="0.0"
@@ -355,21 +363,34 @@ const EditItemModal: React.FC<EditItemModalProps> = ({
             </div>
           </div>
           <div className="modal-footer">
-            <button
-              type="button"
-              onClick={onClose}
-              className="btn btn-secondary"
-              disabled={isSubmitting}
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              className={`btn btn-primary ${isSubmitting ? 'btn-loading' : ''}`}
-              disabled={isSubmitting || !name.trim()}
-            >
-              {isSubmitting ? 'Saving...' : 'Save Changes'}
-            </button>
+            {onRequestDelete && (
+              <button
+                type="button"
+                onClick={handleRequestDelete}
+                className="btn btn-danger"
+                disabled={isSubmitting}
+                aria-label="Delete item"
+              >
+                Delete
+              </button>
+            )}
+            <div className="modal-footer-actions">
+              <button
+                type="button"
+                onClick={onClose}
+                className="btn btn-secondary"
+                disabled={isSubmitting}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className={`btn btn-primary ${isSubmitting ? 'btn-loading' : ''}`}
+                disabled={isSubmitting || !name.trim()}
+              >
+                {isSubmitting ? 'Saving...' : 'Save Changes'}
+              </button>
+            </div>
           </div>
         </form>
       </div>

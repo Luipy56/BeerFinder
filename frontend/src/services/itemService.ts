@@ -36,6 +36,10 @@ const ItemService = {
     const response = await api.patch<Item>(`/items/${id}/`, requestPayload);
     return response.data;
   },
+
+  deleteItem: async (id: number): Promise<void> => {
+    await api.delete(`/items/${id}/`);
+  },
 };
 
 export default ItemService;

@@ -9,6 +9,7 @@ import CreatePOIModal from './CreatePOIModal';
 import ViewPOIModal from './ViewPOIModal';
 import EditPOIModal from './EditPOIModal';
 import DeletePOIModal from './DeletePOIModal';
+import LoginPromptModal from './LoginPromptModal';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 
@@ -55,6 +56,7 @@ const MapComponent: React.FC = () => {
   const [isViewModalOpen, setIsViewModalOpen] = useState<boolean>(false);
   const [isEditModalOpen, setIsEditModalOpen] = useState<boolean>(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState<boolean>(false);
+  const [isLoginPromptModalOpen, setIsLoginPromptModalOpen] = useState<boolean>(false);
   const [clickedLocation, setClickedLocation] = useState<{ lat: number; lng: number } | null>(null);
   const [selectedPOI, setSelectedPOI] = useState<POI | null>(null);
   const [mapState, setMapState] = useState<{ center: [number, number]; zoom: number }>(() => ({
@@ -131,9 +133,7 @@ const MapComponent: React.FC = () => {
       return;
     }
     if (!isAuthenticated) {
-      if (window.confirm('You need to be logged in to create a POI. Would you like to login?')) {
-        navigate('/auth');
-      }
+      setIsLoginPromptModalOpen(true);
       return;
     }
     setMapState((prev) => ({ ...prev, center: [lat, lng] }));
@@ -357,6 +357,10 @@ const MapComponent: React.FC = () => {
           />
         </>
       )}
+      <LoginPromptModal
+        isOpen={isLoginPromptModalOpen}
+        onClose={() => setIsLoginPromptModalOpen(false)}
+      />
     </div>
   );
 };

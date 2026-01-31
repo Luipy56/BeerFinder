@@ -97,6 +97,19 @@
   padding: var(--spacing-lg);
 }
 
+.profile-form-password-section {
+  margin-top: var(--spacing-xl);
+  padding-top: var(--spacing-lg);
+  border-top: 1px solid var(--color-border);
+}
+
+.profile-form-password-heading {
+  margin: 0 0 var(--spacing-md) 0;
+  font-size: var(--font-size-lg);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
 .profile-form-actions {
   display: flex;
   justify-content: flex-end;

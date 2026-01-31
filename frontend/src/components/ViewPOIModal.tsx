@@ -253,9 +253,9 @@ const ViewPOIModal: React.FC<ViewPOIModalProps> = ({
               type="button"
               onClick={onDelete}
               className="btn btn-danger"
-              aria-label="Disable POI"
+              aria-label="Delete POI"
             >
-              Disable
+              Delete
             </button>
           )}
         </div>
