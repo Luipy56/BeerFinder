@@ -270,7 +270,10 @@
       "noItems": "No items",
       "noItemsAssigned": "No items assigned",
       "edit": "Edit",
-      "delete": "Delete"
+      "delete": "Delete",
+      "share": "Share",
+      "linkCopied": "Link copied to clipboard",
+      "shareFailed": "Failed to copy link"
     },
     "viewPOIDetailsModal": {
       "items": "Items",
@@ -278,7 +281,9 @@
       "noItemsAssigned": "No items assigned to this POI",
       "edit": "Edit",
       "delete": "Delete",
-      "location": "Location"
+      "location": "Location",
+      "linkCopied": "Link copied to clipboard",
+      "shareFailed": "Failed to copy link"
     },
     "assignItemModal": {
       "title": "Assign Item to POI",

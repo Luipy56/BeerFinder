@@ -129,6 +129,17 @@ const ViewPOIModal: React.FC<ViewPOIModalProps> = ({
     }
   };
 
+  const handleShare = async () => {
+    if (!poi?.id) return;
+    const url = `${window.location.origin}${window.location.pathname}#poi-${poi.id}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      showSuccess(t('components.viewPOIModal.linkCopied') || 'Link copied to clipboard');
+    } catch {
+      showError(t('components.viewPOIModal.shareFailed') || 'Failed to copy link');
+    }
+  };
+
   if (!isOpen || !poi) return null;
 
   const getThumbnailUrl = (thumbnail: string | null | undefined): string => {
@@ -241,6 +252,14 @@ const ViewPOIModal: React.FC<ViewPOIModalProps> = ({
           </div>
         </div>
         <div className="modal-footer">
+          <button
+            type="button"
+            onClick={handleShare}
+            className="btn btn-secondary"
+            aria-label={t('components.viewPOIModal.share')}
+          >
+            {t('components.viewPOIModal.share') || 'Share'}
+          </button>
           {canEditPOI && onEdit && (
             <button
               type="button"

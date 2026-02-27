@@ -32,7 +32,7 @@ const ViewPOIDetailsModal: React.FC<ViewPOIDetailsModalProps> = ({
 }) => {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const { showError } = useToast();
+  const { showError, showSuccess } = useToast();
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const [poiItems, setPoiItems] = useState<POIItem[]>([]);
   const [loadingItems, setLoadingItems] = useState(false);
@@ -96,6 +96,17 @@ const ViewPOIDetailsModal: React.FC<ViewPOIDetailsModalProps> = ({
     }
   };
 
+  const handleShare = async () => {
+    if (!poi?.id) return;
+    const url = `${window.location.origin}${window.location.pathname}#poi-${poi.id}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      showSuccess(t('components.viewPOIDetailsModal.linkCopied') || 'Link copied to clipboard');
+    } catch {
+      showError(t('components.viewPOIDetailsModal.shareFailed') || 'Failed to copy link');
+    }
+  };
+
   if (!isOpen || !poi) return null;
 
   const getThumbnailUrl = (thumbnail: string | null | undefined): string => {
@@ -117,6 +128,15 @@ const ViewPOIDetailsModal: React.FC<ViewPOIDetailsModalProps> = ({
         <div className="modal-header">
           <h2 id="view-poi-title" className="modal-title">{poi.name}</h2>
           <div className="modal-header-actions">
+            <button
+              className="modal-share-button"
+              onClick={handleShare}
+              aria-label="Share POI link"
+              type="button"
+              title="Copy link"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+            </button>
             {user?.is_admin && onEdit && (
               <button
                 className="modal-edit-button"

@@ -166,6 +166,28 @@
   outline-offset: 2px;
 }
 
+.modal-share-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: var(--spacing-xs);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  color: var(--color-text-secondary);
+}
+
+.modal-share-button:hover {
+  background-color: var(--color-block-background);
+  color: var(--color-text);
+}
+
+.modal-share-button:focus {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+}
+
 /* Modal Body */
 .modal-body {
   padding: var(--spacing-lg);

@@ -270,7 +270,10 @@
       "noItems": "Sin items",
       "noItemsAssigned": "Sin items asignados",
       "edit": "Editar",
-      "delete": "Eliminar"
+      "delete": "Eliminar",
+      "share": "Compartir",
+      "linkCopied": "Enlace copiado al portapapeles",
+      "shareFailed": "Error al copiar el enlace"
     },
     "viewPOIDetailsModal": {
       "items": "Items",
@@ -278,7 +281,9 @@
       "noItemsAssigned": "No hay items asignados a este POI",
       "edit": "Editar",
       "delete": "Eliminar",
-      "location": "Ubicación"
+      "location": "Ubicación",
+      "linkCopied": "Enlace copiado al portapapeles",
+      "shareFailed": "Error al copiar el enlace"
     },
     "assignItemModal": {
       "title": "Asignar item al POI",
