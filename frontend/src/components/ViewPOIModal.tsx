@@ -9,6 +9,7 @@ import POIService from '../services/poiService';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
 import { DEFAULT_BEER_LOGO_PATH } from '../utils/constants';
+import { haversineDistanceKm, formatDistanceFromKm } from '../utils/geoUtils';
 import AssignItemModal from './AssignItemModal';
 
 interface POIItem {
@@ -40,10 +41,11 @@ const ViewPOIModal: React.FC<ViewPOIModalProps> = ({
 }) => {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const { showSuccess, showError } = useToast();
+  const { showSuccess, showError, showInfo } = useToast();
   const closeButtonRef = useRef<HTMLButtonElement>(null);
   const [poiItems, setPoiItems] = useState<POIItem[]>([]);
   const [isAssignModalOpen, setIsAssignModalOpen] = useState(false);
+  const [distanceKm, setDistanceKm] = useState<number | null>(null);
 
   useEffect(() => {
     if (isOpen && closeButtonRef.current) {
@@ -53,6 +55,37 @@ const ViewPOIModal: React.FC<ViewPOIModalProps> = ({
       loadPOIItems();
     }
   }, [isOpen, poi]);
+
+  useEffect(() => {
+    if (!isOpen || !poi?.latitude || !poi?.longitude) {
+      setDistanceKm(null);
+      return;
+    }
+    if (!navigator.geolocation) {
+      setDistanceKm(null);
+      return;
+    }
+    let cancelled = false;
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        if (cancelled) return;
+        const km = haversineDistanceKm(
+          pos.coords.latitude,
+          pos.coords.longitude,
+          poi.latitude!,
+          poi.longitude!
+        );
+        setDistanceKm(km);
+      },
+      () => {
+        if (!cancelled) setDistanceKm(null);
+      },
+      { maximumAge: 120_000, timeout: 12_000 }
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, [isOpen, poi?.id, poi?.latitude, poi?.longitude]);
 
   // Close leaflet popup when modal closes
   useEffect(() => {
@@ -111,7 +144,7 @@ const ViewPOIModal: React.FC<ViewPOIModalProps> = ({
     }
     try {
       const items = await POIService.getPOIItems(poi.id);
-      setPoiItems(items);
+      setPoiItems(Array.isArray(items) ? items : []);
     } catch (error: any) {
       console.error('Error loading POI items:', error);
       const errorMessage = error.response?.data?.detail || error.response?.data?.error || 'Failed to load POI items';
@@ -130,6 +163,42 @@ const ViewPOIModal: React.FC<ViewPOIModalProps> = ({
   };
 
   if (!isOpen || !poi) return null;
+
+  const buildPoiMapShareUrl = (poiId: number): string => {
+    const originAndPath = `${window.location.origin}${process.env.PUBLIC_URL || ''}`.replace(/\/$/, '');
+    const base = `${originAndPath}/`;
+    return new URL(`?poi=${poiId}`, base).href;
+  };
+
+  const handleCopyMapLink = async () => {
+    if (!poi?.id) return;
+    const url = buildPoiMapShareUrl(poi.id);
+    try {
+      await navigator.clipboard.writeText(url);
+      showSuccess(t('components.viewPOIModal.mapLinkCopied'));
+    } catch {
+      showError(t('common.error'));
+    }
+  };
+
+  const handleShare = async () => {
+    if (!poi?.id) return;
+    const url = buildPoiMapShareUrl(poi.id);
+    const title = poi.name;
+    const text = (poi.description && poi.description.slice(0, 240)) || title;
+    if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
+      try {
+        await navigator.share({ title, text, url });
+      } catch (err: unknown) {
+        const name = err && typeof err === 'object' && 'name' in err ? (err as { name?: string }).name : '';
+        if (name === 'AbortError') return;
+        await handleCopyMapLink();
+      }
+    } else {
+      await handleCopyMapLink();
+      showInfo(t('components.viewPOIModal.shareFallbackCopy'));
+    }
+  };
 
   const getThumbnailUrl = (thumbnail: string | null | undefined): string => {
     if (thumbnail) {
@@ -152,17 +221,33 @@ const ViewPOIModal: React.FC<ViewPOIModalProps> = ({
       aria-labelledby="view-poi-title"
     >
       <div className="modal modal-scrollable" onClick={(e) => e.stopPropagation()}>
-        <div className="modal-header">
+        <div className="modal-header view-poi-modal-header">
           <h2 id="view-poi-title" className="modal-title">{poi.name}</h2>
-          <button
-            ref={closeButtonRef}
-            className="modal-close"
-            onClick={onClose}
-            aria-label={t('common.closeModal')}
-            type="button"
-          >
-            ×
-          </button>
+          <div className="view-poi-modal-header-actions">
+            <button
+              type="button"
+              className="btn btn-sm btn-secondary"
+              onClick={() => void handleShare()}
+            >
+              {t('components.viewPOIModal.share')}
+            </button>
+            <button
+              type="button"
+              className="btn btn-sm btn-secondary"
+              onClick={() => void handleCopyMapLink()}
+            >
+              {t('components.viewPOIModal.copyMapLink')}
+            </button>
+            <button
+              ref={closeButtonRef}
+              className="modal-close"
+              onClick={onClose}
+              aria-label={t('common.closeModal')}
+              type="button"
+            >
+              ×
+            </button>
+          </div>
         </div>
         <div className="modal-body">
           {poi.thumbnail && (
@@ -182,6 +267,17 @@ const ViewPOIModal: React.FC<ViewPOIModalProps> = ({
               <div className="poi-detail-item">
                 <h3 className="poi-detail-label">{t('components.viewItemDetailsModal.description')}</h3>
                 <p className="poi-detail-value">{poi.description}</p>
+              </div>
+            )}
+            {(poi.latitude != null && poi.longitude != null) && (
+              <div className="poi-detail-item">
+                <h3 className="poi-detail-label">{t('components.viewPOIDetailsModal.location')}</h3>
+                <p className="poi-detail-value poi-detail-coords">
+                  {poi.latitude.toFixed(5)}, {poi.longitude.toFixed(5)}
+                </p>
+                {distanceKm != null && (
+                  <p className="poi-detail-distance">{t('components.viewPOIModal.distanceFromYou', { distance: formatDistanceFromKm(distanceKm) })}</p>
+                )}
               </div>
             )}
             <div className="poi-detail-item">

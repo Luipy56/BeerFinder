@@ -101,7 +101,24 @@
       "addPOI": "Add point of interest",
       "viewDetails": "View Details",
       "noPOIs": "No Points of Interest",
-      "clickToCreate": "Click on the map to create your first POI"
+      "clickToCreate": "Click on the map to create your first POI",
+      "locateMe": "Zoom to my location",
+      "geolocationNotSupported": "Location is not supported in this browser.",
+      "geolocationDenied": "Could not get your location. Check permissions and try again.",
+      "poiLinkInvalid": "The POI link is invalid.",
+      "poiNotFound": "That point of interest could not be found.",
+      "searchPlace": "Search place on map",
+      "searchPlaceholder": "City, address, place…",
+      "searchButton": "Search",
+      "searchTooShort": "Type at least 3 characters to search.",
+      "searchNoResults": "No places matched your search.",
+      "searchFailed": "Search failed. Try again later.",
+      "clusterPlaces": "{{count}} POIs in this area",
+      "clusterZoomIn": "Zoom in",
+      "basemapGroup": "Map style",
+      "basemapOsm": "Standard",
+      "basemapDark": "Dark",
+      "distanceAway": "{{distance}} away"
     },
     "items": {
       "title": "All Items",
@@ -128,7 +145,8 @@
       "poiUpdated": "POI updated successfully!",
       "failedToDelete": "Failed to delete POI. Please try again.",
       "failedToUpdate": "Failed to update POI. Please try again.",
-      "invalidPOI": "Invalid POI: missing ID"
+      "invalidPOI": "Invalid POI: missing ID",
+      "openOnMap": "Open on map"
     },
     "profile": {
       "title": "Profile",
@@ -270,7 +288,12 @@
       "noItems": "No items",
       "noItemsAssigned": "No items assigned",
       "edit": "Edit",
-      "delete": "Delete"
+      "delete": "Delete",
+      "copyMapLink": "Copy map link",
+      "mapLinkCopied": "Link copied to clipboard",
+      "share": "Share",
+      "shareFallbackCopy": "Sharing is not available here — link copied to clipboard instead.",
+      "distanceFromYou": "About {{distance}} from your location"
     },
     "viewPOIDetailsModal": {
       "items": "Items",

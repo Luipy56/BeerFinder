@@ -101,7 +101,24 @@
       "addPOI": "Añadir punto de interés",
       "viewDetails": "Ver detalles",
       "noPOIs": "Sin puntos de interés",
-      "clickToCreate": "Haz clic en el mapa para crear tu primer POI"
+      "clickToCreate": "Haz clic en el mapa para crear tu primer POI",
+      "locateMe": "Acercar a mi ubicación",
+      "geolocationNotSupported": "Tu navegador no permite la geolocalización.",
+      "geolocationDenied": "No se pudo obtener tu ubicación. Revisa los permisos e inténtalo de nuevo.",
+      "poiLinkInvalid": "El enlace al POI no es válido.",
+      "poiNotFound": "No se encontró ese punto de interés.",
+      "searchPlace": "Buscar lugar en el mapa",
+      "searchPlaceholder": "Ciudad, dirección, lugar…",
+      "searchButton": "Buscar",
+      "searchTooShort": "Escribe al menos 3 caracteres para buscar.",
+      "searchNoResults": "No hay resultados para tu búsqueda.",
+      "searchFailed": "La búsqueda falló. Inténtalo más tarde.",
+      "clusterPlaces": "{{count}} POIs en esta zona",
+      "clusterZoomIn": "Acercar",
+      "basemapGroup": "Estilo del mapa",
+      "basemapOsm": "Estándar",
+      "basemapDark": "Oscuro",
+      "distanceAway": "A {{distance}}"
     },
     "items": {
       "title": "Todos los items",
@@ -128,7 +145,8 @@
       "poiUpdated": "POI actualizado correctamente.",
       "failedToDelete": "Error al eliminar el POI. Inténtalo de nuevo.",
       "failedToUpdate": "Error al actualizar el POI. Inténtalo de nuevo.",
-      "invalidPOI": "POI no válido: falta ID"
+      "invalidPOI": "POI no válido: falta ID",
+      "openOnMap": "Abrir en el mapa"
     },
     "profile": {
       "title": "Perfil",
@@ -270,7 +288,12 @@
       "noItems": "Sin items",
       "noItemsAssigned": "Sin items asignados",
       "edit": "Editar",
-      "delete": "Eliminar"
+      "delete": "Eliminar",
+      "copyMapLink": "Copiar enlace del mapa",
+      "mapLinkCopied": "Enlace copiado al portapapeles",
+      "share": "Compartir",
+      "shareFallbackCopy": "Compartir no está disponible — se copió el enlace al portapapeles.",
+      "distanceFromYou": "A unos {{distance}} de tu ubicación"
     },
     "viewPOIDetailsModal": {
       "items": "Items",

@@ -6,6 +6,169 @@
   /* Removed z-index to prevent stacking context issues with modals */
 }
 
+/* “My location” control (portal inside .leaflet-container) */
+.map-container .map-locate-control {
+  position: absolute;
+  z-index: 1000;
+  bottom: 24px;
+  right: 12px;
+}
+
+.map-locate-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--color-border, #ccc);
+  border-radius: var(--radius-md, 6px);
+  background: var(--color-block-white, #fff);
+  color: var(--color-text, #222);
+  box-shadow: var(--shadow-md, 0 2px 6px rgba(0, 0, 0, 0.15));
+  cursor: pointer;
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.map-locate-button:hover {
+  background: var(--color-block-above, #f5f5f5);
+  box-shadow: var(--shadow-lg, 0 4px 10px rgba(0, 0, 0, 0.2));
+}
+
+.map-locate-button:focus-visible {
+  outline: 2px solid var(--color-primary, #2563eb);
+  outline-offset: 2px;
+}
+
+/* Simple target icon (no extra assets) */
+.map-locate-icon {
+  display: block;
+  width: 18px;
+  height: 18px;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.map-locate-icon::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 4px;
+  height: 4px;
+  margin: -2px 0 0 -2px;
+  background: currentColor;
+  border-radius: 50%;
+}
+
+/* Geocode (Nominatim via backend proxy) */
+.map-geocode-control {
+  position: absolute;
+  z-index: 1000;
+  top: 12px;
+  left: 12px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--spacing-xs, 6px);
+  max-width: min(380px, calc(100vw - 88px));
+}
+
+.map-geocode-input {
+  flex: 1;
+  min-width: 0;
+  padding: var(--spacing-sm, 8px) var(--spacing-md, 10px);
+  border: 1px solid var(--color-border, #ccc);
+  border-radius: var(--radius-md, 6px);
+  background: var(--color-block-white, #fff);
+  color: var(--color-text, #222);
+  font-size: var(--font-size-sm, 14px);
+  font-family: var(--font-family, inherit);
+  box-shadow: var(--shadow-md, 0 2px 6px rgba(0, 0, 0, 0.12));
+}
+
+.map-geocode-input:focus {
+  outline: 2px solid var(--color-primary, #2563eb);
+  outline-offset: 1px;
+}
+
+.map-geocode-submit {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+/* Basemap style (Standard vs Carto dark) — common in map / venue apps */
+.map-basemap-control {
+  position: absolute;
+  z-index: 1000;
+  bottom: 72px;
+  left: 12px;
+  display: flex;
+  border-radius: var(--radius-md, 6px);
+  overflow: hidden;
+  box-shadow: var(--shadow-md, 0 2px 6px rgba(0, 0, 0, 0.15));
+  border: 1px solid var(--color-border, #ccc);
+}
+
+.map-basemap-segment {
+  padding: 6px 10px;
+  font-size: var(--font-size-xs, 12px);
+  font-weight: 600;
+  border: none;
+  background: var(--color-block-white, #fff);
+  color: var(--color-text-secondary, #555);
+  cursor: pointer;
+  font-family: var(--font-family, inherit);
+}
+
+.map-basemap-segment + .map-basemap-segment {
+  border-left: 1px solid var(--color-border, #ccc);
+}
+
+.map-basemap-segment-active {
+  background: var(--color-primary, #2563eb);
+  color: #fff;
+}
+
+.map-basemap-segment:focus-visible {
+  outline: 2px solid var(--color-primary, #2563eb);
+  outline-offset: 2px;
+  z-index: 1;
+}
+
+.poi-popup-distance {
+  margin: 0.35rem 0 0 0;
+  font-size: var(--font-size-xs, 12px);
+  color: var(--color-text-secondary, #666);
+  font-weight: 600;
+}
+
+/* Grid-based cluster markers (no leaflet.markercluster plugin) */
+.leaflet-div-icon.map-cluster-marker {
+  background: var(--color-primary, #2563eb);
+  border: 2px solid rgba(255, 255, 255, 0.95);
+  border-radius: 50%;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow-md, 0 2px 8px rgba(0, 0, 0, 0.2));
+}
+
+.map-cluster-marker-count {
+  color: #fff;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1;
+}
+
+.map-cluster-popup-text {
+  margin: 0 0 var(--spacing-sm, 8px) 0;
+  font-size: var(--font-size-sm, 14px);
+  color: var(--color-text, #222);
+}
+
 /* Map pane background in dark mode so it's not white while tiles load */
 html[data-theme="dark"] .map-container .leaflet-container {
   background: var(--color-block-above);

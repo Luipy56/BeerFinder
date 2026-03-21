@@ -1,0 +1,25 @@
+---
+description: No Co-authored-by, Cursor/agent branding, or advertising in commits or agent output
+alwaysApply: true
+---
+
+# Commits and output: no branding or advertising
+
+1. **Git commits** — Do not add `Co-authored-by:` trailers, “Generated with …”, tool names, or any attribution to Cursor, cursor-agent, or other AI/agent products. Write messages as a human maintainer would: what changed and why, nothing promotional.
+
+2. **PR / changelog text** — Same rule: no tool plugs, no “this PR was created by …”, no affiliate-style mentions.
+
+3. **General agent output** — Do not advertise Cursor or any product; do not append signatures, footers, or boilerplate that promotes a tool or service. Stay task-focused.
+
+**Examples**
+
+```text
+❌ BAD commit body
+Co-authored-by: Cursor <noreply@cursor.com>
+🤖 Generated with Cursor
+
+✅ GOOD commit body
+Fix map test flake by waiting for MapContainer after POIs load.
+```
+
+If the user explicitly asks for a specific attribution line, follow their instruction; otherwise omit all of the above.

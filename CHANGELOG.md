@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Map: OSM-aligned zoom limits (`minZoom` 3, `maxZoom` 19), locate control (fly to GPS at zoom 18), shareable POI URLs `/?poi=<id>` with fetch-by-id fallback
+- Map: grid-based POI clustering when map zoom is below 12; place search via Nominatim proxy `GET /api/v1/geocode/?q=` and `MapGeocodeControl`
+- Competitor-style UX: Web Share + distance-from-you in POI modal and popups; OSM / Carto dark basemap toggle; `geoUtils` tests; [`docs/COMPETITOR_FEATURES.md`](docs/COMPETITOR_FEATURES.md)
+- POIs list: link “Open on map” to `/?poi=<id>` (deep link)
+- View POI modal: copy shareable map link (clipboard)
+- Colocated frontend tests: `frontend/src/components/__tests__/MapComponent.test.tsx`
 - Initial project structure
 - Frontend React application with TypeScript
 - Backend Django REST API

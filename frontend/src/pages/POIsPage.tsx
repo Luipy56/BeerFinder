@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import { useToast } from '../contexts/ToastContext';
@@ -242,6 +242,13 @@ const POIsPage: React.FC = () => {
                       {poi.latitude?.toFixed(4)}, {poi.longitude?.toFixed(4)}
                     </span>
                   </div>
+                  <Link
+                    className="poi-card-map-link"
+                    to={`/?poi=${poi.id}`}
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {t('pages.pois.openOnMap')}
+                  </Link>
                   {poi.items && poi.items.length > 0 && (
                     <div className="poi-card-items-count">
                       {poi.items.length} item{poi.items.length !== 1 ? 's' : ''} assigned

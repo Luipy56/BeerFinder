@@ -123,6 +123,19 @@ USE_TZ = True
 STATIC_URL = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
+# Nominatim geocode proxy — use a reachable contact URL or email in production
+NOMINATIM_USER_AGENT = env(
+    'NOMINATIM_USER_AGENT',
+    default='BeerFinder/1.0 (https://github.com/BeerFinder; geocode proxy)',
+)
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'beerfinder-cache',
+    }
+}
+
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 

@@ -270,6 +270,8 @@ The dev compose does not include a database container. The backend uses MariaDB/
 ## Additional Documentation
 
 For more detailed information, see:
+- [Roadmap index](docs/ROADMAP_INDEX.md) — planning docs (features, waves, engineering)
+- [Competitor feature parity](docs/COMPETITOR_FEATURES.md) — map, distance, share, dark basemap
 - [Frontend Documentation](frontend/README.md) - React and TypeScript guide
 - [Backend Documentation](backend/README.md) - Django and API guide
 - [Database Documentation](database/README.md) - Database setup and usage

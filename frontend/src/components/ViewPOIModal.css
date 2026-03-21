@@ -1,3 +1,37 @@
+.view-poi-modal-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--spacing-md);
+}
+
+.view-poi-modal-header .modal-title {
+  flex: 1;
+  min-width: 0;
+}
+
+.view-poi-modal-header-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  max-width: min(100%, 280px);
+}
+
+.poi-detail-coords {
+  font-family: monospace;
+  font-size: var(--font-size-sm);
+}
+
+.poi-detail-distance {
+  margin: var(--spacing-xs) 0 0 0;
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  font-weight: 600;
+}
+
 .poi-details {
   display: flex;
   flex-direction: column;

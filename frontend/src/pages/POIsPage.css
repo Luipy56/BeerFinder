@@ -170,6 +170,26 @@
   font-family: monospace;
 }
 
+.poi-card-map-link {
+  display: inline-block;
+  margin-top: var(--spacing-sm);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  color: var(--color-primary);
+  text-decoration: none;
+  align-self: flex-start;
+}
+
+.poi-card-map-link:hover {
+  text-decoration: underline;
+}
+
+.poi-card-map-link:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
 .poi-card-items-count {
   margin-top: var(--spacing-xs);
   padding: var(--spacing-xs) var(--spacing-sm);

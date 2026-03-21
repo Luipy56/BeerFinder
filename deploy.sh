@@ -1,6 +1,8 @@
 #!/bin/sh
 set -e
 
+docker-compose -f docker-compose.prod.yml down -v
+
 # Evitar timeout en build del frontend en prod (por defecto 60s)
 export COMPOSE_HTTP_TIMEOUT=200
 

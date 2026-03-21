@@ -1,0 +1,22 @@
+---
+description: After implementing changes, run the app and verify routes (no 5xx/404 regressions)
+alwaysApply: true
+---
+
+# Post-implementation: run and smoke-test
+
+After **every** non-trivial implementation (features, routes, API changes, env wiring):
+
+1. **Run the stack** the way this repo expects (e.g. `docker compose -f docker-compose.dev.yml up` or the project’s documented dev command). Confirm backend and frontend start without crash loops.
+
+2. **Exercise the UI flows** touched by the change (happy path + one failure path if relevant): load pages, submit forms, open modals.
+
+3. **Check HTTP behavior** for affected areas:
+   - No **500** responses on API calls or document navigations you rely on.
+   - No unintended **404** on new or renamed routes, static assets, or API paths (watch the browser Network tab or server logs).
+
+4. **Broad sweep when the change is routing-wide:** hit main frontend routes (map, auth, POIs, items, profile, etc.) and core API endpoints used by those pages; fix anything that regressed before considering the task done.
+
+5. **Run automated tests** when they exist for the changed area (`tests/` frontend or backend); add or extend tests if you introduced new behavior that should stay covered.
+
+If Docker or the network is unavailable in the environment, say so explicitly and list the exact commands and URLs you would run so the human can verify locally.

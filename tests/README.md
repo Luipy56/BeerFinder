@@ -24,8 +24,7 @@ tests/
 ├── backend/          # Backend (Django) tests
 │   ├── test_poi_api.py
 │   └── test_item_api.py
-├── frontend/         # Frontend (React) tests
-│   ├── MapComponent.test.tsx
+├── frontend/         # Legacy / mirror: prefer colocated tests under frontend/src/**/__tests__/
 │   └── poiService.test.ts
 ├── integration/      # Integration tests
 │   └── test_api_integration.py
@@ -59,6 +58,8 @@ python manage.py test tests.backend.test_poi_api.POIAPITestCase.test_create_poi
 
 ### Frontend Tests
 
+Map and component tests live under `frontend/src/**/__tests__/` (CRA picks them up from `frontend/`).
+
 **Using Docker:**
 ```bash
 docker-compose exec frontend npm test
@@ -67,8 +68,26 @@ docker-compose exec frontend npm test
 **Locally:**
 ```bash
 cd frontend
+npm install   # if node_modules is missing or incomplete
 npm test
 ```
+
+**One-shot CI-style run:**
+```bash
+cd frontend && CI=true npm test -- --watchAll=false
+```
+
+`jest.moduleNameMapper` maps `react-i18next` to `src/__mocks__/react-i18next.ts` so tests run even if i18n resolution fails in some environments.
+
+`@testing-library/react` (and related) are listed under `devDependencies` in `frontend/package.json`. If `npm test` fails with “Cannot find module '@testing-library/react'”, run `npm install` in `frontend` and fix ownership of `node_modules` if you see `EACCES`.
+
+### Backend geocode proxy tests
+
+```bash
+cd backend && python manage.py test tests.backend.test_geocode_api
+```
+
+(Requires Django and DB settings as for other API tests.)
 
 **Run tests in watch mode:**
 ```bash
